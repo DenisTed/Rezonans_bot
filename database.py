@@ -24,6 +24,17 @@ def init_db():
     """)
 
     cursor.execute("""
+    CREATE TABLE IF NOT EXISTS shows (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        show_date TEXT,
+        show_time TEXT,
+        description TEXT,
+        is_active INTEGER DEFAULT 1
+    )
+    """)
+
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS ticket_orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         telegram_id INTEGER,
@@ -69,6 +80,35 @@ def get_all_users():
     return users
 
 
+def add_show(title, show_date, show_time, description=""):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    INSERT INTO shows (title, show_date, show_time, description)
+    VALUES (?, ?, ?, ?)
+    """, (title, show_date, show_time, description))
+
+    conn.commit()
+    conn.close()
+
+
+def get_active_shows():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT id, title, show_date, show_time, description
+    FROM shows
+    WHERE is_active = 1
+    ORDER BY id DESC
+    """)
+
+    shows = cursor.fetchall()
+    conn.close()
+    return shows
+
+
 def add_ticket_order(telegram_id, customer_name, phone, show_name, ticket_count, comment):
     conn = get_connection()
     cursor = conn.cursor()
@@ -76,9 +116,9 @@ def add_ticket_order(telegram_id, customer_name, phone, show_name, ticket_count,
     cursor.execute("""
     INSERT INTO ticket_orders (
         telegram_id, customer_name, phone, show_name,
-        ticket_count, comment, created_at
+        ticket_count, comment, created_at, status
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 'new')
     """, (
         telegram_id,
         customer_name,
@@ -89,8 +129,11 @@ def add_ticket_order(telegram_id, customer_name, phone, show_name, ticket_count,
         datetime.now().isoformat()
     ))
 
+    order_id = cursor.lastrowid
+
     conn.commit()
     conn.close()
+    return order_id
 
 
 def get_last_orders(limit=20):
@@ -98,7 +141,7 @@ def get_last_orders(limit=20):
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT telegram_id, customer_name, phone, show_name,
+    SELECT id, telegram_id, customer_name, phone, show_name,
            ticket_count, comment, created_at, status
     FROM ticket_orders
     ORDER BY id DESC
@@ -108,3 +151,52 @@ def get_last_orders(limit=20):
     orders = cursor.fetchall()
     conn.close()
     return orders
+
+
+def get_user_orders(telegram_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT id, show_name, ticket_count, comment, created_at, status
+    FROM ticket_orders
+    WHERE telegram_id = ?
+    ORDER BY id DESC
+    """, (telegram_id,))
+
+    orders = cursor.fetchall()
+    conn.close()
+    return orders
+
+
+def update_order_status(order_id, status):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    UPDATE ticket_orders
+    SET status = ?
+    WHERE id = ?
+    """, (status, order_id))
+
+    updated = cursor.rowcount
+
+    conn.commit()
+    conn.close()
+    return updated > 0
+
+
+def get_order_by_id(order_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT id, telegram_id, customer_name, phone, show_name,
+           ticket_count, comment, created_at, status
+    FROM ticket_orders
+    WHERE id = ?
+    """, (order_id,))
+
+    order = cursor.fetchone()
+    conn.close()
+    return order
