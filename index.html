@@ -3,94 +3,279 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Мій Telegram Web App</title>
+  <title>Театр Резонанс</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      padding: 20px;
       font-family: Arial, sans-serif;
-      background: #f4f6f8;
+      background: linear-gradient(180deg, #1a0f0f 0%, #2b1616 100%);
+      color: #f8f1e7;
     }
 
-    .container {
-      max-width: 450px;
+    .app {
+      max-width: 480px;
       margin: 0 auto;
+      padding: 16px;
     }
 
-    .card {
-      background: white;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    }
-
-    h1 {
-      margin-top: 0;
-      font-size: 24px;
+    .hero {
+      background: linear-gradient(135deg, #5c1010, #8b1e1e);
+      border-radius: 20px;
+      padding: 24px 18px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
       text-align: center;
+      margin-bottom: 18px;
     }
 
-    p {
-      text-align: center;
-      color: #555;
-      margin-bottom: 20px;
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      letter-spacing: 1px;
     }
 
-    .buttons {
+    .hero p {
+      margin: 0;
+      color: #f4d9b6;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .menu {
       display: grid;
-      gap: 12px;
-      margin-top: 20px;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
     }
 
-    button {
+    .menu button {
       border: none;
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 16px;
+      border-radius: 14px;
+      padding: 14px 10px;
+      font-size: 15px;
+      font-weight: bold;
       cursor: pointer;
+      background: #f4d9b6;
+      color: #4b1111;
       transition: 0.2s;
     }
 
-    button:hover {
+    .menu button:hover {
       transform: translateY(-1px);
     }
 
-    .menu-btn {
-      background: #e9eef5;
+    .card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
     }
 
-    .send-btn {
-      background: #2ea6ff;
-      color: white;
+    .card h2 {
+      margin-top: 0;
+      font-size: 22px;
+      color: #ffd9a0;
     }
 
-    .result {
-      margin-top: 20px;
-      padding: 14px;
-      background: #f8fafc;
+    .item {
+      background: rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .item strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 16px;
+      color: #fff2d8;
+    }
+
+    .item span {
+      display: block;
+      color: #f2dfc5;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .ticket-form input,
+    .ticket-form select,
+    .ticket-form textarea {
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 12px;
       border-radius: 12px;
-      min-height: 40px;
-      color: #222;
+      border: none;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .ticket-form textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .ticket-form button {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      background: #d9a441;
+      color: #2d1616;
+      cursor: pointer;
+    }
+
+    .contacts p {
+      margin: 6px 0;
+      line-height: 1.5;
+      color: #f2dfc5;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 13px;
+      color: #d8bfa5;
+      padding: 8px 0 18px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="card">
-      <h1>Меню бота</h1>
-      <p>Оберіть розділ або надішліть дані назад у Telegram</p>
+  <div class="app">
+    <div class="hero">
+      <h1>Театр “Резонанс”</h1>
+      <p>
+        Афіша, прем’єри, колектив, квитки та всі театральні новини —
+        в одному зручному інтерфейсі.
+      </p>
+    </div>
 
-      <div class="buttons">
-        <button class="menu-btn" onclick="showSection('profile')">Какашка</button>
-        <button class="menu-btn" onclick="showSection('schedule')">Розклад</button>
-        <button class="menu-btn" onclick="showSection('homework')">Домашнє завдання</button>
-        <button class="send-btn" onclick="sendData()">Надіслати дані боту</button>
-      </div>
+    <div class="menu">
+      <button onclick="showSection('team')">Колектив</button>
+      <button onclick="showSection('shows')">Вистави</button>
+      <button onclick="showSection('premieres')">Прем’єри</button>
+      <button onclick="showSection('tickets')">Квитки</button>
+      <button onclick="showSection('contacts')">Контакти</button>
+      <button onclick="showSection('about')">Про театр</button>
+    </div>
 
-      <div class="result" id="result">
-        Тут буде показано вибраний розділ.
+    <div id="about" class="card">
+      <h2>Про театр</h2>
+      <div class="item">
+        <strong>Ласкаво просимо до театру “Резонанс”</strong>
+        <span>
+          Тут можна дізнатися про колектив, переглянути вистави,
+          слідкувати за прем’єрами та залишити заявку на квитки.
+        </span>
       </div>
+    </div>
+
+    <div id="team" class="card hidden">
+      <h2>Хто в колективі</h2>
+      <div class="item">
+        <strong>Олена Коваль</strong>
+        <span>Художній керівник</span>
+      </div>
+      <div class="item">
+        <strong>Андрій Мельник</strong>
+        <span>Режисер-постановник</span>
+      </div>
+      <div class="item">
+        <strong>Марія Савчук</strong>
+        <span>Акторка провідного складу</span>
+      </div>
+      <div class="item">
+        <strong>Ігор Бондар</strong>
+        <span>Актор, сценічний рух</span>
+      </div>
+      <div class="item">
+        <strong>Наталія Гринь</strong>
+        <span>Костюмер та адміністратор вистав</span>
+      </div>
+    </div>
+
+    <div id="shows" class="card hidden">
+      <h2>Вистави</h2>
+      <div class="item">
+        <strong>“Тіні старого міста”</strong>
+        <span>Драма • 12 квітня • 18:00</span>
+      </div>
+      <div class="item">
+        <strong>“Сміх крізь куліси”</strong>
+        <span>Комедія • 18 квітня • 17:30</span>
+      </div>
+      <div class="item">
+        <strong>“Коли мовчать дзвони”</strong>
+        <span>Психологічна вистава • 24 квітня • 18:30</span>
+      </div>
+    </div>
+
+    <div id="premieres" class="card hidden">
+      <h2>Прем’єри</h2>
+      <div class="item">
+        <strong>Прем’єра: “Лінія світла”</strong>
+        <span>5 травня • 18:00</span>
+      </div>
+      <div class="item">
+        <strong>Прем’єра: “Після оплесків”</strong>
+        <span>19 травня • 18:30</span>
+      </div>
+      <div class="item">
+        <strong>Скоро анонс</strong>
+        <span>Нова музично-драматична постановка сезону</span>
+      </div>
+    </div>
+
+    <div id="tickets" class="card hidden">
+      <h2>Купити квитки</h2>
+      <form class="ticket-form" onsubmit="sendTicketRequest(event)">
+        <input type="text" id="name" placeholder="Ваше ім’я" required />
+        
+        <select id="show" required>
+          <option value="">Оберіть виставу</option>
+          <option value="Тіні старого міста">Тіні старого міста</option>
+          <option value="Сміх крізь куліси">Сміх крізь куліси</option>
+          <option value="Коли мовчать дзвони">Коли мовчать дзвони</option>
+          <option value="Лінія світла">Лінія світла</option>
+          <option value="Після оплесків">Після оплесків</option>
+        </select>
+
+        <select id="count" required>
+          <option value="">Кількість квитків</option>
+          <option value="1">1 квиток</option>
+          <option value="2">2 квитки</option>
+          <option value="3">3 квитки</option>
+          <option value="4">4 квитки</option>
+          <option value="5">5 квитків</option>
+        </select>
+
+        <textarea id="comment" placeholder="Коментар або побажання"></textarea>
+
+        <button type="submit">Надіслати заявку</button>
+      </form>
+    </div>
+
+    <div id="contacts" class="card hidden contacts">
+      <h2>Контакти</h2>
+      <p><strong>Адреса:</strong> м. Кропивницький, вул. Театральна, 12</p>
+      <p><strong>Телефон:</strong> +38 (050) 123-45-67</p>
+      <p><strong>Email:</strong> rezonans.theatre@gmail.com</p>
+      <p><strong>Графік:</strong> Пн–Сб, 10:00–19:00</p>
+    </div>
+
+    <div class="footer-note">
+      Театр “Резонанс” • сцена, емоції, прем’єри
     </div>
   </div>
 
@@ -98,46 +283,35 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    let selectedSection = "";
+    const sections = ["about", "team", "shows", "premieres", "tickets", "contacts"];
 
-    function showSection(section) {
-      const result = document.getElementById("result");
-      selectedSection = section;
-
-      if (section === "profile") {
-        result.innerHTML = `
-          <strong>Профіль</strong><br>
-          Ім’я: Учень<br>
-          Статус: Активний
-        `;
-      }
-
-      if (section === "schedule") {
-        result.innerHTML = `
-          <strong>Розклад</strong><br>
-          Понеділок: Excel<br>
-          Вівторок: HTML<br>
-          Середа: Scratch
-        `;
-      }
-
-      if (section === "homework") {
-        result.innerHTML = `
-          <strong>Домашнє завдання</strong><br>
-          Створити таблицю в Excel та оформити її.
-        `;
-      }
+    function showSection(id) {
+      sections.forEach(section => {
+        document.getElementById(section).classList.add("hidden");
+      });
+      document.getElementById(id).classList.remove("hidden");
     }
 
-    function sendData() {
-      if (!selectedSection) {
-        alert("Спочатку оберіть розділ");
+    function sendTicketRequest(event) {
+      event.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const show = document.getElementById("show").value;
+      const count = document.getElementById("count").value;
+      const comment = document.getElementById("comment").value.trim();
+
+      if (!name || !show || !count) {
+        alert("Будь ласка, заповніть основні поля.");
         return;
       }
 
       const data = {
-        action: "menu_click",
-        section: selectedSection
+        action: "ticket_request",
+        theatre: "Резонанс",
+        name: name,
+        show: show,
+        count: count,
+        comment: comment
       };
 
       tg.sendData(JSON.stringify(data));
