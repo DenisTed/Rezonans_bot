@@ -20,6 +20,7 @@ def init_db():
         username TEXT,
         phone TEXT,
         registered_at TEXT,
+        is_registered INTEGER DEFAULT 0,
         is_active INTEGER DEFAULT 1
     )
     """)
@@ -49,6 +50,15 @@ def init_db():
     )
     """)
 
+    cursor.execute("PRAGMA table_info(users)")
+    columns = [row[1] for row in cursor.fetchall()]
+
+    if "phone" not in columns:
+        cursor.execute("ALTER TABLE users ADD COLUMN phone TEXT")
+
+    if "is_registered" not in columns:
+        cursor.execute("ALTER TABLE users ADD COLUMN is_registered INTEGER DEFAULT 0")
+
     conn.commit()
     conn.close()
 
@@ -66,13 +76,15 @@ def add_user(telegram_id, first_name, username):
     conn.close()
 
 
-def update_user_phone(telegram_id, phone):
+def register_user(telegram_id, first_name, phone):
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-    UPDATE users SET phone = ? WHERE telegram_id = ?
-    """, (phone, telegram_id))
+    UPDATE users
+    SET first_name = ?, phone = ?, is_registered = 1
+    WHERE telegram_id = ?
+    """, (first_name, phone, telegram_id))
 
     conn.commit()
     conn.close()
@@ -83,7 +95,7 @@ def get_user(telegram_id):
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT telegram_id, first_name, username, phone, registered_at
+    SELECT telegram_id, first_name, username, phone, registered_at, is_registered
     FROM users
     WHERE telegram_id = ?
     """, (telegram_id,))
@@ -98,7 +110,7 @@ def get_all_users():
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT telegram_id, first_name, username, phone, registered_at
+    SELECT telegram_id, first_name, username, phone, registered_at, is_registered
     FROM users
     ORDER BY id DESC
     """)
