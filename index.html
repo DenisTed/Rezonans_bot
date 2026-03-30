@@ -163,7 +163,7 @@
 
     <div class="menu">
       <button onclick="showSection('team')">Колектив</button>
-      <button onclick="showSection('shows')">Вистави</button>
+      
       <button onclick="showSection('premieres')">Прем’єри</button>
       <button onclick="showSection('tickets')">Квитки</button>
       <button onclick="showSection('contacts')">Контакти</button>
@@ -257,42 +257,49 @@
   </div>
 
   <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+  const tg = window.Telegram.WebApp;
+  tg.expand();
 
-    const sections = ["about", "team", "shows", "premieres", "tickets", "contacts"];
+  const sections = ["about", "team", "premieres", "tickets", "contacts"];
 
-    function showSection(id) {
-      sections.forEach(section => {
-        document.getElementById(section).classList.add("hidden");
-      });
-      document.getElementById(id).classList.remove("hidden");
-    }
-
-    function sendTicketRequest(event) {
-      event.preventDefault();
-
-      const name = document.getElementById("name").value.trim();
-      const show = document.getElementById("show").value;
-      const count = document.getElementById("count").value;
-      const comment = document.getElementById("comment").value.trim();
-
-      if (!name || !show || !count) {
-        alert("Будь ласка, заповніть основні поля.");
-        return;
+  function showSection(id) {
+    sections.forEach(section => {
+      const el = document.getElementById(section);
+      if (el) {
+        el.classList.add("hidden");
       }
+    });
 
-      const data = {
-        action: "ticket_request",
-        theatre: "Резонанс",
-        name: name,
-        show: show,
-        count: count,
-        comment: comment
-      };
-
-      tg.sendData(JSON.stringify(data));
+    const activeSection = document.getElementById(id);
+    if (activeSection) {
+      activeSection.classList.remove("hidden");
     }
-  </script>
+  }
+
+  function sendTicketRequest(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const show = document.getElementById("show").value;
+    const count = document.getElementById("count").value;
+    const comment = document.getElementById("comment").value.trim();
+
+    if (!name || !show || !count) {
+      alert("Будь ласка, заповніть основні поля.");
+      return;
+    }
+
+    const data = {
+      action: "ticket_request",
+      theatre: "Резонанс",
+      name: name,
+      show: show,
+      count: count,
+      comment: comment
+    };
+
+    tg.sendData(JSON.stringify(data));
+  }
+</script>
 </body>
 </html>
