@@ -14,8 +14,7 @@ from database import (
     add_user,
     get_all_users,
     add_ticket_order,
-    get_last_orders,
-    save_message
+    get_last_orders
 )
 
 support_mode_users = set()
@@ -27,8 +26,8 @@ def is_admin(user_id: int) -> bool:
 
 def get_user_keyboard():
     keyboard = [
-        ["🎭 Відкрити театр", "💬 Написати адміну"],
-        ["📞 Контакти", "ℹ️ Допомога"]
+        ["Відкрити театр", "Написати адміну"],
+        ["Контакти", "Допомога"]
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
@@ -44,7 +43,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(
         f"Вітаємо, {user.first_name}!\n\n"
-        f"Це бот театру “Резонанс”.\n"
+        f"Ви зареєстровані в боті театру “Резонанс”.\n"
         f"Оберіть дію кнопками нижче.",
         reply_markup=get_user_keyboard()
     )
@@ -52,7 +51,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def open_theatre(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("🎭 Відкрити інтерфейс театру", web_app=WebAppInfo(url=WEB_APP_URL))]
+        [InlineKeyboardButton("Відкрити інтерфейс театру", web_app=WebAppInfo(url=WEB_APP_URL))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -68,13 +67,13 @@ async def support(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(
         "Напишіть повідомлення адміністратору.\n"
-        "Щоб вийти з цього режиму, натисніть /cancel"
+        "Для виходу з режиму використайте /cancel"
     )
 
 
 async def contacts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "📞 Контакти театру “Резонанс”:\n\n"
+        "Контакти театру “Резонанс”:\n\n"
         "Адреса: м. Кропивницький, вул. Театральна, 12\n"
         "Телефон: +38 (050) 123-45-67\n"
         "Email: rezonans.theatre@gmail.com"
@@ -83,10 +82,10 @@ async def contacts(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def help_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "ℹ️ Що можна зробити:\n\n"
-        "🎭 Відкрити театр — переглянути афішу, прем’єри, квитки\n"
-        "💬 Написати адміну — поставити питання живій людині\n"
-        "📞 Контакти — переглянути контакти театру"
+        "Що можна зробити:\n\n"
+        "Відкрити театр — переглянути афішу та квитки\n"
+        "Написати адміну — поставити питання\n"
+        "Контакти — переглянути контакти театру"
     )
 
 
@@ -110,7 +109,7 @@ async def users_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Користувачів ще немає.")
         return
 
-    text = "👥 Список користувачів:\n\n"
+    text = "Список користувачів:\n\n"
     for tg_id, first_name, username, registered_at in users[:20]:
         text += (
             f"ID: {tg_id}\n"
@@ -132,11 +131,12 @@ async def orders_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Заявок ще немає.")
         return
 
-    text = "🎟 Останні заявки:\n\n"
-    for tg_id, name, show_name, ticket_count, comment, created_at, status in orders:
+    text = "Останні заявки:\n\n"
+    for tg_id, customer_name, phone, show_name, ticket_count, comment, created_at, status in orders:
         text += (
-            f"Користувач ID: {tg_id}\n"
-            f"Ім’я: {name}\n"
+            f"User ID: {tg_id}\n"
+            f"Ім’я: {customer_name}\n"
+            f"Телефон: {phone}\n"
             f"Вистава: {show_name}\n"
             f"Квитків: {ticket_count}\n"
             f"Коментар: {comment if comment else 'немає'}\n"
@@ -166,9 +166,8 @@ async def reply_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await context.bot.send_message(
             chat_id=user_id,
-            text=f"💬 Повідомлення від адміністратора:\n\n{text}"
+            text=f"Повідомлення від адміністратора:\n\n{text}"
         )
-        save_message(user_id, 1, text)
         await update.message.reply_text("Відповідь надіслано.")
     except Exception as e:
         await update.message.reply_text(f"Не вдалося надіслати повідомлення: {e}")
@@ -192,14 +191,16 @@ async def broadcast_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             await context.bot.send_message(
                 chat_id=tg_id,
-                text=f"🎭 Новина від театру “Резонанс”:\n\n{text}"
+                text=f"Новина від театру “Резонанс”:\n\n{text}"
             )
             sent += 1
         except Exception:
             failed += 1
 
     await update.message.reply_text(
-        f"Розсилку завершено.\nУспішно: {sent}\nНе вдалося: {failed}"
+        f"Розсилку завершено.\n"
+        f"Успішно: {sent}\n"
+        f"Не вдалося: {failed}"
     )
 
 
@@ -212,19 +213,23 @@ async def handle_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE)
         action = data.get("action")
 
         if action == "ticket_request":
-            name = data.get("name", "")
+            customer_name = data.get("name", "")
+            phone = data.get("phone", "")
             show = data.get("show", "")
             count = data.get("count", "")
             comment = data.get("comment", "")
 
-            add_ticket_order(user.id, name, show, count, comment)
+            add_ticket_order(user.id, customer_name, phone, show, count, comment)
 
-            await update.message.reply_text("✅ Вашу заявку прийнято. Адміністратор зв’яжеться з вами тут у боті.")
+            await update.message.reply_text(
+                "Вашу заявку на квитки прийнято. Адміністратор зв’яжеться з вами тут у боті."
+            )
 
             admin_text = (
-                f"🎟 Нова заявка на квитки\n\n"
+                f"Нова заявка на квитки\n\n"
                 f"User ID: {user.id}\n"
-                f"Ім’я: {name}\n"
+                f"Ім’я: {customer_name}\n"
+                f"Телефон: {phone}\n"
                 f"Вистава: {show}\n"
                 f"Кількість: {count}\n"
                 f"Коментар: {comment if comment else 'немає'}"
@@ -239,32 +244,29 @@ async def handle_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    text = update.message.text
+    text = (update.message.text or "").strip()
 
-    if is_admin(user.id):
-        return
+    print(f"Натиснуто текст: {text}")
 
-    if text == "🎭 Відкрити театр":
+    if text == "Відкрити театр":
         await open_theatre(update, context)
         return
 
-    if text == "💬 Написати адміну":
+    if text == "Написати адміну":
         await support(update, context)
         return
 
-    if text == "📞 Контакти":
+    if text == "Контакти":
         await contacts(update, context)
         return
 
-    if text == "ℹ️ Допомога":
+    if text == "Допомога":
         await help_text(update, context)
         return
 
     if user.id in support_mode_users:
-        save_message(user.id, 0, text)
-
         admin_text = (
-            f"📩 Нове повідомлення адміністратору\n\n"
+            f"Нове повідомлення адміністратору\n\n"
             f"User ID: {user.id}\n"
             f"Ім’я: {user.first_name}\n"
             f"Username: @{user.username if user.username else 'немає'}\n"
@@ -293,13 +295,16 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("cancel", cancel))
 
-    # команди тільки для адміна
+    # команди адміна
     app.add_handler(CommandHandler("users", users_command))
     app.add_handler(CommandHandler("orders", orders_command))
     app.add_handler(CommandHandler("reply", reply_command))
     app.add_handler(CommandHandler("broadcast", broadcast_command))
 
+    # web app
     app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_webapp_data))
+
+    # текстові кнопки
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
     print("Бот запущено...")

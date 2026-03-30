@@ -229,6 +229,8 @@
         </select>
 
         <select id="count" required>
+          <input type="text" id="name" placeholder="Ваше ім’я" required />
+<input type="text" id="phone" placeholder="Ваш телефон" required />
           <option value="">Кількість квитків</option>
           <option value="1">1 квиток</option>
           <option value="2">2 квитки</option>
@@ -256,7 +258,7 @@
     </div>
   </div>
 
-  <script>
+<script>
   const tg = window.Telegram.WebApp;
   tg.expand();
 
@@ -280,19 +282,20 @@
     event.preventDefault();
 
     const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
     const show = document.getElementById("show").value;
     const count = document.getElementById("count").value;
     const comment = document.getElementById("comment").value.trim();
 
-    if (!name || !show || !count) {
-      alert("Будь ласка, заповніть основні поля.");
+    if (!name || !phone || !show || !count) {
+      alert("Будь ласка, заповніть усі основні поля.");
       return;
     }
 
     const data = {
       action: "ticket_request",
-      theatre: "Резонанс",
       name: name,
+      phone: phone,
       show: show,
       count: count,
       comment: comment

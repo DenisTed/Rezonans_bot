@@ -27,22 +27,13 @@ def init_db():
     CREATE TABLE IF NOT EXISTS ticket_orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         telegram_id INTEGER,
-        name TEXT,
+        customer_name TEXT,
+        phone TEXT,
         show_name TEXT,
         ticket_count INTEGER,
         comment TEXT,
         created_at TEXT,
         status TEXT DEFAULT 'new'
-    )
-    """)
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS messages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        telegram_id INTEGER,
-        from_admin INTEGER,
-        text TEXT,
-        created_at TEXT
     )
     """)
 
@@ -67,32 +58,48 @@ def get_all_users():
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT telegram_id, first_name, username, registered_at FROM users ORDER BY id DESC")
-    users = cursor.fetchall()
+    cursor.execute("""
+    SELECT telegram_id, first_name, username, registered_at
+    FROM users
+    ORDER BY id DESC
+    """)
 
+    users = cursor.fetchall()
     conn.close()
     return users
 
 
-def add_ticket_order(telegram_id, name, show_name, ticket_count, comment):
+def add_ticket_order(telegram_id, customer_name, phone, show_name, ticket_count, comment):
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-    INSERT INTO ticket_orders (telegram_id, name, show_name, ticket_count, comment, created_at)
-    VALUES (?, ?, ?, ?, ?, ?)
-    """, (telegram_id, name, show_name, ticket_count, comment, datetime.now().isoformat()))
+    INSERT INTO ticket_orders (
+        telegram_id, customer_name, phone, show_name,
+        ticket_count, comment, created_at
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (
+        telegram_id,
+        customer_name,
+        phone,
+        show_name,
+        ticket_count,
+        comment,
+        datetime.now().isoformat()
+    ))
 
     conn.commit()
     conn.close()
 
 
-def get_last_orders(limit=10):
+def get_last_orders(limit=20):
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT telegram_id, name, show_name, ticket_count, comment, created_at, status
+    SELECT telegram_id, customer_name, phone, show_name,
+           ticket_count, comment, created_at, status
     FROM ticket_orders
     ORDER BY id DESC
     LIMIT ?
@@ -101,16 +108,3 @@ def get_last_orders(limit=10):
     orders = cursor.fetchall()
     conn.close()
     return orders
-
-
-def save_message(telegram_id, from_admin, text):
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("""
-    INSERT INTO messages (telegram_id, from_admin, text, created_at)
-    VALUES (?, ?, ?, ?)
-    """, (telegram_id, from_admin, text, datetime.now().isoformat()))
-
-    conn.commit()
-    conn.close()
