@@ -1,17 +1,19 @@
-import json
-from telegram import (
-    Update,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    WebAppInfo,
-    ReplyKeyboardMarkup
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    MessageHandler,
+    ContextTypes,
+    filters,
+    ConversationHandler
 )
-from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
 
-from config import TOKEN, WEB_APP_URL, ADMINS
+from config import TOKEN, ADMINS
 from database import (
     init_db,
     add_user,
+    update_user_phone,
+    get_user,
     get_all_users,
     add_show,
     get_active_shows,
@@ -22,7 +24,13 @@ from database import (
     get_order_by_id
 )
 
-support_mode_users = set()
+REGISTER_PHONE = 1
+SUPPORT_MESSAGE = 2
+ORDER_NAME = 10
+ORDER_PHONE = 11
+ORDER_SHOW = 12
+ORDER_COUNT = 13
+ORDER_COMMENT = 14
 
 
 def is_admin(user_id: int) -> bool:
@@ -31,9 +39,9 @@ def is_admin(user_id: int) -> bool:
 
 def get_user_keyboard():
     keyboard = [
-        ["Відкрити театр", "Мої квитки"],
+        ["Зареєструватися", "Замовити квиток"],
+        ["Мої квитки", "Актуальні вистави"],
         ["Написати адміну", "Контакти"],
-        ["Допомога"]
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
@@ -49,30 +57,64 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(
         f"Вітаємо, {user.first_name}!\n\n"
-        f"Ви зареєстровані в боті театру “Резонанс”.\n"
+        f"Це бот театру “Резонанс”.\n"
         f"Оберіть дію кнопками нижче.",
         reply_markup=get_user_keyboard()
     )
 
 
-async def open_theatre(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [
-        [InlineKeyboardButton("Відкрити інтерфейс театру", web_app=WebAppInfo(url=WEB_APP_URL))]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+# ---------------- REGISTRATION ----------------
+
+async def register_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "Введіть ваш номер телефону для реєстрації:",
+        reply_markup=ReplyKeyboardRemove()
+    )
+    return REGISTER_PHONE
+
+
+async def register_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    phone = update.message.text.strip()
+    user_id = update.effective_user.id
+
+    update_user_phone(user_id, phone)
 
     await update.message.reply_text(
-        "Натисніть кнопку нижче, щоб відкрити інтерфейс театру:",
-        reply_markup=reply_markup
+        "Реєстрацію завершено.",
+        reply_markup=get_user_keyboard()
     )
+    return ConversationHandler.END
 
+
+# ---------------- SHOWS ----------------
+
+async def shows_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    shows = get_active_shows()
+
+    if not shows:
+        await update.message.reply_text("Зараз активних вистав немає.")
+        return
+
+    text = "Актуальні вистави:\n\n"
+    for show_id, title, show_date, show_time, description in shows:
+        text += (
+            f"#{show_id} {title}\n"
+            f"Дата: {show_date}\n"
+            f"Час: {show_time}\n"
+            f"Опис: {description if description else 'немає'}\n\n"
+        )
+
+    await update.message.reply_text(text)
+
+
+# ---------------- MY TICKETS ----------------
 
 async def my_tickets(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     orders = get_user_orders(user_id)
 
     if not orders:
-        await update.message.reply_text("У вас поки немає замовлень квитків.")
+        await update.message.reply_text("У вас поки немає замовлень.")
         return
 
     text = "Ваші квитки:\n\n"
@@ -89,15 +131,158 @@ async def my_tickets(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(text)
 
 
-async def support(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    support_mode_users.add(user_id)
+# ---------------- ORDER TICKET ----------------
+
+async def order_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "Введіть ваше ім’я для замовлення квитка:",
+        reply_markup=ReplyKeyboardRemove()
+    )
+    return ORDER_NAME
+
+
+async def order_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data["order_name"] = update.message.text.strip()
+    await update.message.reply_text("Введіть ваш телефон:")
+    return ORDER_PHONE
+
+
+async def order_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data["order_phone"] = update.message.text.strip()
+
+    shows = get_active_shows()
+    if not shows:
+        await update.message.reply_text(
+            "На жаль, зараз немає активних вистав.",
+            reply_markup=get_user_keyboard()
+        )
+        return ConversationHandler.END
+
+    keyboard = [[show[1]] for show in shows]
+    keyboard.append(["Скасувати"])
 
     await update.message.reply_text(
-        "Напишіть повідомлення адміністратору.\n"
-        "Для виходу з режиму використайте /cancel"
+        "Оберіть виставу:",
+        reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    )
+    return ORDER_SHOW
+
+
+async def order_show(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text.strip()
+
+    if text == "Скасувати":
+        await update.message.reply_text(
+            "Замовлення скасовано.",
+            reply_markup=get_user_keyboard()
+        )
+        return ConversationHandler.END
+
+    context.user_data["show_name"] = text
+
+    keyboard = [["1", "2", "3"], ["4", "5"], ["Скасувати"]]
+    await update.message.reply_text(
+        "Оберіть кількість квитків:",
+        reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    )
+    return ORDER_COUNT
+
+
+async def order_count(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text.strip()
+
+    if text == "Скасувати":
+        await update.message.reply_text(
+            "Замовлення скасовано.",
+            reply_markup=get_user_keyboard()
+        )
+        return ConversationHandler.END
+
+    context.user_data["ticket_count"] = text
+
+    await update.message.reply_text(
+        "Введіть коментар або напишіть '-' якщо без коментаря:",
+        reply_markup=ReplyKeyboardRemove()
+    )
+    return ORDER_COMMENT
+
+
+async def order_comment(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    comment = update.message.text.strip()
+    if comment == "-":
+        comment = ""
+
+    user = update.effective_user
+
+    order_id = add_ticket_order(
+        telegram_id=user.id,
+        customer_name=context.user_data["order_name"],
+        phone=context.user_data["order_phone"],
+        show_name=context.user_data["show_name"],
+        ticket_count=context.user_data["ticket_count"],
+        comment=comment
     )
 
+    await update.message.reply_text(
+        f"Вашу заявку №{order_id} прийнято.\n"
+        f"Статус: new",
+        reply_markup=get_user_keyboard()
+    )
+
+    admin_text = (
+        f"Нова заявка на квитки\n\n"
+        f"Заявка №{order_id}\n"
+        f"User ID: {user.id}\n"
+        f"Ім’я: {context.user_data['order_name']}\n"
+        f"Телефон: {context.user_data['order_phone']}\n"
+        f"Вистава: {context.user_data['show_name']}\n"
+        f"Кількість: {context.user_data['ticket_count']}\n"
+        f"Коментар: {comment if comment else 'немає'}\n"
+        f"Статус: new"
+    )
+
+    for admin_id in ADMINS:
+        await context.bot.send_message(chat_id=admin_id, text=admin_text)
+
+    context.user_data.clear()
+    return ConversationHandler.END
+
+
+# ---------------- SUPPORT ----------------
+
+async def support_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "Напишіть повідомлення адміністратору:",
+        reply_markup=ReplyKeyboardRemove()
+    )
+    return SUPPORT_MESSAGE
+
+
+async def support_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    text = update.message.text.strip()
+
+    admin_text = (
+        f"Нове повідомлення адміністратору\n\n"
+        f"User ID: {user.id}\n"
+        f"Ім’я: {user.first_name}\n"
+        f"Username: @{user.username if user.username else 'немає'}\n"
+        f"Текст: {text}\n\n"
+        f"Щоб відповісти:\n"
+        f"/reply {user.id} ваша відповідь"
+    )
+
+    for admin_id in ADMINS:
+        await context.bot.send_message(chat_id=admin_id, text=admin_text)
+
+    await update.message.reply_text(
+        "Ваше повідомлення передано адміністратору.",
+        reply_markup=get_user_keyboard()
+    )
+    return ConversationHandler.END
+
+
+# ---------------- INFO ----------------
 
 async def contacts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
@@ -108,42 +293,24 @@ async def contacts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def help_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "Що можна зробити:\n\n"
-        "Відкрити театр — переглянути афішу та квитки\n"
-        "Мої квитки — переглянути свої заявки\n"
-        "Написати адміну — поставити питання\n"
-        "Контакти — переглянути контакти театру"
-    )
-
-
-async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    support_mode_users.discard(user_id)
-
-    await update.message.reply_text(
-        "Режим звернення до адміністратора вимкнено.",
-        reply_markup=get_user_keyboard()
-    )
-
+# ---------------- ADMIN ----------------
 
 async def users_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_admin(update.effective_user.id):
         return
 
     users = get_all_users()
-
     if not users:
         await update.message.reply_text("Користувачів ще немає.")
         return
 
     text = "Список користувачів:\n\n"
-    for tg_id, first_name, username, registered_at in users[:20]:
+    for tg_id, first_name, username, phone, registered_at in users[:20]:
         text += (
             f"ID: {tg_id}\n"
             f"Ім’я: {first_name}\n"
             f"Username: @{username if username else 'немає'}\n"
+            f"Телефон: {phone if phone else 'немає'}\n"
             f"Реєстрація: {registered_at[:19]}\n\n"
         )
 
@@ -155,7 +322,6 @@ async def orders_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     orders = get_last_orders()
-
     if not orders:
         await update.message.reply_text("Заявок ще немає.")
         return
@@ -181,19 +347,14 @@ async def addshow_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_admin(update.effective_user.id):
         return
 
-    if len(context.args) < 3:
-        await update.message.reply_text(
-            "Формат: /addshow Назва | Дата | Час | Опис\n"
-            "Приклад:\n"
-            "/addshow Випадок у психолога | 2026-05-20 | 18:00 | Прем'єра сезону"
-        )
-        return
-
     raw = " ".join(context.args)
     parts = [p.strip() for p in raw.split("|")]
 
     if len(parts) < 3:
-        await update.message.reply_text("Мало даних. Потрібно: Назва | Дата | Час | Опис")
+        await update.message.reply_text(
+            "Формат:\n"
+            "/addshow Назва | Дата | Час | Опис"
+        )
         return
 
     title = parts[0]
@@ -205,25 +366,6 @@ async def addshow_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"Виставу '{title}' додано.")
 
 
-async def shows_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    shows = get_active_shows()
-
-    if not shows:
-        await update.message.reply_text("Активних вистав поки немає.")
-        return
-
-    text = "Актуальні вистави:\n\n"
-    for show_id, title, show_date, show_time, description in shows:
-        text += (
-            f"#{show_id} {title}\n"
-            f"Дата: {show_date}\n"
-            f"Час: {show_time}\n"
-            f"Опис: {description if description else 'немає'}\n\n"
-        )
-
-    await update.message.reply_text(text)
-
-
 async def confirm_order_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_admin(update.effective_user.id):
         return
@@ -232,22 +374,14 @@ async def confirm_order_command(update: Update, context: ContextTypes.DEFAULT_TY
         await update.message.reply_text("Формат: /confirm_order order_id")
         return
 
-    try:
-        order_id = int(context.args[0])
-    except ValueError:
-        await update.message.reply_text("order_id має бути числом.")
-        return
-
+    order_id = int(context.args[0])
     order = get_order_by_id(order_id)
+
     if not order:
         await update.message.reply_text("Заявку не знайдено.")
         return
 
-    updated = update_order_status(order_id, "confirmed")
-    if not updated:
-        await update.message.reply_text("Не вдалося оновити статус.")
-        return
-
+    update_order_status(order_id, "confirmed")
     _, user_id, customer_name, _, show_name, ticket_count, _, _, _ = order
 
     await update.message.reply_text(f"Заявка №{order_id} підтверджена.")
@@ -256,7 +390,7 @@ async def confirm_order_command(update: Update, context: ContextTypes.DEFAULT_TY
         await context.bot.send_message(
             chat_id=user_id,
             text=(
-                f"Вашу заявку №{order_id} підтверджено.\n\n"
+                f"Вашу заявку №{order_id} підтверджено.\n"
                 f"Вистава: {show_name}\n"
                 f"Кількість квитків: {ticket_count}\n"
                 f"Глядач: {customer_name}"
@@ -274,22 +408,14 @@ async def cancel_order_command(update: Update, context: ContextTypes.DEFAULT_TYP
         await update.message.reply_text("Формат: /cancel_order order_id")
         return
 
-    try:
-        order_id = int(context.args[0])
-    except ValueError:
-        await update.message.reply_text("order_id має бути числом.")
-        return
-
+    order_id = int(context.args[0])
     order = get_order_by_id(order_id)
+
     if not order:
         await update.message.reply_text("Заявку не знайдено.")
         return
 
-    updated = update_order_status(order_id, "canceled")
-    if not updated:
-        await update.message.reply_text("Не вдалося оновити статус.")
-        return
-
+    update_order_status(order_id, "canceled")
     _, user_id, customer_name, _, show_name, ticket_count, _, _, _ = order
 
     await update.message.reply_text(f"Заявка №{order_id} скасована.")
@@ -298,7 +424,7 @@ async def cancel_order_command(update: Update, context: ContextTypes.DEFAULT_TYP
         await context.bot.send_message(
             chat_id=user_id,
             text=(
-                f"Вашу заявку №{order_id} скасовано.\n\n"
+                f"Вашу заявку №{order_id} скасовано.\n"
                 f"Вистава: {show_name}\n"
                 f"Кількість квитків: {ticket_count}\n"
                 f"Глядач: {customer_name}"
@@ -316,12 +442,7 @@ async def reply_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Формат: /reply user_id текст")
         return
 
-    try:
-        user_id = int(context.args[0])
-    except ValueError:
-        await update.message.reply_text("user_id має бути числом.")
-        return
-
+    user_id = int(context.args[0])
     text = " ".join(context.args[1:])
 
     try:
@@ -331,7 +452,7 @@ async def reply_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         await update.message.reply_text("Відповідь надіслано.")
     except Exception as e:
-        await update.message.reply_text(f"Не вдалося надіслати повідомлення: {e}")
+        await update.message.reply_text(f"Помилка: {e}")
 
 
 async def broadcast_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -339,7 +460,7 @@ async def broadcast_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if not context.args:
-        await update.message.reply_text("Формат: /broadcast текст повідомлення")
+        await update.message.reply_text("Формат: /broadcast текст")
         return
 
     text = " ".join(context.args)
@@ -348,7 +469,7 @@ async def broadcast_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sent = 0
     failed = 0
 
-    for tg_id, _, _, _ in users:
+    for tg_id, _, _, _, _ in users:
         try:
             await context.bot.send_message(
                 chat_id=tg_id,
@@ -359,96 +480,32 @@ async def broadcast_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             failed += 1
 
     await update.message.reply_text(
-        f"Розсилку завершено.\n"
-        f"Успішно: {sent}\n"
-        f"Не вдалося: {failed}"
+        f"Розсилку завершено.\nУспішно: {sent}\nНе вдалося: {failed}"
     )
 
 
-async def handle_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    raw_data = update.message.web_app_data.data
-    user = update.effective_user
+# ---------------- FALLBACK ----------------
 
-    try:
-        data = json.loads(raw_data)
-        action = data.get("action")
-
-        if action == "ticket_request":
-            customer_name = data.get("name", "")
-            phone = data.get("phone", "")
-            show = data.get("show", "")
-            count = data.get("count", "")
-            comment = data.get("comment", "")
-
-            order_id = add_ticket_order(user.id, customer_name, phone, show, count, comment)
-
-            await update.message.reply_text(
-                f"Вашу заявку №{order_id} прийнято.\n"
-                f"Статус: new\n"
-                f"Адміністратор зв’яжеться з вами тут у боті."
-            )
-
-            admin_text = (
-                f"Нова заявка на квитки\n\n"
-                f"Заявка №{order_id}\n"
-                f"User ID: {user.id}\n"
-                f"Ім’я: {customer_name}\n"
-                f"Телефон: {phone}\n"
-                f"Вистава: {show}\n"
-                f"Кількість: {count}\n"
-                f"Коментар: {comment if comment else 'немає'}\n"
-                f"Статус: new"
-            )
-
-            for admin_id in ADMINS:
-                await context.bot.send_message(chat_id=admin_id, text=admin_text)
-
-    except Exception as e:
-        await update.message.reply_text(f"Помилка обробки даних: {e}")
-
-
-async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
+async def fallback_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = (update.message.text or "").strip()
 
-    print(f"Натиснуто текст: {text}")
+    if text == "Зареєструватися":
+        return await register_start(update, context)
 
-    if text == "Відкрити театр":
-        await open_theatre(update, context)
-        return
+    if text == "Замовити квиток":
+        return await order_start(update, context)
 
     if text == "Мої квитки":
-        await my_tickets(update, context)
-        return
+        return await my_tickets(update, context)
+
+    if text == "Актуальні вистави":
+        return await shows_command(update, context)
 
     if text == "Написати адміну":
-        await support(update, context)
-        return
+        return await support_start(update, context)
 
     if text == "Контакти":
-        await contacts(update, context)
-        return
-
-    if text == "Допомога":
-        await help_text(update, context)
-        return
-
-    if user.id in support_mode_users:
-        admin_text = (
-            f"Нове повідомлення адміністратору\n\n"
-            f"User ID: {user.id}\n"
-            f"Ім’я: {user.first_name}\n"
-            f"Username: @{user.username if user.username else 'немає'}\n"
-            f"Текст: {text}\n\n"
-            f"Щоб відповісти:\n"
-            f"/reply {user.id} ваша відповідь"
-        )
-
-        for admin_id in ADMINS:
-            await context.bot.send_message(chat_id=admin_id, text=admin_text)
-
-        await update.message.reply_text("Ваше повідомлення передано адміністратору.")
-        return
+        return await contacts(update, context)
 
     await update.message.reply_text(
         "Оберіть дію кнопками нижче.",
@@ -461,24 +518,49 @@ def main():
 
     app = Application.builder().token(TOKEN).build()
 
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("cancel", cancel))
+    register_handler = ConversationHandler(
+        entry_points=[MessageHandler(filters.Regex("^Зареєструватися$"), register_start)],
+        states={
+            REGISTER_PHONE: [MessageHandler(filters.TEXT & ~filters.COMMAND, register_phone)],
+        },
+        fallbacks=[CommandHandler("cancel", start)],
+    )
 
-    # команди адміна
+    order_handler = ConversationHandler(
+        entry_points=[MessageHandler(filters.Regex("^Замовити квиток$"), order_start)],
+        states={
+            ORDER_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, order_name)],
+            ORDER_PHONE: [MessageHandler(filters.TEXT & ~filters.COMMAND, order_phone)],
+            ORDER_SHOW: [MessageHandler(filters.TEXT & ~filters.COMMAND, order_show)],
+            ORDER_COUNT: [MessageHandler(filters.TEXT & ~filters.COMMAND, order_count)],
+            ORDER_COMMENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, order_comment)],
+        },
+        fallbacks=[CommandHandler("cancel", start)],
+    )
+
+    support_handler = ConversationHandler(
+        entry_points=[MessageHandler(filters.Regex("^Написати адміну$"), support_start)],
+        states={
+            SUPPORT_MESSAGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, support_message)],
+        },
+        fallbacks=[CommandHandler("cancel", start)],
+    )
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("shows", shows_command))
     app.add_handler(CommandHandler("users", users_command))
     app.add_handler(CommandHandler("orders", orders_command))
     app.add_handler(CommandHandler("addshow", addshow_command))
-    app.add_handler(CommandHandler("shows", shows_command))
     app.add_handler(CommandHandler("confirm_order", confirm_order_command))
     app.add_handler(CommandHandler("cancel_order", cancel_order_command))
     app.add_handler(CommandHandler("reply", reply_command))
     app.add_handler(CommandHandler("broadcast", broadcast_command))
 
-    # web app
-    app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_webapp_data))
+    app.add_handler(register_handler)
+    app.add_handler(order_handler)
+    app.add_handler(support_handler)
 
-    # текстові кнопки
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, fallback_text))
 
     print("Бот запущено...")
     app.run_polling()

@@ -18,6 +18,7 @@ def init_db():
         telegram_id INTEGER UNIQUE,
         first_name TEXT,
         username TEXT,
+        phone TEXT,
         registered_at TEXT,
         is_active INTEGER DEFAULT 1
     )
@@ -65,12 +66,39 @@ def add_user(telegram_id, first_name, username):
     conn.close()
 
 
+def update_user_phone(telegram_id, phone):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    UPDATE users SET phone = ? WHERE telegram_id = ?
+    """, (phone, telegram_id))
+
+    conn.commit()
+    conn.close()
+
+
+def get_user(telegram_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT telegram_id, first_name, username, phone, registered_at
+    FROM users
+    WHERE telegram_id = ?
+    """, (telegram_id,))
+
+    user = cursor.fetchone()
+    conn.close()
+    return user
+
+
 def get_all_users():
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT telegram_id, first_name, username, registered_at
+    SELECT telegram_id, first_name, username, phone, registered_at
     FROM users
     ORDER BY id DESC
     """)
@@ -130,7 +158,6 @@ def add_ticket_order(telegram_id, customer_name, phone, show_name, ticket_count,
     ))
 
     order_id = cursor.lastrowid
-
     conn.commit()
     conn.close()
     return order_id
@@ -180,7 +207,6 @@ def update_order_status(order_id, status):
     """, (status, order_id))
 
     updated = cursor.rowcount
-
     conn.commit()
     conn.close()
     return updated > 0
