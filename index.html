@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Мій Telegram Web App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+    }
+
+    .container {
+      max-width: 450px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    p {
+      text-align: center;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .buttons {
+      display: grid;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .menu-btn {
+      background: #e9eef5;
+    }
+
+    .send-btn {
+      background: #2ea6ff;
+      color: white;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 14px;
+      background: #f8fafc;
+      border-radius: 12px;
+      min-height: 40px;
+      color: #222;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Меню бота</h1>
+      <p>Оберіть розділ або надішліть дані назад у Telegram</p>
+
+      <div class="buttons">
+        <button class="menu-btn" onclick="showSection('profile')">Профіль</button>
+        <button class="menu-btn" onclick="showSection('schedule')">Розклад</button>
+        <button class="menu-btn" onclick="showSection('homework')">Домашнє завдання</button>
+        <button class="send-btn" onclick="sendData()">Надіслати дані боту</button>
+      </div>
+
+      <div class="result" id="result">
+        Тут буде показано вибраний розділ.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    let selectedSection = "";
+
+    function showSection(section) {
+      const result = document.getElementById("result");
+      selectedSection = section;
+
+      if (section === "profile") {
+        result.innerHTML = `
+          <strong>Профіль</strong><br>
+          Ім’я: Учень<br>
+          Статус: Активний
+        `;
+      }
+
+      if (section === "schedule") {
+        result.innerHTML = `
+          <strong>Розклад</strong><br>
+          Понеділок: Excel<br>
+          Вівторок: HTML<br>
+          Середа: Scratch
+        `;
+      }
+
+      if (section === "homework") {
+        result.innerHTML = `
+          <strong>Домашнє завдання</strong><br>
+          Створити таблицю в Excel та оформити її.
+        `;
+      }
+    }
+
+    function sendData() {
+      if (!selectedSection) {
+        alert("Спочатку оберіть розділ");
+        return;
+      }
+
+      const data = {
+        action: "menu_click",
+        section: selectedSection
+      };
+
+      tg.sendData(JSON.stringify(data));
+    }
+  </script>
+</body>
+</html>
