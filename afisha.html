@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Афіша — Театр Резонанс</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="page-afisha">
+  <div class="page-transition is-entering" id="pageTransition">
+    <div class="page-transition__curtain page-transition__curtain--left"></div>
+    <div class="page-transition__curtain page-transition__curtain--right"></div>
+    <div class="page-transition__glow"></div>
+  </div>
+
+  <main class="afisha-page">
+    <section class="afisha-section">
+      <div class="afisha-container">
+        <div class="section-top-line"></div>
+
+        <div class="afisha-header">
+          <h2>Афіша</h2>
+          <a href="index.html" class="back-link js-page-link">← Назад</a>
+        </div>
+
+        <div class="cards">
+          <article class="poster-card">
+            <div class="poster-image poster-image-1"></div>
+            <div class="poster-info">
+              <h3>Буря</h3>
+              <p>5 травня 2024</p>
+              <button type="button">Купити квиток</button>
+            </div>
+          </article>
+
+          <article class="poster-card">
+            <div class="poster-image poster-image-2"></div>
+            <div class="poster-info">
+              <h3>Пігмаліон</h3>
+              <p>17 травня 2024</p>
+              <button type="button">Купити квиток</button>
+            </div>
+          </article>
+
+          <article class="poster-card">
+            <div class="poster-image poster-image-3"></div>
+            <div class="poster-info">
+              <h3>Отелло</h3>
+              <p>25 травня 2024</p>
+              <button type="button">Купити квиток</button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

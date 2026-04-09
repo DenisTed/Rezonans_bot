@@ -1,308 +1,54 @@
 <!DOCTYPE html>
 <html lang="uk">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Театр Резонанс</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(180deg, #1a0f0f 0%, #2b1616 100%);
-      color: #f8f1e7;
-    }
-
-    .app {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-
-    .hero {
-      background: linear-gradient(135deg, #5c1010, #8b1e1e);
-      border-radius: 20px;
-      padding: 24px 18px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-      text-align: center;
-      margin-bottom: 18px;
-    }
-
-    .hero h1 {
-      margin: 0 0 8px;
-      font-size: 30px;
-      letter-spacing: 1px;
-    }
-
-    .hero p {
-      margin: 0;
-      color: #f4d9b6;
-      font-size: 15px;
-      line-height: 1.5;
-    }
-
-    .menu {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    .menu button {
-      border: none;
-      border-radius: 14px;
-      padding: 14px 10px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      background: #f4d9b6;
-      color: #4b1111;
-      transition: 0.2s;
-    }
-
-    .menu button:hover {
-      transform: translateY(-1px);
-    }
-
-    .card {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-    }
-
-    .card h2 {
-      margin-top: 0;
-      font-size: 22px;
-      color: #ffd9a0;
-    }
-
-    .item {
-      background: rgba(255,255,255,0.06);
-      border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 10px;
-    }
-
-    .item strong {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 16px;
-      color: #fff2d8;
-    }
-
-    .item span {
-      display: block;
-      color: #f2dfc5;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .ticket-form input,
-    .ticket-form select,
-    .ticket-form textarea {
-      width: 100%;
-      margin-bottom: 12px;
-      padding: 12px;
-      border-radius: 12px;
-      border: none;
-      font-size: 15px;
-      outline: none;
-    }
-
-    .ticket-form textarea {
-      min-height: 90px;
-      resize: vertical;
-    }
-
-    .ticket-form button {
-      width: 100%;
-      border: none;
-      border-radius: 14px;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: bold;
-      background: #d9a441;
-      color: #2d1616;
-      cursor: pointer;
-    }
-
-    .contacts p {
-      margin: 6px 0;
-      line-height: 1.5;
-      color: #f2dfc5;
-    }
-
-    .footer-note {
-      text-align: center;
-      font-size: 13px;
-      color: #d8bfa5;
-      padding: 8px 0 18px;
-    }
-  </style>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body>
-  <div class="app">
-    <div class="hero">
-      <h1>Театр “Резонанс”</h1>
-      <p>
-        Афіши, прем’єри, колектив, квитки та всі театральні новини —
-        в одному зручному інтерфейсі.
-      </p>
-    </div>
 
-    <div class="menu">
-      <button onclick="showSection('team')">Колектив</button>
-      
-      <button onclick="showSection('premieres')">Прем’єри</button>
-      <button onclick="showSection('tickets')">Квитки</button>
-      <button onclick="showSection('contacts')">Контакти</button>
-      <button onclick="showSection('about')">Про театр</button>
-    </div>
-
-    <div id="about" class="card">
-      <h2>Про театр</h2>
-      <div class="item">
-        <strong>Ласкаво просимо до театру “Резонанс”</strong>
-        <span>
-          Тут можна дізнатися про колектив, переглянути вистави,
-          слідкувати за прем’єрами та залишити заявку на квитки.
-        </span>
-      </div>
-    </div>
-
-    <div id="team" class="card hidden">
-      <h2>Хто в колективі</h2>
-      <div class="item">
-        <strong>Дайнекіна Ірина Ілівна</strong>
-        <span>Художній керівник</span>
-      </div>
-      <div class="item">
-        <strong>Катерина</strong>
-        <span>Акторка</span>
-      </div>
-      <div class="item">
-        <strong>Володимир</strong>
-        <span>Актор</span>
-      </div>
-      <div class="item">
-        <strong>Корик Денис</strong>
-        <span>Актор</span>
-      </div>
-    </div>
-
-    <!--<div id="shows" class="card hidden">
-      <h2>Вистави</h2>
-      <div class="item">
-        <strong>“Випадок у психолога”</strong>
-        <span>Драма • 12 квітня • 18:00</span>
-      </div>
-    </div> -->
-
-    <div id="premieres" class="card hidden">
-      <h2>Прем’єри</h2>
-      <div class="item">
-        <strong>Прем’єра: “Випадок у психолога”</strong>
-        <span>20травня • 18:00</span>
-      </div>
-    </div>
-
-    <div id="tickets" class="card hidden">
-      <h2>Купити квитки</h2>
-      <form class="ticket-form" onsubmit="sendTicketRequest(event)">
-        <input type="text" id="name" placeholder="Ваше ім’я" required />
-        
-        <select id="show" required>
-          <option value="">Оберіть виставу</option>
-          <option value="Випадок у психолога">Випадок у психолога</option>
-          
-        </select>
-
-        <select id="count" required>
-          <input type="text" id="name" placeholder="Ваше ім’я" required />
-<input type="text" id="phone" placeholder="Ваш телефон" required />
-          <option value="">Кількість квитків</option>
-          <option value="1">1 квиток</option>
-          <option value="2">2 квитки</option>
-          <option value="3">3 квитки</option>
-          <option value="4">4 квитки</option>
-          <option value="5">5 квитків</option>
-        </select>
-
-        <textarea id="comment" placeholder="Коментар або побажання"></textarea>
-
-        <button type="submit">Надіслати заявку</button>
-      </form>
-    </div>
-
-    <div id="contacts" class="card hidden contacts">
-      <h2>Контакти</h2>
-      <p><strong>Адреса:</strong> м. Кропивницький, вул. Театральна, 12</p>
-      <p><strong>Телефон:</strong> +38 (050) 123-45-67</p>
-      <p><strong>Email:</strong> rezonans.theatre@gmail.com</p>
-      
-    </div>
-
-    <div class="footer-note">
-      Театр “Резонанс” • сцена, емоції, прем’єри
-    </div>
+<body class="page-home">
+  <div class="page-transition" id="pageTransition">
+    <div class="page-transition__curtain page-transition__curtain--left"></div>
+    <div class="page-transition__curtain page-transition__curtain--right"></div>
+    <div class="page-transition__glow"></div>
   </div>
 
-<script>
-  const tg = window.Telegram.WebApp;
-  tg.expand();
+  <main class="hero-page">
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
 
-  const sections = ["about", "team", "premieres", "tickets", "contacts"];
+      <div class="hero-content">
+        <h1>Театр “Резонанс”</h1>
+        <p>
+          Афіші, прем’єри, колектив, квитки та всі театральні новини —
+          в одному зручному інтерфейсі.
+        </p>
+        <div class="menu-row">
+          <div class="dropdown" id="mainMenuDropdown">
+            <button class="dropdown-toggle" id="dropdownToggle" type="button" aria-expanded="false"
+              aria-controls="dropdownMenu">
+              Про театр
+              <span class="dropdown-arrow"></span>
+            </button>
 
-  function showSection(id) {
-    sections.forEach(section => {
-      const el = document.getElementById(section);
-      if (el) {
-        el.classList.add("hidden");
-      }
-    });
+            <div class="dropdown-menu" id="dropdownMenu">
+              <a href="afisha.html" class="dropdown-item js-page-link">Контакти</a>
+              <a href="afisha.html" class="dropdown-item js-page-link">Де знайти нас!</a>
+            </div>
+          </div>
 
-    const activeSection = document.getElementById(id);
-    if (activeSection) {
-      activeSection.classList.remove("hidden");
-    }
-  }
+          <a href="afisha.html" class="hero-btn js-page-link">Афіша</a>
+          <a href="afisha.html" class="hero-btn js-page-link">Репертуар</a>
+          <a href="afisha.html" class="hero-btn js-page-link">Резонансівці</a>
+        </div>
 
-  function sendTicketRequest(event) {
-    event.preventDefault();
+  </main>
 
-    const name = document.getElementById("name").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const show = document.getElementById("show").value;
-    const count = document.getElementById("count").value;
-    const comment = document.getElementById("comment").value.trim();
-
-    if (!name || !phone || !show || !count) {
-      alert("Будь ласка, заповніть усі основні поля.");
-      return;
-    }
-
-    const data = {
-      action: "ticket_request",
-      name: name,
-      phone: phone,
-      show: show,
-      count: count,
-      comment: comment
-    };
-
-    tg.sendData(JSON.stringify(data));
-  }
-</script>
+  <script src="js/main.js"></script>
 </body>
+
 </html>
