@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="uk">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,45 +9,56 @@
 </head>
 
 <body class="page-home">
-  <div class="page-transition" id="pageTransition">
+  <div class="page-transition is-entering" id="pageTransition">
     <div class="page-transition__curtain page-transition__curtain--left"></div>
     <div class="page-transition__curtain page-transition__curtain--right"></div>
     <div class="page-transition__glow"></div>
   </div>
 
   <main class="hero-page">
-    <section class="hero">
-      <div class="hero-bg"></div>
-      <div class="hero-overlay"></div>
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
 
-      <div class="hero-content">
-        <h1>Театр “Резонанс”</h1>
-        <p>
-          Афіші, прем’єри, колектив, квитки та всі театральні новини —
-          в одному зручному інтерфейсі.
-        </p>
-        <div class="menu-row">
-          <div class="dropdown" id="mainMenuDropdown">
-            <button class="dropdown-toggle" id="dropdownToggle" type="button" aria-expanded="false"
-              aria-controls="dropdownMenu">
-              Про театр
-              <span class="dropdown-arrow"></span>
-            </button>
-
-            <div class="dropdown-menu" id="dropdownMenu">
-              <a href="afisha.html" class="dropdown-item js-page-link">Контакти</a>
-              <a href="afisha.html" class="dropdown-item js-page-link">Де знайти нас!</a>
-            </div>
-          </div>
-
-          <a href="afisha.html" class="hero-btn js-page-link">Афіша</a>
-          <a href="afisha.html" class="hero-btn js-page-link">Репертуар</a>
-          <a href="afisha.html" class="hero-btn js-page-link">Резонансівці</a>
+    <div class="hero-content">
+      <div class="hero-info-group">
+        <div class="hero-text-top">
+          <h1>Театр “Резонанс”</h1>
+          <p>Афіші, прем’єри та живі хроніки підготовки вистав.</p>
         </div>
 
-  </main>
+        <div class="menu-row">
+          <div class="dropdown" id="mainMenuDropdown">
+            <button class="dropdown-toggle" id="dropdownToggle">
+              Про театр <span class="dropdown-arrow"></span>
+            </button>
+            <div class="dropdown-menu">
+              <a href="contacts.html" class="dropdown-item js-page-link">Контакти</a>
+              <a href="map.html" class="dropdown-item js-page-link">Де знайти нас!</a>
+            </div>
+          </div>
+          <a href="afisha.html" class="hero-btn js-page-link">Афіша</a>
+          <a href="repertoire.html" class="hero-btn js-page-link">Репертуар</a>
+        </div>
+      </div>
+
+      <div class="theatre-news-feed">
+        <h2 class="feed-title">Хроніки залаштунків</h2>
+        <div class="news-scroll-container">
+          <article class="news-post">
+            <div class="news-post-image"><span class="status-tag">Репетиція</span></div>
+            <div class="news-post-content">
+              <h3>"Магія ночі": Перші прогони</h3>
+              <p>Ведуться інтенсивні репетиції. Сьогодні актори вперше працювали з декораціями...</p>
+              <time>12.04.2026</time>
+            </div>
+          </article>
+          </div>
+      </div>
+    </div>
+  </section>
+</main>
 
   <script src="js/main.js"></script>
 </body>
-
 </html>
