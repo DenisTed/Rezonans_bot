@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Вхід — Театр Резонанс</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Додаткові стилі спеціально для форми, щоб не засмічувати основний файл */
+    .auth-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 70vh;
+      padding: 20px;
+    }
+    .auth-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .auth-tabs {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-soft);
+      padding: 10px 0;
+      cursor: pointer;
+      font-size: 1rem;
+      position: relative;
+    }
+    .tab-btn.active {
+      color: #fff;
+    }
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #fff; /* Твій акцентний колір */
+    }
+    .input-field {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 14px;
+      color: #fff;
+      margin-bottom: 15px;
+      outline: none;
+      transition: 0.3s;
+    }
+    .input-field:focus {
+      border-color: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .auth-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      border: none;
+      background: #fff;
+      color: #000;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.3s;
+    }
+    .auth-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255,255,255,0.2);
+    }
+  </style>
+</head>
+<body class="page-auth">
+  <div class="page-transition is-entering" id="pageTransition">
+    <div class="page-transition__curtain page-transition__curtain--left"></div>
+    <div class="page-transition__curtain page-transition__curtain--right"></div>
+  </div>
+
+  <main class="afisha-page">
+    <section class="afisha-section">
+      <div class="afisha-container">
+        <div class="afisha-header">
+          <a href="index.html" class="back-link js-page-link">← Головна</a>
+        </div>
+
+        <div class="auth-container">
+          <div class="auth-card">
+            <div class="auth-tabs">
+              <button class="tab-btn active" onclick="switchTab('login')">Вхід</button>
+              <button class="tab-btn" onclick="switchTab('reg')">Реєстрація</button>
+            </div>
+
+            <form id="authForm" onsubmit="handleAuth(event)">
+              <input type="email" class="input-field" placeholder="Email" required>
+              <input type="password" class="input-field" placeholder="Пароль" required>
+              <button type="submit" class="auth-btn" id="submitBtn">Увійти</button>
+            </form>
+            
+            <p id="authMessage" style="display:none; margin-top: 20px; text-align: center; font-size: 0.9rem;"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function handleAuth(event) {
+  event.preventDefault();
+  const emailInput = document.querySelector('input[type="email"]');
+  const passwordInput = document.querySelector('input[type="password"]');
+  const btn = document.getElementById('submitBtn');
+  const msg = document.getElementById('authMessage');
+
+  // Імітація перевірки
+  if (emailInput.value && passwordInput.value.length >= 4) {
+    btn.innerText = 'Вхід...';
+    btn.disabled = true;
+
+    setTimeout(() => {
+      // Зберігаємо дані для особистого кабінету
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('userEmail', emailInput.value);
+      // Робимо ім'я з першої частини email (наприклад, Denys з denys@gmail.com)
+      const name = emailInput.value.split('@')[0].toUpperCase();
+      localStorage.setItem('userName', name);
+
+      msg.style.display = 'block';
+      msg.style.color = '#4CAF50';
+      msg.innerText = 'Успішно! Перенаправлення до кабінету...';
+
+      setTimeout(() => {
+        window.location.href = 'profile.html'; 
+      }, 1000);
+    }, 1500);
+  } else {
+    alert("Будь ласка, введіть коректні дані.");
+  }
+}
+  </script>
+  <script src="js/main.js"></script>
+</body>
+</html>

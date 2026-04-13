@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бронювання квитків — Театр Резонанс</title>
+    <style>
+        :root {
+            --gold: #d89a4a;
+            --gold-bright: #ffc273;
+            --bg-dark: #070707;
+            --border-gold: rgba(216, 154, 74, 0.3);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column; /* Змінено для навігації */
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- НОВА НАВІГАЦІЯ --- */
+        header {
+            width: 100%;
+            padding: 20px 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            border-bottom: 1px solid var(--border-gold);
+            display: flex;
+            justify-content: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-container {
+            width: 90%;
+            max-width: 1400px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-decoration: none;
+        }
+
+        .main-menu {
+            display: flex;
+            gap: 30px;
+        }
+
+        .main-menu a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            opacity: 0.7;
+        }
+
+        .main-menu a:hover, .main-menu a.active {
+            color: var(--gold);
+            opacity: 1;
+        }
+
+        .admin-link {
+            color: var(--gold);
+            text-decoration: none;
+            font-size: 12px;
+            border: 1px solid var(--gold);
+            padding: 6px 15px;
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+
+        .admin-link:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
+        /* --- ПЛАНУВАННЯ --- */
+        .booking-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 40px;
+            width: 95%;
+            max-width: 1400px;
+            padding: 60px 40px;
+        }
+
+        /* Стилі залу та легенди залишаються без змін */
+        .hall-section {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 30px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .legend {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+            padding: 15px 30px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            font-size: 13px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 10px; }
+        .l-box { width: 18px; height: 18px; border-radius: 4px; }
+        .l-free { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(216, 154, 74, 0.15); }
+        .l-selected { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+        .l-occupied { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); position: relative; }
+        .l-occupied::after { content: '×'; position: absolute; left: 4px; top: -2px; color: rgba(255,255,255,0.2); }
+
+        .stage {
+            width: 70%;
+            height: 4px;
+            background: var(--gold);
+            margin-bottom: 60px;
+            box-shadow: 0 0 30px var(--gold), 0 10px 60px rgba(216, 154, 74, 0.5);
+            position: relative;
+        }
+
+        .stage::after {
+            content: 'СЦЕНА';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            letter-spacing: 10px;
+            color: var(--gold);
+        }
+
+        .seats-grid { display: flex; flex-direction: column; gap: 10px; }
+        .seat-row { display: flex; gap: 8px; align-items: center; }
+        .row-label { width: 60px; font-size: 11px; color: var(--gold); opacity: 0.6; text-transform: uppercase; }
+        .aisle { width: 35px; }
+
+        .seat {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(216, 154, 74, 0.15);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .seat:hover:not(.occupied) {
+            background: rgba(216, 154, 74, 0.3);
+            border-color: var(--gold);
+            transform: scale(1.1);
+        }
+
+        .seat.occupied {
+            background: rgba(255, 255, 255, 0.02);
+            border-color: rgba(255, 255, 255, 0.05);
+            cursor: not-allowed;
+        }
+
+        .seat.occupied::after {
+            content: '×';
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 16px;
+        }
+
+        .seat.selected {
+            background: var(--gold) !important;
+            border-color: #fff !important;
+            box-shadow: 0 0 15px var(--gold);
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        .selection-sidebar {
+            background: rgba(20, 10, 10, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-gold);
+            border-radius: 20px;
+            padding: 30px;
+            height: fit-content;
+        }
+
+        .sidebar-title { color: var(--gold); letter-spacing: 2px; margin-bottom: 25px; text-transform: uppercase; }
+        .selected-info { margin-bottom: 15px; font-size: 14px; color: #ccc; }
+        .selected-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; min-height: 40px; }
+        .tag { background: rgba(216, 154, 74, 0.15); border: 1px solid var(--gold); color: #fff; padding: 5px 12px; border-radius: 6px; font-size: 12px; }
+
+        .total-box { border-top: 1px solid rgba(216, 154, 74, 0.3); padding-top: 25px; display: flex; justify-content: space-between; align-items: center; }
+        .total-price { font-size: 32px; color: var(--gold); font-weight: bold; }
+
+        .btn-pay {
+            width: 100%; padding: 20px; margin-top: 30px;
+            background: linear-gradient(135deg, #46140a 0%, #230808 100%);
+            border: 1px solid var(--gold); border-radius: 10px;
+            color: #fff; font-weight: bold; text-transform: uppercase;
+            cursor: pointer; opacity: 0.3; pointer-events: none; transition: 0.4s;
+        }
+
+        .btn-pay.active { opacity: 1; pointer-events: auto; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <a href="#" class="logo">RESONANCE</a>
+        <nav class="main-menu">
+            <a href="index.html">Головна</a>
+            <a href="afisha.html" class="active">Афіша</a>
+            <a href="about.html">Про нас</a>
+            <a href="contacts.html">Контакти</a>
+        </nav>
+        <a href="admin.html" class="admin-link">⚙️ АДМІН</a>
+    </div>
+</header>
+
+<div class="booking-layout">
+    <section class="hall-section">
+        <div class="legend">
+            <div class="legend-item"><div class="l-box l-free"></div> Вільні</div>
+            <div class="legend-item"><div class="l-box l-selected"></div> Вибрані</div>
+            <div class="legend-item"><div class="l-box l-occupied"></div> Зайняті</div>
+        </div>
+
+        <div class="stage"></div>
+        <div class="seats-grid" id="seatsGrid"></div>
+    </section>
+
+    <aside class="selection-sidebar">
+        <div class="sidebar-title">Ваше замовлення</div>
+        <div class="selected-info">Обрані місця:</div>
+        <div class="selected-tags" id="selectedTags"></div>
+        
+        <div class="total-box">
+            <span>Разом:</span>
+            <div class="total-price"><span id="totalAmount">0</span> грн</div>
+        </div>
+        <button class="btn-pay" id="payBtn">Купити квитки</button>
+    </aside>
+</div>
+
+<script>
+    const grid = document.getElementById('seatsGrid');
+    const tagsContainer = document.getElementById('selectedTags');
+    const totalAmount = document.getElementById('totalAmount');
+    const payBtn = document.getElementById('payBtn');
+    
+    const rows = 10;
+    const seatsInRow = 16;
+    const price = 250;
+    let selectedSeats = [];
+
+    const confirmedSeats = JSON.parse(localStorage.getItem('confirmedSeats')) || [];
+
+    for (let r = 1; r <= rows; r++) {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'seat-row';
+        
+        const label = document.createElement('div');
+        label.className = 'row-label';
+        label.innerText = `РЯД ${r}`;
+        rowDiv.appendChild(label);
+
+        for (let s = 1; s <= seatsInRow; s++) {
+            if (s === 5 || s === 13) {
+                const aisle = document.createElement('div');
+                aisle.className = 'aisle';
+                rowDiv.appendChild(aisle);
+            }
+
+            const seat = document.createElement('div');
+            seat.className = 'seat';
+            const seatKey = `${r}-${s}`;
+
+            if (confirmedSeats.includes(seatKey)) {
+                seat.classList.add('occupied');
+            }
+
+            seat.addEventListener('click', () => toggleSeat(seat, r, s));
+            rowDiv.appendChild(seat);
+        }
+        grid.appendChild(rowDiv);
+    }
+
+    function toggleSeat(el, r, s) {
+        if (el.classList.contains('occupied')) return;
+        const seatKey = `${r}-${s}`;
+
+        if (el.classList.contains('selected')) {
+            el.classList.remove('selected');
+            selectedSeats = selectedSeats.filter(item => item.key !== seatKey);
+        } else {
+            el.classList.add('selected');
+            selectedSeats.push({ key: seatKey, row: r, seat: s });
+        }
+        renderSummary();
+    }
+
+    function renderSummary() {
+        tagsContainer.innerHTML = '';
+        selectedSeats.forEach(item => {
+            const tag = document.createElement('span');
+            tag.className = 'tag';
+            tag.innerText = `Р${item.row} М${item.seat}`;
+            tagsContainer.appendChild(tag);
+        });
+        totalAmount.innerText = selectedSeats.length * price;
+        selectedSeats.length > 0 ? payBtn.classList.add('active') : payBtn.classList.remove('active');
+    }
+
+    payBtn.addEventListener('click', () => {
+        const allOrders = JSON.parse(localStorage.getItem('theatreOrders')) || [];
+        const newOrder = {
+            id: Date.now(),
+            seats: [...selectedSeats],
+            totalPrice: selectedSeats.length * price,
+            status: 'pending',
+            time: new Date().toLocaleTimeString()
+        };
+        allOrders.push(newOrder);
+        localStorage.setItem('theatreOrders', JSON.stringify(allOrders));
+        alert('Замовлення надіслано в адмінку!');
+        location.reload(); 
+    });
+</script>
+
+</body>
+</html>

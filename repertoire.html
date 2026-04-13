@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Репертуар — Театр Резонанс</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="page-repertoire">
+  <div class="page-transition is-entering" id="pageTransition">
+    <div class="page-transition__curtain page-transition__curtain--left"></div>
+    <div class="page-transition__curtain page-transition__curtain--right"></div>
+    <div class="page-transition__glow"></div>
+  </div>
+
+  <main class="afisha-page">
+    <section class="afisha-section">
+      <div class="afisha-container">
+        <div class="section-top-line"></div>
+
+        <div class="afisha-header">
+          <h2>Репертуар</h2>
+          <a href="index.html" class="back-link js-page-link">← Назад</a>
+        </div>
+
+        <div class="cards">
+          
+          <article class="featured-wrapper">
+            <article class="poster-card">
+              <div class="poster-image" style="background-image: url('img/performance1.jpg');">
+                </div>
+              <div class="poster-info">
+                <div class="poster-meta">Трагікомедія</div>
+                <h3>Назва вистави 1</h3>
+                <p class="poster-date">У поточному сезоні</p>
+              </div>
+            </article>
+          </article>
+
+          <article class="featured-wrapper">
+            <article class="poster-card">
+              <div class="poster-image" style="background-image: url('img/performance2.jpg');">
+              </div>
+              <div class="poster-info">
+                <div class="poster-meta">Драма</div>
+                <h3>Назва вистави 2</h3>
+                <p class="poster-date">Архівна / В репертуарі</p>
+              </div>
+            </article>
+          </article>
+
+        </div>
+        
+        <p style="text-align: center; color: var(--text-soft); margin-top: 40px; font-style: italic; opacity: 0.6;">
+          Повний перелік вистав нашого театру.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

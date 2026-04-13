@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мій Профіль — Театр Резонанс</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    :root {
+      --bg-dark: #0a0a0a;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --gold: #d89a4a;
+      --gold-deep: #8a5d25;
+      --text-gray: #a0a0a0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #fff;
+      font-family: 'Segoe UI', serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    /* Навігація (хлібні крихти) */
+    .breadcrumb {
+      padding: 20px 40px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-gray);
+    }
+    .breadcrumb a { color: var(--gold); text-decoration: none; }
+
+    .profile-container {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 40px;
+      padding: 0 40px 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Бокове меню */
+    .sidebar {
+      border-right: 1px solid rgba(216, 154, 74, 0.15);
+      padding-right: 20px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      color: var(--text-gray);
+      text-decoration: none;
+      transition: 0.3s;
+      border-radius: 8px;
+      margin-bottom: 5px;
+    }
+
+    .nav-item.active {
+      color: var(--gold);
+      background: rgba(216, 154, 74, 0.05);
+    }
+
+    .nav-item:hover { color: #fff; }
+
+    /* Основна форма */
+    .main-content h1 {
+      font-size: 42px;
+      letter-spacing: 4px;
+      margin-bottom: 40px;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      max-width: 800px;
+    }
+
+    .input-group { display: flex; flex-direction: column; gap: 10px; }
+    
+    label {
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 1.5px;
+    }
+
+    input {
+      background: var(--card-bg);
+      border: 1px solid rgba(216, 154, 74, 0.2);
+      padding: 14px;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 15px rgba(216, 154, 74, 0.1);
+    }
+
+    /* Стильна кнопка як на головній */
+    .btn-submit {
+      grid-column: span 2;
+      margin-top: 20px;
+      background: linear-gradient(to right, #46140a, #230808);
+      border: 1px solid var(--gold);
+      color: #fff;
+      padding: 18px;
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: 0.3s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-submit:hover {
+      box-shadow: 0 0 25px rgba(216, 154, 74, 0.2);
+      transform: translateY(-2px);
+    }
+
+    /* Блок Дія */
+    .diia-card {
+      background: rgba(216, 154, 74, 0.03);
+      border: 1px solid rgba(216, 154, 74, 0.1);
+      padding: 30px;
+      border-radius: 4px;
+      height: fit-content;
+      text-align: center;
+    }
+
+    .diia-btn {
+      background: #000;
+      border: 1px solid #333;
+      color: #fff;
+      padding: 12px 25px;
+      width: 100%;
+      margin-top: 20px;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="breadcrumb">
+    <a href="index.html">Головна</a> / <a href="#">Особистий кабінет</a> / Мій профіль
+  </nav>
+
+  <div class="profile-container">
+    <aside class="sidebar">
+      <a href="#" class="nav-item active">👤 Мій профіль</a>
+      <a href="orders.html" class="nav-item">📋 Мої замовлення</a>
+      <a href="afisha.html" class="nav-item">🎭 Афіша</a>
+      <a href="#" class="nav-item">📞 Контакти</a>
+      <div style="margin-top: 40px;">
+        <a href="index.html" class="nav-item">↳ Вихід</a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+  <h1>Мій Профіль</h1>
+  
+  <form class="form-grid" style="max-width: 1000px;"> <div class="input-group">
+      <label>ВАШЕ ІМ'Я</label>
+      <input type="text" value="DENYS">
+    </div>
+    <div class="input-group">
+      <label>ВАШЕ ПРІЗВИЩЕ</label>
+      <input type="text" value="KORYK">
+    </div>
+    <div class="input-group">
+      <label>ВАШ EMAIL</label>
+      <input type="email" value="denis.crolik007@gmail.com">
+    </div>
+    <div class="input-group">
+      <label>ВАШ НОМЕР ТЕЛЕФОНУ</label>
+      <input type="tel" value="+380 66 330 54 19">
+    </div>
+    <div class="input-group" style="grid-column: span 2;">
+      <label>ВАШ ПАРОЛЬ</label>
+      <input type="password" value="********">
+    </div>
+    
+    <button type="submit" class="btn-submit">
+      Внести зміни <span>→</span>
+    </button>
+  </form>
+</main>
+  </div>
+
+</body>
+</html>

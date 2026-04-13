@@ -3,9 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Театр Резонанс</title>
+  <title>Театр Резонанс — Головна</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Додаткове вирівнювання для усунення "дивності" */
+    .menu-container {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      width: 100%;
+    }
+
+    .nav-main-links {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    /* Стиль для кнопки кабінету, коли користувач авторизований */
+    .user-account-btn {
+      border-color: var(--gold-soft);
+      background: linear-gradient(to right, rgba(216, 154, 74, 0.15), transparent);
+      letter-spacing: 1px;
+      font-weight: bold;
+      color: var(--gold) !important;
+    }
+  </style>
 </head>
 
 <body class="page-home">
@@ -14,51 +38,78 @@
     <div class="page-transition__curtain page-transition__curtain--right"></div>
     <div class="page-transition__glow"></div>
   </div>
-
+ 
   <main class="hero-page">
-  <section class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-overlay"></div>
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
 
-    <div class="hero-content">
-      <div class="hero-info-group">
-        <div class="hero-text-top">
-          <h1>Театр “Резонанс”</h1>
-          <p>Афіші, прем’єри та живі хроніки підготовки вистав.</p>
-        </div>
+      <div class="hero-content">
+        <div class="hero-info-group">
+          <div class="hero-text-top">
+            <h1>Театр “Резонанс”</h1>
+            <p>Афіші, прем’єри та живі хроніки підготовки вистав у самому серці театрального затишку.</p>
+          </div>
 
-        <div class="menu-row">
-          <div class="dropdown" id="mainMenuDropdown">
-            <button class="dropdown-toggle" id="dropdownToggle">
-              Про театр <span class="dropdown-arrow"></span>
-            </button>
-            <div class="dropdown-menu">
-              <a href="contacts.html" class="dropdown-item js-page-link">Контакти</a>
-              <a href="map.html" class="dropdown-item js-page-link">Де знайти нас!</a>
+          <div class="menu-container">
+            <div class="nav-main-links">
+              <a href="afisha.html" class="hero-btn js-page-link">Афіша</a>
+              <a href="repertoire.html" class="hero-btn js-page-link">Репертуар</a>
+            </div>
+
+            <div class="menu-row">
+              <div class="dropdown" id="mainMenuDropdown">
+                <button class="dropdown-toggle" id="dropdownToggle">
+                  Про театр <span class="dropdown-arrow"></span>
+                </button>
+                <div class="dropdown-menu">
+                  <a href="contacts.html" class="dropdown-item js-page-link">Контакти</a>
+                  <a href="history.html" class="dropdown-item js-page-link">Історія театру</a>
+                </div>
+              </div>
+
+              <a href="auth.html" class="hero-btn js-page-link" id="authButton">
+                <span>Вхід</span>
+              </a>
             </div>
           </div>
-          <a href="afisha.html" class="hero-btn js-page-link">Афіша</a>
-          <a href="repertoire.html" class="hero-btn js-page-link">Репертуар</a>
+        </div>
+
+        <div class="theatre-news-feed">
+          <h2 class="feed-title">Хроніки залаштунків</h2>
+          <div class="news-scroll-container">
+            <article class="news-post">
+              <div class="news-post-image"></div>
+              <div class="news-post-content">
+                <span class="status-tag" style="color: var(--gold); font-size: 10px; text-transform: uppercase;">Репетиція</span>
+                <h3>"Цікавий випадок у психологічній практиці"</h3>
+                <p>Вже йдемо на фінальні прогони. Ведуться інтенсивні репетиції.</p>
+              </div>
+            </article>
+          </div>
         </div>
       </div>
-
-      <div class="theatre-news-feed">
-        <h2 class="feed-title">Хроніки залаштунків</h2>
-        <div class="news-scroll-container">
-          <article class="news-post">
-            <div class="news-post-image"><span class="status-tag">Репетиція</span></div>
-            <div class="news-post-content">
-              <h3>"Магія ночі": Перші прогони</h3>
-              <p>Ведуться інтенсивні репетиції. Сьогодні актори вперше працювали з декораціями...</p>
-              <time>12.04.2026</time>
-            </div>
-          </article>
-          </div>
-      </div>
-    </div>
-  </section>
-</main>
+    </section>
+  </main>
 
   <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const authBtn = document.getElementById('authButton');
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const userName = localStorage.getItem('userName');
+
+      if (isLoggedIn === 'true' && authBtn) {
+        authBtn.href = 'profile.html';
+        authBtn.classList.add('user-account-btn'); // Додаємо преміальний стиль
+        
+        // Створюємо іконку для кабінету
+        authBtn.innerHTML = `
+          <span style="margin-right: 8px;">👤</span>
+          <span>${userName ? userName.toUpperCase() : 'КАБІНЕТ'}</span>
+        `;
+      }
+    });
+  </script>
 </body>
 </html>
