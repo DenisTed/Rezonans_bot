@@ -15,22 +15,16 @@
         body {
             background-color: var(--bg-dark);
             color: #fff;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             margin: 0;
-            display: flex;
-            flex-direction: column; /* Змінено для навігації */
-            align-items: center;
             min-height: 100vh;
         }
 
-        /* --- НОВА НАВІГАЦІЯ --- */
         header {
             width: 100%;
             padding: 20px 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
             border-bottom: 1px solid var(--border-gold);
-            display: flex;
-            justify-content: center;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -40,13 +34,14 @@
         .nav-container {
             width: 90%;
             max-width: 1400px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .logo {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
             color: var(--gold);
             text-transform: uppercase;
@@ -66,169 +61,245 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: 0.3s;
-            opacity: 0.7;
+            opacity: 0.75;
         }
 
-        .main-menu a:hover, .main-menu a.active {
+        .main-menu a:hover,
+        .main-menu a.active {
             color: var(--gold);
             opacity: 1;
         }
 
-        .admin-link {
-            color: var(--gold);
-            text-decoration: none;
-            font-size: 12px;
-            border: 1px solid var(--gold);
-            padding: 6px 15px;
-            border-radius: 20px;
-            transition: 0.3s;
-        }
-
-        .admin-link:hover {
-            background: var(--gold);
-            color: #000;
-        }
-
-        /* --- ПЛАНУВАННЯ --- */
         .booking-layout {
             display: grid;
-            grid-template-columns: 1fr 380px;
-            gap: 40px;
+            grid-template-columns: 1fr 400px;
+            gap: 50px;
             width: 95%;
             max-width: 1400px;
-            padding: 60px 40px;
+            margin: 40px auto;
+            padding: 0 20px;
         }
 
-        /* Стилі залу та легенди залишаються без змін */
         .hall-section {
             background: rgba(255, 255, 255, 0.01);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 30px;
-            padding: 40px 20px;
+            padding: 50px 30px 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+
+        .performance-title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            color: var(--gold);
         }
 
         .legend {
             display: flex;
             gap: 30px;
             margin-bottom: 40px;
-            padding: 15px 30px;
+            padding: 15px 35px;
             background: rgba(255,255,255,0.03);
             border-radius: 15px;
-            font-size: 13px;
+            font-size: 13.5px;
         }
 
-        .legend-item { display: flex; align-items: center; gap: 10px; }
-        .l-box { width: 18px; height: 18px; border-radius: 4px; }
-        .l-free { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(216, 154, 74, 0.15); }
-        .l-selected { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
-        .l-occupied { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); position: relative; }
-        .l-occupied::after { content: '×'; position: absolute; left: 4px; top: -2px; color: rgba(255,255,255,0.2); }
+        .legend-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        .l-box { 
+            width: 18px; 
+            height: 18px; 
+            border-radius: 5px; 
+        }
+        .l-free { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(216, 154, 74, 0.2); }
+        .l-selected { background: var(--gold); box-shadow: 0 0 12px var(--gold); }
+        .l-occupied { 
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            position: relative; 
+        }
+        .l-occupied::after { 
+            content: '×'; 
+            position: absolute; 
+            left: 50%; 
+            top: 50%; 
+            transform: translate(-50%, -50%);
+            color: rgba(255,255,255,0.25);
+            font-size: 14px;
+        }
 
         .stage {
-            width: 70%;
-            height: 4px;
-            background: var(--gold);
-            margin-bottom: 60px;
-            box-shadow: 0 0 30px var(--gold), 0 10px 60px rgba(216, 154, 74, 0.5);
+            width: 65%;
+            height: 6px;
+            background: linear-gradient(to right, transparent, var(--gold), transparent);
+            margin: 40px 0 70px;
+            box-shadow: 0 0 40px var(--gold);
             position: relative;
         }
 
         .stage::after {
             content: 'СЦЕНА';
             position: absolute;
-            top: 15px;
+            top: 18px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 10px;
-            letter-spacing: 10px;
+            font-size: 11px;
+            letter-spacing: 12px;
             color: var(--gold);
+            opacity: 0.8;
         }
 
-        .seats-grid { display: flex; flex-direction: column; gap: 10px; }
-        .seat-row { display: flex; gap: 8px; align-items: center; }
-        .row-label { width: 60px; font-size: 11px; color: var(--gold); opacity: 0.6; text-transform: uppercase; }
-        .aisle { width: 35px; }
+        .seats-grid { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+        }
+        .seat-row { 
+            display: flex; 
+            gap: 7px; 
+            align-items: center; 
+        }
+        .row-label { 
+            width: 70px; 
+            font-size: 12px; 
+            color: var(--gold); 
+            opacity: 0.65; 
+            text-transform: uppercase; 
+            font-weight: 500;
+        }
+        .aisle { width: 30px; }
 
         .seat {
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(216, 154, 74, 0.15);
-            border-radius: 6px;
+            border: 1px solid rgba(216, 154, 74, 0.18);
+            border-radius: 7px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
         }
 
         .seat:hover:not(.occupied) {
-            background: rgba(216, 154, 74, 0.3);
+            background: rgba(216, 154, 74, 0.35);
             border-color: var(--gold);
-            transform: scale(1.1);
+            transform: scale(1.12);
         }
 
         .seat.occupied {
-            background: rgba(255, 255, 255, 0.02);
-            border-color: rgba(255, 255, 255, 0.05);
+            background: rgba(40, 40, 40, 0.6);
+            border-color: rgba(255,255,255,0.08);
             cursor: not-allowed;
-        }
-
-        .seat.occupied::after {
-            content: '×';
-            color: rgba(255, 255, 255, 0.15);
-            font-size: 16px;
+            color: rgba(255,255,255,0.2);
         }
 
         .seat.selected {
             background: var(--gold) !important;
-            border-color: #fff !important;
-            box-shadow: 0 0 15px var(--gold);
-            animation: pulse 2s infinite ease-in-out;
+            color: #000 !important;
+            border-color: #fff;
+            box-shadow: 0 0 20px var(--gold);
+            transform: scale(1.08);
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-            100% { transform: scale(1); }
-        }
-
+        /* Sidebar */
         .selection-sidebar {
-            background: rgba(20, 10, 10, 0.85);
-            backdrop-filter: blur(10px);
+            background: rgba(20, 10, 10, 0.92);
             border: 1px solid var(--border-gold);
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 24px;
+            padding: 35px 30px;
             height: fit-content;
+            position: sticky;
+            top: 100px;
         }
 
-        .sidebar-title { color: var(--gold); letter-spacing: 2px; margin-bottom: 25px; text-transform: uppercase; }
-        .selected-info { margin-bottom: 15px; font-size: 14px; color: #ccc; }
-        .selected-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; min-height: 40px; }
-        .tag { background: rgba(216, 154, 74, 0.15); border: 1px solid var(--gold); color: #fff; padding: 5px 12px; border-radius: 6px; font-size: 12px; }
+        .sidebar-title {
+            color: var(--gold);
+            font-size: 20px;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
 
-        .total-box { border-top: 1px solid rgba(216, 154, 74, 0.3); padding-top: 25px; display: flex; justify-content: space-between; align-items: center; }
-        .total-price { font-size: 32px; color: var(--gold); font-weight: bold; }
+        .selected-info {
+            color: #ccc;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        .selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 50px;
+            margin-bottom: 30px;
+        }
+
+        .tag {
+            background: rgba(216, 154, 74, 0.15);
+            border: 1px solid var(--gold);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13.5px;
+        }
+
+        .total-box {
+            border-top: 1px solid rgba(216, 154, 74, 0.3);
+            padding-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        .total-price {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--gold);
+        }
 
         .btn-pay {
-            width: 100%; padding: 20px; margin-top: 30px;
-            background: linear-gradient(135deg, #46140a 0%, #230808 100%);
-            border: 1px solid var(--gold); border-radius: 10px;
-            color: #fff; font-weight: bold; text-transform: uppercase;
-            cursor: pointer; opacity: 0.3; pointer-events: none; transition: 0.4s;
+            width: 100%;
+            padding: 18px;
+            margin-top: 35px;
+            background: linear-gradient(135deg, #d89a4a, #f4b76e);
+            color: #000;
+            font-weight: 700;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .btn-pay.active { opacity: 1; pointer-events: auto; }
+        .btn-pay:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(216, 154, 74, 0.4);
+        }
+
+        .btn-pay:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
     </style>
 </head>
 <body>
 
 <header>
     <div class="nav-container">
-        <a href="#" class="logo">RESONANCE</a>
+        <a href="index.html" class="logo">RESONANCE</a>
         <nav class="main-menu">
             <a href="index.html">Головна</a>
             <a href="afisha.html" class="active">Афіша</a>
@@ -241,6 +312,8 @@
 
 <div class="booking-layout">
     <section class="hall-section">
+        <h2 class="performance-title">«Цікавий випадок у психологічній практиці»</h2>
+        
         <div class="legend">
             <div class="legend-item"><div class="l-box l-free"></div> Вільні</div>
             <div class="legend-item"><div class="l-box l-selected"></div> Вибрані</div>
@@ -260,30 +333,32 @@
             <span>Разом:</span>
             <div class="total-price"><span id="totalAmount">0</span> грн</div>
         </div>
-        <button class="btn-pay" id="payBtn">Купити квитки</button>
+        
+        <button class="btn-pay" id="payBtn" disabled>Купити квитки</button>
     </aside>
 </div>
 
 <script>
     const grid = document.getElementById('seatsGrid');
     const tagsContainer = document.getElementById('selectedTags');
-    const totalAmount = document.getElementById('totalAmount');
+    const totalAmountEl = document.getElementById('totalAmount');
     const payBtn = document.getElementById('payBtn');
     
+    const PRICE_PER_TICKET = 250;
+    let selectedSeats = [];
+    let occupiedSeats = JSON.parse(localStorage.getItem('occupiedSeats')) || [];
+
     const rows = 10;
     const seatsInRow = 16;
-    const price = 250;
-    let selectedSeats = [];
 
-    const confirmedSeats = JSON.parse(localStorage.getItem('confirmedSeats')) || [];
-
+    // Генерація залу
     for (let r = 1; r <= rows; r++) {
         const rowDiv = document.createElement('div');
         rowDiv.className = 'seat-row';
         
         const label = document.createElement('div');
         label.className = 'row-label';
-        label.innerText = `РЯД ${r}`;
+        label.textContent = `РЯД ${r}`;
         rowDiv.appendChild(label);
 
         for (let s = 1; s <= seatsInRow; s++) {
@@ -297,57 +372,82 @@
             seat.className = 'seat';
             const seatKey = `${r}-${s}`;
 
-            if (confirmedSeats.includes(seatKey)) {
+            if (occupiedSeats.includes(seatKey)) {
                 seat.classList.add('occupied');
             }
 
-            seat.addEventListener('click', () => toggleSeat(seat, r, s));
+            seat.addEventListener('click', () => toggleSeat(seat, seatKey, r, s));
             rowDiv.appendChild(seat);
         }
         grid.appendChild(rowDiv);
     }
 
-    function toggleSeat(el, r, s) {
-        if (el.classList.contains('occupied')) return;
-        const seatKey = `${r}-${s}`;
+    function toggleSeat(seatEl, seatKey, row, seatNum) {
+        if (seatEl.classList.contains('occupied')) return;
 
-        if (el.classList.contains('selected')) {
-            el.classList.remove('selected');
-            selectedSeats = selectedSeats.filter(item => item.key !== seatKey);
+        if (seatEl.classList.contains('selected')) {
+            seatEl.classList.remove('selected');
+            selectedSeats = selectedSeats.filter(s => s.key !== seatKey);
         } else {
-            el.classList.add('selected');
-            selectedSeats.push({ key: seatKey, row: r, seat: s });
+            seatEl.classList.add('selected');
+            selectedSeats.push({ key: seatKey, row: row, seat: seatNum });
         }
-        renderSummary();
+        updateSummary();
     }
 
-    function renderSummary() {
+    function updateSummary() {
         tagsContainer.innerHTML = '';
         selectedSeats.forEach(item => {
             const tag = document.createElement('span');
             tag.className = 'tag';
-            tag.innerText = `Р${item.row} М${item.seat}`;
+            tag.textContent = `Ряд ${item.row} • Місце ${item.seat}`;
             tagsContainer.appendChild(tag);
         });
-        totalAmount.innerText = selectedSeats.length * price;
-        selectedSeats.length > 0 ? payBtn.classList.add('active') : payBtn.classList.remove('active');
+
+        totalAmountEl.textContent = selectedSeats.length * PRICE_PER_TICKET;
+        payBtn.disabled = selectedSeats.length === 0;
     }
 
+    // Купівля квитків + збір телефону
     payBtn.addEventListener('click', () => {
-        const allOrders = JSON.parse(localStorage.getItem('theatreOrders')) || [];
+        if (selectedSeats.length === 0) return;
+
+        const phone = prompt("Введіть номер телефону для підтвердження замовлення:\nНаприклад: +380501234567", "+380");
+
+        if (!phone || phone.length < 10) {
+            alert("Будь ласка, введіть коректний номер телефону!");
+            return;
+        }
+
+        if (!confirm(`Купити ${selectedSeats.length} квитків за ${selectedSeats.length * PRICE_PER_TICKET} грн?\n\nТелефон: ${phone}`)) {
+            return;
+        }
+
+        const orders = JSON.parse(localStorage.getItem('theatreOrders')) || [];
+        
         const newOrder = {
             id: Date.now(),
-            seats: [...selectedSeats],
-            totalPrice: selectedSeats.length * price,
+            performance: "Цікавий випадок у психологічній практиці",
+            seats: selectedSeats.map(s => `Р${s.row} М${s.seat}`),
+            seatKeys: selectedSeats.map(s => s.key),     // для звільнення місць
+            totalPrice: selectedSeats.length * PRICE_PER_TICKET,
+            phone: phone.trim(),
             status: 'pending',
-            time: new Date().toLocaleTimeString()
+            date: new Date().toLocaleString('uk-UA')
         };
-        allOrders.push(newOrder);
-        localStorage.setItem('theatreOrders', JSON.stringify(allOrders));
-        alert('Замовлення надіслано в адмінку!');
-        location.reload(); 
+
+        orders.push(newOrder);
+        localStorage.setItem('theatreOrders', JSON.stringify(orders));
+
+        // Займаємо місця
+        occupiedSeats = [...occupiedSeats, ...newOrder.seatKeys];
+        localStorage.setItem('occupiedSeats', JSON.stringify(occupiedSeats));
+
+        alert(`✅ Замовлення прийнято!\nМи зателефонуємо вам на ${phone} для підтвердження.`);
+
+        selectedSeats = [];
+        location.reload();
     });
 </script>
-
 </body>
 </html>
