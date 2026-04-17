@@ -20,11 +20,11 @@ html, body {
   padding: 0;
   min-height: 100dvh;
   font-family: var(--font-main);
-  background: var(--bg-dark);
+  /* Замість var(--bg-dark) ставимо картинку */
+  background: url('theatre-bg.png') center/cover no-repeat fixed;
   color: var(--text-light);
   overflow-x: hidden;
 }
-
 /* ===== PAGE TRANSITION ===== */
 .page-transition {
   position: fixed;
@@ -246,7 +246,7 @@ html, body {
 .news-post-image {
   width: 72px;
   height: 72px;
-  background: url('theatre-bg.png') center/cover; /* заміни на свою картинку */
+  background: url('a_pcix.jpg') center/cover; /* заміни на свою картинку */
   border-radius: 12px;
   flex-shrink: 0;
 }
@@ -307,4 +307,168 @@ html, body {
   transform: translateY(-3px);
   box-shadow: 0 12px 35px rgba(216, 154, 74, 0.55);
   background: linear-gradient(135deg, #f6c88a, #d89a4a);
+}
+/* Робимо картку компактнішою по ширині */
+.poster-card {
+    max-width: 900px; /* Обмежуємо максимальну ширину */
+    margin: 0 auto;   /* Центруємо */
+}
+
+/* Змінюємо висоту картинки, щоб вона не займала весь екран */
+.poster-image {
+    height: 350px !important; /* Було 450px або 480px, робимо меншою */
+}
+
+/* Масштабування тексту заголовка */
+.poster-info h3 {
+    font-size: 22px !important; /* Трохи зменшуємо шрифт для балансу */
+}
+/* ======================================================= */
+/* ===== ГЛОБАЛЬНА АДАПТИВНІСТЬ (ДЛЯ ВСІХ СТОРІНОК) ===== */
+/* ======================================================= */
+
+@media (max-width: 768px) {
+    /* 1. Адаптація головної сторінки (Hero) */
+    .hero-content {
+        padding: 40px 20px;
+        text-align: center;
+        flex-direction: column;
+    }
+    
+    .hero-text-top h1 {
+        font-size: 42px;
+        letter-spacing: 1px;
+    }
+
+    /* 2. Адаптація адмін-панелі (Схема залу) */
+    .hall-container {
+        overflow-x: auto; /* Дозволяє совати зал пальцем */
+        display: block;
+        padding: 15px;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .seat {
+        min-width: 28px;
+        height: 28px;
+        font-size: 10px;
+        margin: 2px;
+    }
+
+    .booking-forms {
+        flex-direction: column;
+    }
+
+    /* 3. Адаптація Репертуару та Афіші */
+    .cards {
+        grid-template-columns: 1fr; /* Одна картка в ряд */
+        gap: 20px;
+    }
+
+    .poster-image {
+        height: 250px !important; /* Компактне фото для мобілки */
+    }
+
+    .afisha-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .back-link, .back-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* 4. Масштабування тексту для читабельності */
+    .title, .afisha-header h2 {
+        font-size: 26px !important;
+    }
+    
+    .buy-btn {
+        padding: 18px;
+        font-size: 16px;
+    }
+}
+
+/* Налаштування для дуже маленьких екранів (iPhone SE і т.д.) */
+@media (max-width: 380px) {
+    .hero-text-top h1 {
+        font-size: 34px;
+    }
+    
+    .poster-meta {
+        font-size: 10px;
+    }
+}
+/* Дизайн всередині карток контактів */
+.contact-card {
+    display: flex;
+    align-items: flex-start; /* Вирівнюємо іконку і текст по верхньому краю */
+    gap: 20px;
+    background: rgba(20, 15, 10, 0.8);
+    border: 1px solid rgba(216, 154, 74, 0.2);
+    padding: 30px;
+    border-radius: 20px;
+    transition: all 0.4s ease;
+    backdrop-filter: blur(10px);
+}
+
+.contact-card:hover {
+    border-color: #d89a4a;
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Красиві кружечки для іконок */
+.card-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, rgba(216, 154, 74, 0.15), rgba(216, 154, 74, 0));
+    border: 1px solid rgba(216, 154, 74, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d89a4a; /* Золотий колір іконки */
+    flex-shrink: 0;
+}
+
+.card-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.contact-link:hover {
+    color: #d89a4a;
+}
+
+/* Кнопки соцмереж */
+.social-links {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.social-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f6e6cf;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.social-btn:hover {
+    background: #d89a4a;
+    color: #1a0f08;
+    border-color: #d89a4a;
 }

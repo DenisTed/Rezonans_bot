@@ -3,451 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Бронювання квитків — Театр Резонанс</title>
+    <title>Бронювання квитків</title>
     <style>
-        :root {
-            --gold: #d89a4a;
-            --gold-bright: #ffc273;
-            --bg-dark: #070707;
-            --border-gold: rgba(216, 154, 74, 0.3);
-        }
+        /* Базові налаштування і темна тема */
+        body { font-family: 'Segoe UI', sans-serif; background: #070707; color: #fff; margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 1px solid #d89a4a; padding-bottom: 10px; }
+        .header a { color: #d89a4a; text-decoration: none; font-weight: bold; text-transform: uppercase; }
+        
+        /* Сітка сторінки (зал ліворуч, панель оплати праворуч) */
+        .container { display: flex; gap: 30px; max-width: 1100px; margin: auto; flex-wrap: wrap; }
+        .hall { flex: 2; min-width: 600px; }
+        .sidebar { flex: 1; background: #1a1a1a; padding: 25px; border-radius: 15px; border: 1px solid rgba(216, 154, 74, 0.3); height: fit-content; }
+        
+        /* Елементи керування */
+        select, button { width: 100%; padding: 15px; border-radius: 8px; font-size: 16px; margin-top: 10px; }
+        select { background: #222; color: #fff; border: 1px solid #d89a4a; }
+        button { background: #d89a4a; color: #000; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        button:disabled { background: #555; cursor: not-allowed; opacity: 0.5; }
+        button:hover:not(:disabled) { background: #f4b76e; }
 
-        body {
-            background-color: var(--bg-dark);
-            color: #fff;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            margin: 0;
-            min-height: 100vh;
-        }
-
-        header {
-            width: 100%;
-            padding: 20px 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-            border-bottom: 1px solid var(--border-gold);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-        }
-
-        .nav-container {
-            width: 90%;
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 22px;
-            font-weight: bold;
-            color: var(--gold);
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            text-decoration: none;
-        }
-
-        .main-menu {
-            display: flex;
-            gap: 30px;
-        }
-
-        .main-menu a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: 0.3s;
-            opacity: 0.75;
-        }
-
-        .main-menu a:hover,
-        .main-menu a.active {
-            color: var(--gold);
-            opacity: 1;
-        }
-
-        .booking-layout {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 50px;
-            width: 95%;
-            max-width: 1400px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .hall-section {
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 30px;
-            padding: 50px 30px 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .performance-title {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 28px;
-            color: var(--gold);
-        }
-
-        .legend {
-            display: flex;
-            gap: 30px;
-            margin-bottom: 40px;
-            padding: 15px 35px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 15px;
-            font-size: 13.5px;
-        }
-
-        .legend-item { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-        }
-        .l-box { 
-            width: 18px; 
-            height: 18px; 
-            border-radius: 5px; 
-        }
-        .l-free { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(216, 154, 74, 0.2); }
-        .l-selected { background: var(--gold); box-shadow: 0 0 12px var(--gold); }
-        .l-occupied { 
-            background: rgba(255, 255, 255, 0.03); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            position: relative; 
-        }
-        .l-occupied::after { 
-            content: '×'; 
-            position: absolute; 
-            left: 50%; 
-            top: 50%; 
-            transform: translate(-50%, -50%);
-            color: rgba(255,255,255,0.25);
-            font-size: 14px;
-        }
-
-        .stage {
-            width: 65%;
-            height: 6px;
-            background: linear-gradient(to right, transparent, var(--gold), transparent);
-            margin: 40px 0 70px;
-            box-shadow: 0 0 40px var(--gold);
-            position: relative;
-        }
-
-        .stage::after {
-            content: 'СЦЕНА';
-            position: absolute;
-            top: 18px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 11px;
-            letter-spacing: 12px;
-            color: var(--gold);
-            opacity: 0.8;
-        }
-
-        .seats-grid { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px; 
-        }
-        .seat-row { 
-            display: flex; 
-            gap: 7px; 
-            align-items: center; 
-        }
-        .row-label { 
-            width: 70px; 
-            font-size: 12px; 
-            color: var(--gold); 
-            opacity: 0.65; 
-            text-transform: uppercase; 
-            font-weight: 500;
-        }
-        .aisle { width: 30px; }
-
-        .seat {
-            width: 34px;
-            height: 34px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(216, 154, 74, 0.18);
-            border-radius: 7px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .seat:hover:not(.occupied) {
-            background: rgba(216, 154, 74, 0.35);
-            border-color: var(--gold);
-            transform: scale(1.12);
-        }
-
-        .seat.occupied {
-            background: rgba(40, 40, 40, 0.6);
-            border-color: rgba(255,255,255,0.08);
-            cursor: not-allowed;
-            color: rgba(255,255,255,0.2);
-        }
-
-        .seat.selected {
-            background: var(--gold) !important;
-            color: #000 !important;
-            border-color: #fff;
-            box-shadow: 0 0 20px var(--gold);
-            transform: scale(1.08);
-        }
-
-        /* Sidebar */
-        .selection-sidebar {
-            background: rgba(20, 10, 10, 0.92);
-            border: 1px solid var(--border-gold);
-            border-radius: 24px;
-            padding: 35px 30px;
-            height: fit-content;
-            position: sticky;
-            top: 100px;
-        }
-
-        .sidebar-title {
-            color: var(--gold);
-            font-size: 20px;
-            margin-bottom: 20px;
-            letter-spacing: 1px;
-        }
-
-        .selected-info {
-            color: #ccc;
-            margin-bottom: 15px;
-            font-size: 15px;
-        }
-
-        .selected-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            min-height: 50px;
-            margin-bottom: 30px;
-        }
-
-        .tag {
-            background: rgba(216, 154, 74, 0.15);
-            border: 1px solid var(--gold);
-            color: #fff;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 13.5px;
-        }
-
-        .total-box {
-            border-top: 1px solid rgba(216, 154, 74, 0.3);
-            padding-top: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 18px;
-        }
-
-        .total-price {
-            font-size: 36px;
-            font-weight: bold;
-            color: var(--gold);
-        }
-
-        .btn-pay {
-            width: 100%;
-            padding: 18px;
-            margin-top: 35px;
-            background: linear-gradient(135deg, #d89a4a, #f4b76e);
-            color: #000;
-            font-weight: 700;
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-pay:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(216, 154, 74, 0.4);
-        }
-
-        .btn-pay:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-        }
+        /* Сцена та місця */
+        .stage { text-align: center; color: #d89a4a; letter-spacing: 10px; padding-bottom: 10px; border-bottom: 2px solid #d89a4a; margin: 30px 0; }
+        .row { display: flex; gap: 8px; justify-content: center; margin-bottom: 8px; align-items: center; }
+        .row span { width: 50px; color: #d89a4a; font-size: 12px; }
+        .seat { width: 30px; height: 30px; background: #333; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 1px solid #555; }
+        
+        /* Стани місць */
+        .seat:hover:not(.occupied) { background: #d89a4a; }
+        .seat.selected { background: #d89a4a; color: #000; border-color: #fff; }
+        .seat.occupied { background: #111; color: #444; border-color: #222; cursor: not-allowed; }
     </style>
 </head>
 <body>
-
-<header>
-    <div class="nav-container">
-        <a href="index.html" class="logo">RESONANCE</a>
-        <nav class="main-menu">
-            <a href="index.html">Головна</a>
-            <a href="afisha.html" class="active">Афіша</a>
-            <a href="about.html">Про нас</a>
-            <a href="contacts.html">Контакти</a>
-        </nav>
-        <a href="admin.html" class="admin-link">⚙️ АДМІН</a>
+    <div class="header">
+        <a href="#">RESONANCE</a>
+        <a href="index.html">Наголовну</a>
     </div>
-</header>
-
-<div class="booking-layout">
-    <section class="hall-section">
-        <h2 class="performance-title">«Цікавий випадок у психологічній практиці»</h2>
-        
-        <div class="legend">
-            <div class="legend-item"><div class="l-box l-free"></div> Вільні</div>
-            <div class="legend-item"><div class="l-box l-selected"></div> Вибрані</div>
-            <div class="legend-item"><div class="l-box l-occupied"></div> Зайняті</div>
-        </div>
-
-        <div class="stage"></div>
-        <div class="seats-grid" id="seatsGrid"></div>
-    </section>
-
-    <aside class="selection-sidebar">
-        <div class="sidebar-title">Ваше замовлення</div>
-        <div class="selected-info">Обрані місця:</div>
-        <div class="selected-tags" id="selectedTags"></div>
-        
-        <div class="total-box">
-            <span>Разом:</span>
-            <div class="total-price"><span id="totalAmount">0</span> грн</div>
-        </div>
-        
-        <button class="btn-pay" id="payBtn" disabled>Купити квитки</button>
-    </aside>
-</div>
-
-<script>
-    const grid = document.getElementById('seatsGrid');
-    const tagsContainer = document.getElementById('selectedTags');
-    const totalAmountEl = document.getElementById('totalAmount');
-    const payBtn = document.getElementById('payBtn');
     
-    const PRICE_PER_TICKET = 250;
-    let selectedSeats = [];
-    let occupiedSeats = JSON.parse(localStorage.getItem('occupiedSeats')) || [];
+    
 
-    const rows = 10;
-    const seatsInRow = 16;
+    <div class="container">
+        <div class="hall">
+            <h2>Оберіть виставу:</h2>
+            <select id="sessionSelect" onchange="loadSession()">
+                <option value="">— Оберіть виставу та дату —</option>
+            </select>
 
-    // Генерація залу
-    for (let r = 1; r <= rows; r++) {
-        const rowDiv = document.createElement('div');
-        rowDiv.className = 'seat-row';
+            <div class="stage">СЦЕНА</div>
+            <div id="seatsGrid"></div>
+        </div>
+
+        <div class="sidebar">
+            <h3>Ваше замовлення</h3>
+            <p style="color: #aaa;">Місця: <span id="selectedTags" style="color: #fff;">Не обрано</span></p>
+            <h2 style="color: #d89a4a;">Разом: <span id="totalAmount">0</span> грн</h2>
+            <button id="payBtn" disabled>Оплатити на картку</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. Наші дані
+        const performances = [
+            { id: "1", title: "Цікавий випадок", date: "2026-04-25" }
+            
+        ];
+        const TICKET_PRICE = 250;
         
-        const label = document.createElement('div');
-        label.className = 'row-label';
-        label.textContent = `РЯД ${r}`;
-        rowDiv.appendChild(label);
+        let currentSessionKey = null;
+        let occupiedSeats = [];
+        let selectedSeats = [];
 
-        for (let s = 1; s <= seatsInRow; s++) {
-            if (s === 5 || s === 13) {
-                const aisle = document.createElement('div');
-                aisle.className = 'aisle';
-                rowDiv.appendChild(aisle);
-            }
-
-            const seat = document.createElement('div');
-            seat.className = 'seat';
-            const seatKey = `${r}-${s}`;
-
-            if (occupiedSeats.includes(seatKey)) {
-                seat.classList.add('occupied');
-            }
-
-            seat.addEventListener('click', () => toggleSeat(seat, seatKey, r, s));
-            rowDiv.appendChild(seat);
-        }
-        grid.appendChild(rowDiv);
-    }
-
-    function toggleSeat(seatEl, seatKey, row, seatNum) {
-        if (seatEl.classList.contains('occupied')) return;
-
-        if (seatEl.classList.contains('selected')) {
-            seatEl.classList.remove('selected');
-            selectedSeats = selectedSeats.filter(s => s.key !== seatKey);
-        } else {
-            seatEl.classList.add('selected');
-            selectedSeats.push({ key: seatKey, row: row, seat: seatNum });
-        }
-        updateSummary();
-    }
-
-    function updateSummary() {
-        tagsContainer.innerHTML = '';
-        selectedSeats.forEach(item => {
-            const tag = document.createElement('span');
-            tag.className = 'tag';
-            tag.textContent = `Ряд ${item.row} • Місце ${item.seat}`;
-            tagsContainer.appendChild(tag);
+        // 2. Завантажуємо список вистав у Select
+        const selectEl = document.getElementById('sessionSelect');
+        performances.forEach(perf => {
+            selectEl.innerHTML += `<option value="${perf.id}|${perf.date}">${perf.title} — ${perf.date}</option>`;
         });
 
-        totalAmountEl.textContent = selectedSeats.length * PRICE_PER_TICKET;
-        payBtn.disabled = selectedSeats.length === 0;
-    }
+        // 3. Функція завантаження сеансу (спрацьовує при виборі вистави)
+        function loadSession() {
+            currentSessionKey = selectEl.value;
+            if (!currentSessionKey) {
+                document.getElementById('seatsGrid').innerHTML = '';
+                return;
+            }
 
-    // Купівля квитків + збір телефону
-    payBtn.addEventListener('click', () => {
-        if (selectedSeats.length === 0) return;
-
-        const phone = prompt("Введіть номер телефону для підтвердження замовлення:\nНаприклад: +380501234567", "+380");
-
-        if (!phone || phone.length < 10) {
-            alert("Будь ласка, введіть коректний номер телефону!");
-            return;
+            // Дістаємо зайняті місця з пам'яті браузера (для адмінки)
+            const allSessions = JSON.parse(localStorage.getItem('hallSessions')) || {};
+            occupiedSeats = allSessions[currentSessionKey] || [];
+            selectedSeats = []; 
+            
+            renderHall();
+            updateCart();
         }
 
-        if (!confirm(`Купити ${selectedSeats.length} квитків за ${selectedSeats.length * PRICE_PER_TICKET} грн?\n\nТелефон: ${phone}`)) {
-            return;
+        // 4. Малюємо зал простіше
+        function renderHall() {
+            const grid = document.getElementById('seatsGrid');
+            grid.innerHTML = ''; // Очищаємо
+
+            for (let r = 1; r <= 10; r++) { // 10 рядів
+                let rowHTML = `<div class="row"><span>Ряд ${r}</span>`;
+                
+                for (let s = 1; s <= 15; s++) { // 15 місць у ряду
+                    const key = `${r}-${s}`;
+                    const isOccupied = occupiedSeats.includes(key);
+                    const className = isOccupied ? 'seat occupied' : 'seat';
+                    
+                    // Додаємо місце в рядок HTML
+                    rowHTML += `<div class="${className}" onclick="toggleSeat(this, '${key}', ${r}, ${s})">${s}</div>`;
+                    
+                    // Робимо прохід (aisle) після 5 та 10 місця
+                    if (s === 5 || s === 10) rowHTML += `<div style="width: 20px;"></div>`; 
+                }
+                
+                rowHTML += `</div>`;
+                grid.innerHTML += rowHTML;
+            }
         }
 
-        const orders = JSON.parse(localStorage.getItem('theatreOrders')) || [];
-        
-        const newOrder = {
-            id: Date.now(),
-            performance: "Цікавий випадок у психологічній практиці",
-            seats: selectedSeats.map(s => `Р${s.row} М${s.seat}`),
-            seatKeys: selectedSeats.map(s => s.key),     // для звільнення місць
-            totalPrice: selectedSeats.length * PRICE_PER_TICKET,
-            phone: phone.trim(),
-            status: 'pending',
-            date: new Date().toLocaleString('uk-UA')
+        // 5. Вибір місця
+        function toggleSeat(element, key, row, seatNum) {
+            if (element.classList.contains('occupied')) return; // Якщо зайнято — нічого не робимо
+
+            if (element.classList.contains('selected')) {
+                element.classList.remove('selected');
+                selectedSeats = selectedSeats.filter(s => s.key !== key); // Видаляємо з масиву
+            } else {
+                element.classList.add('selected');
+                selectedSeats.push({ key, row, seatNum }); // Додаємо в масив
+            }
+            updateCart();
+        }
+
+        // 6. Оновлення кошика
+        function updateCart() {
+            const tags = document.getElementById('selectedTags');
+            const total = document.getElementById('totalAmount');
+            const btn = document.getElementById('payBtn');
+
+            if (selectedSeats.length === 0) {
+                tags.innerText = "Не обрано";
+            } else {
+                tags.innerText = selectedSeats.map(s => `Р${s.row}М${s.seatNum}`).join(', ');
+            }
+
+            total.innerText = selectedSeats.length * TICKET_PRICE;
+            btn.disabled = selectedSeats.length === 0; // Вмикаємо кнопку, якщо є місця
+        }
+
+        // 7. Оплата і збереження (Міст до Адмін-панелі)
+        document.getElementById('payBtn').onclick = () => {
+            const phone = prompt("Введіть ваш номер телефону (наприклад: 0501234567):");
+            if (!phone) return;
+
+            const totalSum = selectedSeats.length * TICKET_PRICE;
+            const perfName = selectEl.options[selectEl.selectedIndex].text;
+
+            alert(`✅ Замовлення створено!\nПереведіть ${totalSum} грн на картку 4441 1111 2222 3333.\nПісля оплати адміністратор підтвердить квитки.`);
+
+            // ЗБЕРЕЖЕННЯ ДЛЯ АДМІНКИ (Замовлення)
+            const orders = JSON.parse(localStorage.getItem('theatreOrders')) || [];
+            orders.push({
+                id: Date.now(),
+                sessionKey: currentSessionKey,
+                performance: perfName,
+                seats: selectedSeats.map(s => `Р${s.row} М${s.seatNum}`),
+                seatKeys: selectedSeats.map(s => s.key),
+                totalPrice: totalSum,
+                phone: phone,
+                status: 'waiting_payment', // Статус для адмінки
+                date: new Date().toLocaleString('uk-UA')
+            });
+            localStorage.setItem('theatreOrders', JSON.stringify(orders));
+
+            // ЗБЕРЕЖЕННЯ ДЛЯ АДМІНКИ (Зайняті місця)
+            occupiedSeats.push(...selectedSeats.map(s => s.key));
+            const allSessions = JSON.parse(localStorage.getItem('hallSessions')) || {};
+            allSessions[currentSessionKey] = occupiedSeats;
+            localStorage.setItem('hallSessions', JSON.stringify(allSessions));
+
+            loadSession(); // Оновлюємо зал (місця стануть зайнятими)
         };
-
-        orders.push(newOrder);
-        localStorage.setItem('theatreOrders', JSON.stringify(orders));
-
-        // Займаємо місця
-        occupiedSeats = [...occupiedSeats, ...newOrder.seatKeys];
-        localStorage.setItem('occupiedSeats', JSON.stringify(occupiedSeats));
-
-        alert(`✅ Замовлення прийнято!\nМи зателефонуємо вам на ${phone} для підтвердження.`);
-
-        selectedSeats = [];
-        location.reload();
-    });
-</script>
+    </script>
 </body>
 </html>

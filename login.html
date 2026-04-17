@@ -1,71 +1,39 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Вхід — Театр Резонанс</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <link rel="stylesheet" href="css/styles.css" />
+    <meta charset="UTF-8">
+    <title>Вхід в систему</title>
+    <style>
+        body { background: #070707; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: #1a1a1a; padding: 40px; border-radius: 15px; border: 1px solid #d89a4a; text-align: center; width: 300px; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; background: #222; border: 1px solid #444; color: #fff; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #d89a4a; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; }
+    </style>
 </head>
-<body class="page-repertoire page-auth">
-  
-  <div class="page-transition is-entering" id="pageTransition">
-    <div class="page-transition__curtain page-transition__curtain--left"></div>
-    <div class="page-transition__curtain page-transition__curtain--right"></div>
-  </div>
-
-  <header class="main-header">
-    <div class="header-container">
-      <a href="index.html" class="header-logo js-page-link">РЕЗОНАНС</a>
-      <nav class="main-nav">
-        <ul>
-          <li><a href="index.html" class="js-page-link">ГОЛОВНА</a></li>
-          <li><a href="afisha.html" class="js-page-link">АФІША</a></li>
-          <li><a href="repertoire.html" class="js-page-link">РЕПЕРТУАР</a></li>
-          <li><a href="#" class="js-page-link">ПРО ТЕАТР</a></li>
-          <li><a href="#" class="js-page-link">КОНТАКТИ</a></li>
-        </ul>
-      </nav>
-      <a href="afisha.html" class="header-cta js-page-link">КВИТКИ</a>
+<body>
+    <div class="login-card">
+        <h2 style="color: #d89a4a;">RESONANCE</h2>
+        <p>Вхід для адміністратора</p>
+        <input type="text" id="username" placeholder="Логін">
+        <input type="password" id="password" placeholder="Пароль">
+        <button onclick="tryLogin()">Увійти</button>
+        <p id="error" style="color: red; font-size: 12px; display: none;">Невірний логін або пароль!</p>
     </div>
-  </header>
 
-  <main class="repertoire-layout auth-layout">
-    <div class="repertoire-container">
-      
-      <div class="auth-centered-box">
-        <header class="repertoire-fixed-header" style="border: none; text-align: center;">
-          <h1 style="font-size: 40px;">ВХІД</h1>
-          <p style="color: var(--gold); letter-spacing: 2px; font-size: 12px; margin-top: 10px;">ОСОБИСТИЙ КАБІНЕТ ГЛЯДАЧА</p>
-        </header>
+    <script>
+        function tryLogin() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
 
-        <div class="show-card auth-card">
-          <form id="loginForm" class="auth-form">
-            <div class="input-group">
-              <label for="username">Логін або Email</label>
-              <input type="text" id="username" name="username" placeholder="Введіть ваш логін" required>
-            </div>
-
-            <div class="input-group">
-              <label for="password">Пароль</label>
-              <input type="password" id="password" name="password" placeholder="••••••••" required>
-            </div>
-
-            <button type="submit" class="hero-btn auth-submit-btn">
-              <span>УВІЙТИ</span>
-              <div class="dropdown-arrow"></div>
-            </button>
-          </form>
-          
-          <div class="auth-footer">
-            <p>Немає акаунту? <a href="#" class="gold-link">Зареєструватися</a></p>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </main>
-
-  <script src="js/main.js"></script>
+            // ТУТ ЗАДАЄШ СВІЙ ПАРОЛЬ
+            if (user === "admin" && pass === "1234") {
+                // Зберігаємо "ключ" у пам'ять браузера на 1 годину
+                localStorage.setItem('adminLoggedIn', 'true');
+                window.location.href = "admin.html"; // Перенаправлення на адмінку
+            } else {
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+    </script>
 </body>
 </html>

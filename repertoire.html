@@ -8,117 +8,131 @@
   <link rel="stylesheet" href="css/styles.css" />
   
   <style>
+    /* Глобальні налаштування фону */
     .page-repertoire {
-      background: #0a0805;
+      background: linear-gradient(rgba(10, 8, 5, 0.92), rgba(10, 8, 5, 0.92)), 
+                  url('img/theatre-bg.jpg') center/cover no-repeat fixed;
       min-height: 100dvh;
       padding: 40px 20px;
+      color: #f6e6cf;
     }
 
     .afisha-container {
-      max-width: 1280px;
+      max-width: 1200px;
       margin: 0 auto;
-      width: 100%;
     }
 
     .afisha-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 50px;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    .afisha-header h2 {
-      font-size: clamp(32px, 5vw, 48px);
-      color: #f6e6cf;
-      margin: 0;
-      letter-spacing: -1px;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-      gap: 40px;
       margin-bottom: 60px;
     }
 
-    .featured-wrapper {
-      animation: fadeUp 0.9s ease forwards;
+    .afisha-header h2 {
+      font-size: clamp(28px, 5vw, 42px);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin: 0;
+      /* Золоте сяйво для заголовка */
+      text-shadow: 0 0 20px rgba(216, 154, 74, 0.4);
+    }
+
+    .back-link {
+      background: linear-gradient(to right, #3c2a1f, #2a1f18);
+      border: 1px solid #d89a4a;
+      color: #f6e6cf;
+      padding: 10px 24px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .back-link:hover {
+      background: #d89a4a;
+      color: #000;
+      box-shadow: 0 0 15px rgba(216, 154, 74, 0.5);
+    }
+
+    /* Сітка карток */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 40px;
     }
 
     .poster-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(216,154,74,0.25);
-      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(216, 154, 74, 0.15);
+      border-radius: 24px;
       overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      transition: 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+      backdrop-filter: blur(10px);
     }
 
     .poster-card:hover {
-      transform: translateY(-12px) scale(1.03);
-      border-color: var(--gold);
-      box-shadow: 0 30px 70px rgba(216,154,74,0.3);
+      transform: translateY(-10px);
+      border-color: #d89a4a;
+      background: rgba(255, 255, 255, 0.06);
     }
 
+    /* ФОТО ВИСТАВИ (Виправлено) */
     .poster-image {
-      height: 480px;
+      height: 450px; /* Задаємо висоту тут */
       background-size: cover;
       background-position: center;
       position: relative;
     }
 
+    /* Градієнт на фото, щоб текст знизу читався краще */
     .poster-image::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(to bottom, transparent 60%, rgba(10,8,5,0.92) 100%);
+      background: linear-gradient(to bottom, transparent 60%, rgba(10,8,5,1) 100%);
     }
 
     .poster-info {
-      padding: 28px 32px;
+      padding: 30px;
       text-align: center;
     }
 
     .poster-meta {
       display: inline-block;
-      background: rgba(216,154,74,0.15);
-      color: var(--gold-soft);
-      font-size: 13px;
+      color: #d89a4a;
+      font-size: 12px;
       letter-spacing: 2px;
-      padding: 6px 18px;
-      border-radius: 50px;
-      margin-bottom: 12px;
+      text-transform: uppercase;
+      margin-bottom: 15px;
+      border-bottom: 1px solid rgba(216, 154, 74, 0.3);
+      padding-bottom: 4px;
     }
 
     .poster-info h3 {
-      font-size: 26px;
-      color: #f6e6cf;
-      margin: 0 0 12px 0;
-      line-height: 1.2;
+      font-size: 24px;
+      margin: 0 0 10px 0;
+      font-weight: 400;
     }
 
     .poster-date {
       color: #d9c3a3;
-      font-size: 17px;
-      opacity: 0.9;
+      font-size: 14px;
+      opacity: 0.7;
     }
 
     .coming-soon-text {
       text-align: center;
-      color: var(--text-soft);
-      font-size: 17px;
+      margin-top: 80px;
+      color: #d9c3a3;
+      opacity: 0.4;
       font-style: italic;
-      opacity: 0.75;
-      max-width: 600px;
-      margin: 0 auto;
     }
   </style>
 </head>
 <body class="page-repertoire">
 
-  <!-- Анімація переходу -->
   <div class="page-transition is-entering" id="pageTransition">
     <div class="page-transition__curtain page-transition__curtain--left"></div>
     <div class="page-transition__curtain page-transition__curtain--right"></div>
@@ -126,50 +140,32 @@
   </div>
 
   <main>
-    <section class="afisha-section">
-      <div class="afisha-container">
+    <div class="afisha-container">
 
-        <div class="afisha-header">
-          <h2>Репертуар</h2>
-          <a href="index.html" class="back-link js-page-link">← Назад на головну</a>
-        </div>
-
-        <!-- Сітка вистав -->
-        <div class="cards">
-
-          <!-- Вистав 1 -->
-          <div class="featured-wrapper">
-            <div class="poster-card">
-              <div class="poster-image" style="background-image: url('img/performance1.jpg');"></div>
-              <div class="poster-info">
-                <div class="poster-meta">Трагікомедія</div>
-                <h3>Назва вистави 1</h3>
-                <p class="poster-date">У поточному сезоні • 2026</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Вистав 2 -->
-          <div class="featured-wrapper">
-            <div class="poster-card">
-              <div class="poster-image" style="background-image: url('img/performance2.jpg');"></div>
-              <div class="poster-info">
-                <div class="poster-meta">Драма</div>
-                <h3>Назва вистави 2</h3>
-                <p class="poster-date">Архівна • В репертуарі</p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <p class="coming-soon-text">
-          Повний перелік вистав нашого театру.<br>
-          Нові прем’єри вже готуються.
-        </p>
-
+      <div class="afisha-header">
+        <h2>Репертуар</h2>
+        <a href="index.html" class="back-link">← На Головну</a>
       </div>
-    </section>
+
+      <div class="cards">
+        
+        <div class="poster-card">
+          <div class="poster-image" style="background-image: url('css/a_pcix.jpg');"></div>
+          <div class="poster-info">
+            <div class="poster-meta">Психологічна комедія</div>
+            <h3>Цікавий випадок у психологічній практиці</h3>
+            <p class="poster-date">Основна сцена • 2026</p>
+          </div>
+        </div>
+
+        </div>
+
+      <p class="coming-soon-text">
+        В репертуарі театру «Резонанс» тільки актуальні постановки.<br>
+        Бронювання квитків доступне в розділі «Афіша».
+      </p>
+
+    </div>
   </main>
 
   <script src="js/main.js"></script>

@@ -1,3 +1,22 @@
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrGe33T9HltpN_u-UqAqey39UBQ5JhA7hDmmf6bUAqrCeum-lHXnl1rnWMJZq-pkw4/exec";
+
+async function loadOccupiedSeats() {
+    try {
+        const response = await fetch(GOOGLE_SCRIPT_URL);
+        const data = await response.json();
+        
+        let occupied = [];
+        data.forEach(order => {
+            if(order.sessionKey === currentSession) {
+                occupied = [...occupied, ...order.seatKeys];
+            }
+        });
+        return occupied;
+    } catch (e) {
+        console.error("Помилка бази:", e);
+        return [];
+    }
+}
 document.addEventListener("DOMContentLoaded", () => {
   const transition = document.getElementById("pageTransition");
   const duration = 900;
@@ -7,6 +26,12 @@ document.addEventListener("DOMContentLoaded", () => {
   handlePageLeaveAnimation(transition, duration);
   updateAuthUI();
 });
+fetch('data.json')
+  .then(response => response.json())
+  .then(data => {
+    console.log("Моя база:", data);
+    // Тут код, який створює картки вистав з цих даних
+  });
 
 function initDropdowns() {
   const dropdowns = document.querySelectorAll(".dropdown");

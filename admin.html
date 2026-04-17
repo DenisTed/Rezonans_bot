@@ -3,398 +3,286 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Адмін-центр — Керування залом</title>
+    <title>Адмін-центр — Театр Резонанс</title>
     <style>
+        /* БАЗОВІ СТИЛІ ТА ДИЗАЙН */
         :root {
             --gold: #d89a4a;
-            --red: #ff4d4d;
-            --green: #28a745;
-            --bg: #0a0a0a;
-            --card-bg: #161616;
-            --border: #333;
+            --dark: #0a0805;
+            --bg-card: #14110d;
+            --text-soft: #a8a095;
         }
 
         body { 
-            background: var(--bg); 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--dark); 
             color: #fff; 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
             margin: 0; 
-            padding: 0; 
-            min-height: 100vh; 
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        nav { 
-            background: #000; 
             padding: 20px; 
+        }
+
+        .header { 
             display: flex; 
+            justify-content: space-between; 
             align-items: center; 
-            gap: 30px; 
-            border-bottom: 1px solid var(--border);
-        }
-        nav h2 { color: var(--gold); margin: 0; font-size: 24px; letter-spacing: 3px; }
-        nav a { 
-            color: #ccc; 
-            text-decoration: none; 
-            font-size: 15px; 
-            padding: 8px 16px; 
-            border-radius: 8px; 
-            transition: 0.3s;
-        }
-        nav a:hover, nav a.active { background: var(--card-bg); color: var(--gold); }
-
-        .main-content {
-            display: flex;
-            gap: 30px;
-            margin-top: 30px;
+            border-bottom: 1px solid var(--gold); 
+            padding-bottom: 15px; 
+            margin-bottom: 25px; 
         }
 
-        .left-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
+        .header h2 { color: var(--gold); margin: 0; letter-spacing: 2px; font-weight: 300; }
+
+        .container { display: flex; gap: 20px; flex-wrap: wrap; }
+        .sidebar { flex: 1; min-width: 280px; background: var(--bg-card); padding: 20px; border-radius: 15px; border: 1px solid rgba(216, 154, 74, 0.2); }
+        .main { flex: 3; min-width: 320px; }
+
+        .card { 
+            background: var(--bg-card); 
+            padding: 20px; 
+            border-radius: 15px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            margin-bottom: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        .right-panel {
-            width: 420px;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
+        h3 { color: var(--gold); margin: 0 0 15px 0; text-transform: uppercase; font-size: 14px; letter-spacing: 1px; }
+
+        input, select, button { 
+            width: 100%; padding: 12px; margin-bottom: 10px; box-sizing: border-box; 
+            background: #1a1713; color: #fff; border: 1px solid #332f2a; border-radius: 8px; 
         }
 
-        .section-card {
-            background: var(--card-bg);
-            padding: 24px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
+        button { font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
+        .btn-gold { background: var(--gold); color: #000; }
+        .btn-green { background: #2d5a27; color: #fff; }
+        .btn-red { background: #7a2a2a; color: #fff; }
+        button:hover { filter: brightness(1.2); transform: translateY(-2px); }
+
+        /* ЗАЛ ТА КРІСЛА */
+        .hall-wrapper { overflow-x: auto; padding: 20px 0; text-align: center; }
+        .row { display: flex; gap: 6px; margin-bottom: 8px; justify-content: center; min-width: 600px; }
+        .seat { 
+            width: 28px; height: 28px; background: #2a2621; display: flex; 
+            align-items: center; justify-content: center; font-size: 10px; 
+            cursor: pointer; border-radius: 4px; border: 1px solid #3d3831; transition: 0.2s;
+        }
+        .seat.occupied { background: #7a2a2a; border-color: #ff4d4d; color: #fff; cursor: not-allowed; }
+        .seat.selected { background: var(--gold) !important; color: #000; border-color: #fff; }
+
+        /* СПИСОК ЗАМОВЛЕНЬ */
+        .order { 
+            background: rgba(255,255,255,0.03); padding: 15px; margin-bottom: 10px; 
+            border-left: 3px solid var(--gold); border-radius: 8px; 
         }
 
-        h3 {
-            color: var(--gold);
-            margin: 0 0 20px 0;
-            font-size: 17px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        /* АДАПТИВНІСТЬ */
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 15px; text-align: center; }
+            .main { min-width: 100%; }
         }
-
-        /* Швидкий продаж */
-        .quick-sale input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
-            background: #111;
-            border: 1px solid #444;
-            color: white;
-            border-radius: 8px;
-            font-size: 15px;
-        }
-
-        .btn-cash {
-            width: 100%;
-            padding: 16px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-cash:hover { background: #2ecc71; }
-
-        /* Зал */
-        .grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background: #0f0f0f;
-            padding: 25px;
-            border-radius: 12px;
-        }
-        .row {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-        .row-info {
-            width: 80px;
-            font-size: 13px;
-            color: #888;
-            font-weight: 500;
-        }
-        .seat {
-            width: 26px;
-            height: 26px;
-            background: #222;
-            border: 1px solid #555;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            transition: all 0.2s;
-        }
-        .seat.occupied {
-            background: var(--red);
-            border-color: #ff6666;
-            color: white;
-        }
-        .seat:hover:not(.occupied) {
-            border-color: var(--gold);
-            transform: scale(1.15);
-        }
-        .aisle { width: 20px; }
-
-        /* Статистика */
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        .stat-card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid var(--border);
-        }
-        .stat-card small { color: #777; }
-        .stat-card .value {
-            font-size: 32px;
-            font-weight: bold;
-            margin-top: 8px;
-        }
-
-        /* Замовлення */
-        .order-card {
-            background: #1f1f1f;
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 14px;
-            border-left: 4px solid var(--gold);
-        }
-        .phone { color: var(--gold); font-weight: 600; }
-
-        .btn {
-            padding: 8px 14px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        .btn-confirm { background: var(--green); color: white; }
-        .btn-edit { background: #3498db; color: white; }
-        .btn-cancel { background: transparent; border: 1px solid var(--red); color: var(--red); }
     </style>
 </head>
 <body>
 
-    <nav>
-        <h2>RESONANCE</h2>
-        <a href="#" class="active">Панель керування</a>
-        <a href="booking.html">Бронювання</a>
-    </nav>
-
-    <div class="container">
-        <div class="main-content">
-
-            <!-- Ліва колонка (основний контент) -->
-            <div class="left-panel">
-
-                <!-- Швидкий продаж в касу -->
-                <div class="section-card quick-sale">
-                    <h3>Швидкий продаж в касу (по телефону)</h3>
-                    <input type="number" id="quickSeats" value="1" min="1" max="10">
-                    <input type="text" id="quickPhone" placeholder="Телефон клієнта (+380...)">
-                    <input type="text" id="quickNote" placeholder="Примітка (необов'язково)">
-                    <button class="btn-cash" onclick="addQuickSale()">
-                        ➕ Додати в касу (оплачено)
-                    </button>
-                </div>
-
-                <!-- Керування залом -->
-                <div class="section-card">
-                    <h3>Керування залом</h3>
-                    <div class="grid" id="hallGrid"></div>
-                </div>
-
-                <!-- Статистика -->
-                <div class="stats">
-                    <div class="stat-card">
-                        <small>КАСА (ОПЛАЧЕНО)</small>
-                        <div id="cashTotal" class="value" style="color: var(--green);">0 грн</div>
-                    </div>
-                    <div class="stat-card">
-                        <small>ПРОДАНО КВИТКІВ</small>
-                        <div id="seatsTotal" class="value" style="color: var(--gold);">0</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Права колонка - Замовлення -->
-            <div class="right-panel">
-                <div class="section-card">
-                    <h3>Замовлення клієнтів</h3>
-                    <div id="ordersList"></div>
-                </div>
-            </div>
-
+    <div class="header">
+        <h2>RESONANCE | ADMIN</h2>
+        <div style="display: flex; gap: 10px;">
+            <a href="index.html" style="color: #ccc; text-decoration: none; padding-top: 8px;">🔙 На сайт</a>
+            <button class="btn-red" style="width: auto;" onclick="logout()">Вихід</button>
         </div>
     </div>
 
-    <script>
-        // ... (весь JavaScript залишається майже таким самим, як у попередній версії)
+    <div class="container">
+        <div class="sidebar">
+            <h3>Каса (Оплачено)</h3>
+            <div id="statsBox" style="font-size: 24px; color: var(--gold); font-weight: bold;">0 грн</div>
+            <p id="ticketCount" style="color: var(--text-soft); font-size: 14px;">0 квитків</p>
+            <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+            <button class="btn-red" style="font-size: 12px; opacity: 0.6;" onclick="resetSystem()">Очистити локальну базу</button>
+        </div>
 
-        const rows = 10, seatsInRow = 16;
-        const PRICE = 250;
+        <div class="main">
+            <div class="card">
+                <h3>Активний сеанс</h3>
+                <select id="sessionSelect" onchange="loadData()"></select>
+            </div>
 
-        function getOccupied() { return JSON.parse(localStorage.getItem('occupiedSeats')) || []; }
-        function getOrders() { return JSON.parse(localStorage.getItem('theatreOrders')) || []; }
-        function saveOccupied(occ) { localStorage.setItem('occupiedSeats', JSON.stringify(occ)); }
-
-        function findNextFreeSeats(count) {
-            let occupied = getOccupied();
-            let selected = [];
-            for (let r = 1; r <= rows && selected.length < count; r++) {
-                for (let s = 1; s <= seatsInRow && selected.length < count; s++) {
-                    const key = `${r}-${s}`;
-                    if (!occupied.includes(key)) {
-                        selected.push({key, label: `Р${r} М${s}`});
-                    }
-                }
-            }
-            return selected;
-        }
-
-        window.addQuickSale = function() {
-            const count = parseInt(document.getElementById('quickSeats').value) || 1;
-            const phone = document.getElementById('quickPhone').value.trim();
-            if (!phone) return alert("Введіть номер телефону!");
-
-            const free = findNextFreeSeats(count);
-            if (free.length < count) return alert("Недостатньо вільних місць!");
-
-            const orders = getOrders();
-            orders.push({
-                id: Date.now(),
-                performance: "Цікавий випадок у психологічній практиці",
-                seats: free.map(s => s.label),
-                seatKeys: free.map(s => s.key),
-                totalPrice: count * PRICE,
-                phone: phone,
-                status: 'paid',
-                date: new Date().toLocaleString('uk-UA'),
-                note: document.getElementById('quickNote').value.trim() || "Продаж по телефону"
-            });
-
-            localStorage.setItem('theatreOrders', JSON.stringify(orders));
-            saveOccupied([...getOccupied(), ...free.map(s => s.key)]);
-
-            document.getElementById('quickSeats').value = 1;
-            document.getElementById('quickPhone').value = '';
-            document.getElementById('quickNote').value = '';
-
-            updateUI();
-            alert(`✅ Додано ${count} квитків в касу!`);
-        };
-
-        function renderHall() {
-            const grid = document.getElementById('hallGrid');
-            const occupied = getOccupied();
-            grid.innerHTML = '';
-
-            for (let r = 1; r <= rows; r++) {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'row';
-                rowDiv.innerHTML = `<div class="row-info">Ряд ${r}</div>`;
-
-                for (let s = 1; s <= seatsInRow; s++) {
-                    if (s === 5 || s === 13) rowDiv.innerHTML += `<div class="aisle"></div>`;
-
-                    const key = `${r}-${s}`;
-                    const seat = document.createElement('div');
-                    seat.className = `seat ${occupied.includes(key) ? 'occupied' : ''}`;
-                    seat.textContent = s;
-                    seat.onclick = () => {
-                        let occ = getOccupied();
-                        occ = occ.includes(key) ? occ.filter(k => k !== key) : [...occ, key];
-                        saveOccupied(occ);
-                        renderHall();
-                    };
-                    rowDiv.appendChild(seat);
-                }
-                grid.appendChild(rowDiv);
-            }
-        }
-
-        function renderOrders() {
-            const container = document.getElementById('ordersList');
-            const orders = getOrders();
-
-            if (orders.length === 0) {
-                container.innerHTML = '<p style="color:#666; text-align:center; padding:40px 0;">Замовлень поки немає</p>';
-                return;
-            }
-
-            container.innerHTML = orders.slice().reverse().map(order => `
-                <div class="order-card">
-                    <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-                        <span style="color:#777">#${order.id.toString().slice(-6)}</span>
-                        <span style="color:${order.status === 'paid' ? 'var(--green)' : '#f1c40f'}">
-                            ${order.status === 'paid' ? '● ОПЛАЧЕНО' : '● ОЧІКУЄ'}
-                        </span>
-                    </div>
-                    <div><strong>${order.performance}</strong></div>
-                    <div style="margin:6px 0;">${order.seats.join(' • ')}</div>
-                    <div style="color:var(--gold);font-weight:600;margin:8px 0;">${order.totalPrice} грн</div>
-                    ${order.phone ? `<div style="margin:10px 0;"><strong>Телефон:</strong> <span class="phone">${order.phone}</span></div>` : ''}
-                    ${order.note ? `<div style="font-size:12.5px;color:#aaa;">📝 ${order.note}</div>` : ''}
-
-                    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-                        ${order.status === 'pending' ? `<button class="btn btn-confirm" onclick="approveOrder(${order.id})">Підтвердити оплату</button>` : ''}
-                        <button class="btn btn-edit" onclick="editSeats(${order.id})">Редагувати місця</button>
-                        <button class="btn btn-cancel" onclick="deleteOrder(${order.id})">Видалити</button>
-                    </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                <div class="card">
+                    <h3>Продаж (Каса)</h3>
+                    <input type="text" id="quickPhone" placeholder="Телефон або 'Каса'">
+                    <button class="btn-green" onclick="quickSale()">Підтвердити продаж</button>
                 </div>
-            `).join('');
+                <div class="card">
+                    <h3>Бронь по телефону</h3>
+                    <input type="text" id="manualPhone" placeholder="Номер телефону">
+                    <input type="text" id="manualSeats" readonly placeholder="Оберіть місця нижче">
+                    <button class="btn-gold" onclick="manualBook()">Забронювати</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Схема залу</h3>
+                <div class="hall-wrapper">
+                    <div id="hallGrid"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Останні замовлення</h3>
+                <div id="ordersList"></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // --- КОНФІГУРАЦІЯ ---
+    const PRICE = 250;
+    const GOOGLE_SCRIPT_URL = "ВСТАВ_СЮДИ_СВОЄ_ПОСИЛАННЯ"; // Обов'язково встав URL від Google Apps Script
+    
+    const performances = [
+        { id: "1", title: "Цікавий випадок", date: "2026-04-25" }
+    ];
+
+    let currentSession = "";
+    let selectedSeats = [];
+
+    // --- БАЗА ДАНИХ (LocalStorage) ---
+    function getDB(key) { return JSON.parse(localStorage.getItem(key)) || (key === 'theatreOrders' ? [] : {}); }
+    function saveDB(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+
+    // --- ІНІЦІАЛІЗАЦІЯ ---
+    const select = document.getElementById('sessionSelect');
+    performances.forEach(p => select.innerHTML += `<option value="${p.id}|${p.date}">${p.title} (${p.date})</option>`);
+
+    function loadData() {
+        currentSession = select.value;
+        selectedSeats = []; 
+        document.getElementById('manualSeats').value = "";
+        renderHall();
+        renderOrdersAndStats();
+    }
+
+    // --- ВІДОБРАЖЕННЯ ЗАЛУ ---
+    function renderHall() {
+        const occupied = getDB('hallSessions')[currentSession] || [];
+        let html = '';
+        for (let r = 1; r <= 10; r++) {
+            html += `<div class="row">`;
+            for (let s = 1; s <= 15; s++) {
+                const key = `${r}-${s}`;
+                let statusClass = '';
+                if (occupied.includes(key)) statusClass = 'occupied';
+                if (selectedSeats.includes(key)) statusClass = 'selected';
+                html += `<div class="seat ${statusClass}" onclick="clickSeat('${r}','${s}')">${s}</div>`;
+                if (s === 5 || s === 10) html += `<div style="width: 15px;"></div>`;
+            }
+            html += `</div>`;
         }
+        document.getElementById('hallGrid').innerHTML = html;
+    }
 
-        function calculateStats() {
-            const orders = getOrders();
-            const paid = orders.filter(o => o.status === 'paid');
-            document.getElementById('cashTotal').textContent = paid.reduce((s,o)=>s+(o.totalPrice||0),0) + ' грн';
-            document.getElementById('seatsTotal').textContent = paid.reduce((s,o)=>s+(o.seats?o.seats.length:0),0);
+    window.clickSeat = function(r, s) {
+        const key = `${r}-${s}`;
+        const occupied = getDB('hallSessions')[currentSession] || [];
+        if (occupied.includes(key)) return;
+
+        if (selectedSeats.includes(key)) {
+            selectedSeats = selectedSeats.filter(k => k !== key);
+        } else {
+            selectedSeats.push(key);
         }
+        document.getElementById('manualSeats').value = selectedSeats.length ? `Обрано: ${selectedSeats.length} квит.` : "";
+        renderHall();
+    };
 
-        function updateUI() {
-            renderHall();
-            renderOrders();
-            calculateStats();
-        }
+    // --- СИНХРОНІЗАЦІЯ З GOOGLE ---
+    async function syncWithGoogle(orderData) {
+        if (GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbyrGe33T9HltpN_u-UqAqey39UBQ5JhA7hDmmf6bUAqrCeum-lHXnl1rnWMJZq-pkw4/exec") return;
+        try {
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                body: JSON.stringify(orderData)
+            });
+        } catch (e) { console.error("Помилка синхронізації", e); }
+    }
 
-        // Функції editSeats, approveOrder, deleteOrder, resetSystem — залишаються як у попередній версії (з правильним звільненням/зайняттям місць)
+    // --- ЛОГІКА ПРОДАЖУ ---
+    window.quickSale = function() {
+        processOrder("Продаж в касі", document.getElementById('quickPhone').value || "КАСА", "paid");
+    };
 
-        window.editSeats = function(id) { /* ... той самий код з попередньої версії ... */ 
-            // (встав сюди функцію editSeats з останньої моєї відповіді)
+    window.manualBook = function() {
+        const phone = document.getElementById('manualPhone').value;
+        if (!phone) return alert("Введіть телефон!");
+        processOrder("Ручна бронь", phone, "waiting_payment");
+    };
+
+    function processOrder(name, phone, status) {
+        if (selectedSeats.length === 0) return alert("Оберіть місця!");
+
+        const order = {
+            id: Date.now(),
+            sessionKey: currentSession,
+            clientName: name,
+            phone: phone,
+            seatKeys: [...selectedSeats],
+            totalPrice: selectedSeats.length * PRICE,
+            status: status
         };
 
-        window.approveOrder = function(id) { /* ... */ };
-        window.deleteOrder = function(id) { /* ... */ };
+        // Локально
+        let orders = getDB('theatreOrders');
+        orders.push(order);
+        saveDB('theatreOrders', orders);
 
-        window.resetSystem = function() {
-            if(confirm("Очистити всю базу?")) { localStorage.clear(); location.reload(); }
-        };
+        let hall = getDB('hallSessions');
+        hall[currentSession] = [...(hall[currentSession] || []), ...selectedSeats];
+        saveDB('hallSessions', hall);
 
-        // Запуск
-        updateUI();
-    </script>
+        // В хмару
+        syncWithGoogle(order);
+
+        loadData();
+        alert("Успішно збережено!");
+    }
+
+    // --- СТАТИСТИКА ТА СПИСОК ---
+    function renderOrdersAndStats() {
+        const allOrders = getDB('theatreOrders');
+        const sessionOrders = allOrders.filter(o => o.sessionKey === currentSession).reverse();
+        
+        let html = '';
+        let cash = 0, tks = 0;
+
+        sessionOrders.forEach(o => {
+            const isPaid = o.status === 'paid';
+            if (isPaid) { cash += o.totalPrice; tks += o.seatKeys.length; }
+            html += `
+                <div class="order">
+                    <div style="display:flex; justify-content:space-between; font-size:13px;">
+                        <b>${o.phone}</b>
+                        <span style="color:${isPaid?'#4caf50':'#ff9800'}">${isPaid?'ОПЛАЧЕНО':'БРОНЬ'}</span>
+                    </div>
+                    <div style="color:var(--text-soft); font-size:12px; margin-top:5px;">
+                        ${o.seatKeys.length} квит. на суму ${o.totalPrice} грн
+                    </div>
+                </div>`;
+        });
+
+        document.getElementById('ordersList').innerHTML = html || "Замовлень поки немає";
+        document.getElementById('statsBox').innerText = `${cash} грн`;
+        document.getElementById('ticketCount').innerText = `${tks} квитків продано`;
+    }
+
+    // --- СИСТЕМНІ ФУНКЦІЇ ---
+    window.logout = () => { localStorage.removeItem('adminLoggedIn'); window.location.href = "login.html"; };
+    window.resetSystem = () => { if(confirm("Видалити всі дані з цього браузера?")) { localStorage.clear(); location.reload(); }};
+
+    if (localStorage.getItem('adminLoggedIn') !== 'true') window.location.href = "login.html";
+    
+    loadData();
+</script>
 </body>
 </html>
