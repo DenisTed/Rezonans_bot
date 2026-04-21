@@ -97,7 +97,7 @@
     </div>
 
     <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwglq2L0fUF1FnstkPwolH--noKmZedTRXyNHEYSQnIciw7ly0RtAZKCTFVrrHEsAXP/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyEUuctwPk1oMzByss1Ex-wYJ_ym2PrKwob9fb3wEe7HYJXKKQfakliWawx2CHJHwRc/exec"; 
 
     let selectedSeats = [];
     let allOrders = [];
@@ -233,51 +233,73 @@
 
     // Підрахунок статистики та відмальовка списку
     function renderOrdersAndStats() {
-        const cur = document.getElementById('sessionSelect').value;
-        const filtered = allOrders.filter(o => String(o.sessionKey) === cur);
-        let totalCash = 0, totalTix = 0;
+    const cur = document.getElementById('sessionSelect').value;
+    const filtered = allOrders.filter(o => String(o.sessionKey) === cur);
+    
+    let totalCash = 0;
+    let totalTix = 0;
 
-        // Рахуємо всю касу по всіх сеансах (якщо статус "Оплачено")
-        allOrders.forEach(o => {
-            if (String(o.status).trim().toLowerCase() === 'оплачено') {
-                totalCash += Number(o.totalPrice) || 0;
-                const keys = Array.isArray(o.seatKeys) ? o.seatKeys : (o.seatKeys ? String(o.seatKeys).split(',') : []);
-                totalTix += keys.length;
-            }
-        });
-
-        let html = '';
-        [...filtered].reverse().forEach(o => {
-            const status = String(o.status || "").trim();
-            const isPaid = status.toLowerCase() === 'оплачено';
+    // РАХУЄМО СУМУ: проходимо по всіх замовленнях у базі
+    allOrders.forEach(o => {
+        // Якщо статус "Оплачено" (незалежно від сеансу)
+        if (String(o.status).toLowerCase().trim() === 'оплачено') {
+            totalCash += Number(o.totalPrice) || 0;
+            
+            // Рахуємо кількість квитків
             const keys = Array.isArray(o.seatKeys) ? o.seatKeys : (o.seatKeys ? String(o.seatKeys).split(',') : []);
+            totalTix += keys.length;
+        }
+    });
 
-            html += `
-                <div class="order" style="border-left-color: ${isPaid ? '#4caf50' : '#d89a4a'}">
-                    <div style="display:flex; justify-content:space-between;">
-                        <b>${o.phone}</b>
-                        <span class="status-badge ${isPaid ? 'status-paid' : 'status-pending'}">${status}</span>
-                    </div>
-                    <small style="color:var(--text-soft)">${keys.join(', ')} — ${o.totalPrice} грн</small>
-                    <div class="order-actions">
-                        ${!isPaid ? `<button class="btn-green btn-mini" onclick="confirmOrder('${o.id}')">✅ Підтвердити</button>` : ''}
-                        <button class="btn-red btn-mini" style="opacity:0.6" onclick="deleteOrder('${o.id}', '${o.sessionKey}', '${keys.join(',')}')">🗑️ Видалити</button>
-                    </div>
-                </div>`;
-        });
+    // Оновлюємо цифри в лівій колонці
+    document.getElementById('statsBox').innerText = totalCash + " грн";
+    document.getElementById('ticketCount').innerText = totalTix + " квитків продано";
 
-        document.getElementById('ordersList').innerHTML = html || "<p>Замовлень немає</p>";
+    // Далі — ваш існуючий код виводу списку останніх замовлень
+    let html = '';
+    [...filtered].reverse().forEach(o => {
+        const status = String(o.status || "").trim();
+        const isPaid = status.toLowerCase() === 'оплачено';
+        const keys = Array.isArray(o.seatKeys) ? o.seatKeys : (o.seatKeys ? String(o.seatKeys).split(',') : []);
+
+        html += `
+            <div class="order" style="border-left-color: ${isPaid ? '#4caf50' : '#d89a4a'}">
+                <div style="display:flex; justify-content:space-between;">
+                    <b>${o.phone}</b>
+                    <span class="status-badge ${isPaid ? 'status-paid' : 'status-pending'}">${status}</span>
+                </div>
+                <small>${keys.join(', ')} — ${o.totalPrice} грн</small>
+                <div class="order-actions">
+                    ${!isPaid ? `<button class="btn-green btn-mini" onclick="confirmOrder('${o.id}', this)">✅ Підтвердити</button>` : ''}
+                    <button class="btn-red btn-mini" onclick="deleteOrder('${o.id}', '${o.sessionKey}', '${keys.join(',')}')">🗑️ Видалити</button>
+                </div>
+            </div>`;
+    });
+    document.getElementById('ordersList').innerHTML = html || "<p>Замовлень немає</p>";
+
         document.getElementById('statsBox').innerText = totalCash + " грн";
         document.getElementById('ticketCount').innerText = totalTix + " квитків";
     }
 
-    async function confirmOrder(orderId) {
-        if (!confirm("Підтвердити оплату?")) return;
-        try {
-            await sendPost({ action: "updateOrderStatus", id: orderId, status: "Оплачено" });
-            await loadData();
-        } catch (e) { alert("Помилка."); }
-    }
+    async function confirmOrder(orderId, btn) {
+    if (!confirm("Підтвердити оплату?")) return;
+    
+    btn.disabled = true;
+    btn.innerText = "ЧЕКАЙТЕ...";
+    
+    // Відправляємо запит
+    await sendPost({ 
+        action: "updateOrderStatus", 
+        id: orderId, 
+        status: "Оплачено" 
+    });
+    
+    // Важливо: даємо Google 1.5 секунди оновити таблицю перед тим, як завантажити дані знову
+    setTimeout(() => {
+        loadData();
+    }, 1500);
+}
+
 
     async function deleteOrder(orderId, sessionKey, seatKeysStr) {
         if (!confirm("Видалити замовлення? Місця звільняться.")) return;
@@ -298,19 +320,18 @@
 
     // Універсальна функція відправки
     async function sendPost(data) {
-        const formData = new URLSearchParams();
-        for (const key in data) {
-            if (typeof data[key] === 'object') {
-                formData.append(key, JSON.stringify(data[key]));
-            } else {
-                formData.append(key, data[key]);
-            }
-        }
-        return fetch(SCRIPT_URL, {
-            method: "POST",
-            body: formData
-        });
+    const formData = new URLSearchParams();
+    for (const key in data) {
+        formData.append(key, typeof data[key] === 'object' ? JSON.stringify(data[key]) : data[key]);
     }
+    
+    return fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors", // Це дозволяє відправити дані без помилок CORS
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData
+    });
+}
 
     async function resetSystem() {
         if (!confirm("⚠️ УВАГА! Це видалить ВСІ замовлення та очистить зал. Продовжити?")) return;
