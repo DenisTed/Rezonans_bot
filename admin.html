@@ -97,6 +97,10 @@
     </div>
 
     <script>
+        if (localStorage.getItem('adminLoggedIn') !== 'true') {
+        // Якщо ключа немає — миттєво відправляємо на сторінку входу
+        window.location.href = "login.html"; 
+    }
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyEUuctwPk1oMzByss1Ex-wYJ_ym2PrKwob9fb3wEe7HYJXKKQfakliWawx2CHJHwRc/exec"; 
 
     let selectedSeats = [];
@@ -339,9 +343,19 @@
         location.reload();
     }
 
+    // 2. УПРАВЛІННЯ ОНОВЛЕННЯМ ТА ВИХОДОМ
     window.refreshDataFromBase = loadData;
-    window.logout = () => { localStorage.removeItem('adminLoggedIn'); location.href = "login.html"; };
+
+    window.logout = () => { 
+        // Видаляємо позначку про вхід
+        localStorage.removeItem('adminLoggedIn'); 
+        // Повертаємо користувача на сторінку логіна
+        location.href = "login.html"; 
+    };
+
+    // Завантаження даних при відкритті
     window.onload = loadData;
+    
 </script>
 </body>
 </html>
