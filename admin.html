@@ -19,7 +19,11 @@
         .btn-gold { background: var(--gold); color: #000; }
         .btn-green { background: #2d5a27; color: #fff; }
         .btn-red { background: #7a2a2a; color: #fff; }
+        .btn-blue { background: #1e5a8c; color: #fff; }
         button:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        
+        .selected-info { font-size: 13px; color: var(--gold); margin-bottom: 10px; min-height: 18px; font-weight: 500; }
+
         .hall-wrapper { overflow-x: auto; padding: 20px 0; text-align: center; }
         .row { display: flex; gap: 6px; margin-bottom: 8px; justify-content: center; min-width: 500px; }
         .row-info { width: 80px; font-size: 10px; color: var(--text-soft); display: flex; align-items: center; }
@@ -42,10 +46,11 @@
     <div class="container">
         <div class="sidebar">
             <h3>Загальна каса</h3>
-            <div id="statsBox" style="font-size: 24px; color: var(--gold); font-weight: bold;">0 грн</div>
-            <p id="ticketCount" style="color: var(--text-soft); font-size: 14px;">0 квитків (Оплачено)</p>
+            <div id="statsBox" style="font-size: 28px; color: var(--gold); font-weight: bold;">0 грн</div>
+            <p id="ticketCount" style="color: var(--text-soft); font-size: 14px;">0 квитків продано</p>
             <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
-            <button class="btn-red" style="font-size: 12px; opacity: 0.6;" onclick="resetSystem()">Очистити базу</button>
+            <button class="btn-blue" onclick="refreshDataFromBase()">🔄 Витягти дані</button>
+            <button class="btn-red" style="font-size: 12px; opacity: 0.6; margin-top: 8px;" onclick="resetSystem()">Очистити базу</button>
         </div>
 
         <div class="main">
@@ -60,22 +65,22 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
                 <div class="card">
                     <h3>Продаж (Оплата на місці)</h3>
+                    <div id="quickSeatsDisplay" class="selected-info">Місця не обрано</div>
                     <input type="text" id="quickPhone" placeholder="Телефон або 'Каса'">
                     <button class="btn-green" onclick="processOrder('Продаж', document.getElementById('quickPhone').value || 'КАСА', 'Оплачено')">Підтвердити оплату</button>
                 </div>
+
                 <div class="card">
                     <h3>Ручне бронювання</h3>
+                    <div id="manualSeatsDisplay" class="selected-info">Оберіть місця на схемі</div>
                     <input type="text" id="manualPhone" placeholder="Номер телефону">
-                    <input type="text" id="manualSeats" readonly placeholder="Оберіть місця на схемі">
                     <button class="btn-gold" onclick="processOrder('Адмін-бронь', document.getElementById('manualPhone').value, 'Очікує підтвердження')">Забронювати</button>
                 </div>
             </div>
 
             <div class="card">
-                <h3>Схема залу (Ряд 5 відсутній)</h3>
-                <div class="hall-wrapper">
-                    <div id="hallGrid"></div>
-                </div>
+                <h3>Схема залу</h3>
+                <div class="hall-wrapper"><div id="hallGrid"></div></div>
             </div>
 
             <div class="card">
@@ -86,65 +91,37 @@
     </div>
 
     <script>
-        // ================== НАЛАШТУВАННЯ ==================
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-pcdZVST0BnD5EgSeEQ48gy-CuG__aWDIt2cHfBmbko4VmgxEEsWUBnSQEVPpmIUK/exec";   // ← ЗАМІНИ НА СВОЮ АКТУАЛЬНУ ПОСИЛКУ!!!
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxjVSXHACGWSQyp2bVX-QWQlMzsZcRan5Uvgk9Eyr8vhvYuFNVwU9W1ugT6DUP4vk8A/exec"; 
 
         let selectedSeats = [];
         let allOrders = [];
         let hallSessions = {};
 
-        // Завантаження всіх даних з Google Таблиці
-        async function loadAllData() {
-            try {
-                // Зайняті місця
-                const hallRes = await fetch(`${SCRIPT_URL}?action=getHall`);
-                hallSessions = JSON.parse(await hallRes.text() || '{}');
-
-                // Замовлення
-                const ordersRes = await fetch(`${SCRIPT_URL}?action=getOrders`);
-                allOrders = JSON.parse(await ordersRes.text());
-            } catch (e) {
-                console.error("Помилка завантаження даних", e);
-            }
-        }
-
         async function loadData() {
-            selectedSeats = [];
-            document.getElementById('manualSeats').value = "";
-            await loadAllData();
-            renderHall();
-            renderOrdersAndStats();
+            try {
+                const ordersRes = await fetch(`${SCRIPT_URL}?action=getOrders`);
+                allOrders = await ordersRes.json();
+                const hallRes = await fetch(`${SCRIPT_URL}?action=getHall`);
+                hallSessions = await hallRes.json();
+                renderHall();
+                renderOrdersAndStats();
+            } catch (e) { console.error("Помилка:", e); }
         }
 
-        // Рендер залу (точно як на твоєму скріншоті)
         function renderHall() {
             const currentSession = document.getElementById('sessionSelect').value;
             const occupied = hallSessions[currentSession] || [];
-
-            let html = `
-                <div style="display: flex; justify-content: center; margin-bottom: 15px; font-size: 14px; color: #d89a4a; font-weight: bold; letter-spacing: 1px;">
-                    <span style="width: 85px;"></span>
-                    <div style="min-width: 185px; text-align: center;">4 місць</div>
-                    <div style="width: 35px;"></div>
-                    <div style="min-width: 185px; text-align: center;">10 центр</div>
-                    <div style="width: 35px;"></div>
-                    <div style="min-width: 260px; text-align: center;">3 крайній ряд</div>
-                </div>
-            `;
-
+            let html = '';
             for (let r = 1; r <= 11; r++) {
                 if (r === 5) continue;
-                const numSeats = (r === 4 || r === 6) ? 14 : 17;
-
                 html += `<div class="row"><div class="row-info">Ряд ${r}</div>`;
-
+                const numSeats = (r === 4 || r === 6) ? 14 : 17;
                 for (let s = 1; s <= numSeats; s++) {
                     const key = `${r}-${s}`;
-                    let statusClass = occupied.includes(key) ? 'occupied' : '';
-                    if (selectedSeats.some(item => item.id === key)) statusClass = 'selected';
-
-                    html += `<div class="seat ${statusClass}" onclick="clickSeat('${r}','${s}')">${s}</div>`;
-                    if (s === 5 || s === 10) html += `<div style="width: 30px;"></div>`;
+                    let status = occupied.includes(key) ? 'occupied' : '';
+                    if (selectedSeats.some(i => i.id === key)) status = 'selected';
+                    html += `<div class="seat ${status}" onclick="clickSeat('${r}','${s}')">${s}</div>`;
+                    if (s === 5 || s === 10) html += `<div style="width: 25px;"></div>`;
                 }
                 html += `</div>`;
             }
@@ -152,118 +129,114 @@
         }
 
         window.clickSeat = function(r, s) {
-            const currentSession = document.getElementById('sessionSelect').value;
             const key = `${r}-${s}`;
-            const occupied = hallSessions[currentSession] || [];
-            if (occupied.includes(key)) return;
+            const currentSession = document.getElementById('sessionSelect').value;
+            if ((hallSessions[currentSession] || []).includes(key)) return;
 
-            const price = r <= 3 ? 250 : 200;
-            const index = selectedSeats.findIndex(item => item.id === key);
+            const idx = selectedSeats.findIndex(i => i.id === key);
+            if (idx > -1) selectedSeats.splice(idx, 1);
+            else selectedSeats.push({ id: key, price: (r <= 3 ? 250 : 200) });
 
-            if (index > -1) {
-                selectedSeats.splice(index, 1);
-            } else {
-                selectedSeats.push({ id: key, price: price });
-            }
-
-            document.getElementById('manualSeats').value = selectedSeats.length ? 
-                `Обрано: ${selectedSeats.length} (на ${calculateTotal()} грн)` : "";
+            // Оновлення тексту в обох картках
+            const seatList = selectedSeats.map(i => i.id).join(', ');
+            const total = selectedSeats.reduce((a, b) => a + b.price, 0);
+            const infoText = selectedSeats.length ? `Обрано: ${seatList} (${total} грн)` : "Оберіть місця на схемі";
+            
+            document.getElementById('quickSeatsDisplay').innerText = infoText;
+            document.getElementById('manualSeatsDisplay').innerText = infoText;
+            
             renderHall();
         };
 
-        function calculateTotal() {
-            return selectedSeats.reduce((acc, curr) => acc + curr.price, 0);
-        }
-
-        // Обробка замовлення (продаж / бронювання)
         async function processOrder(type, phone, status) {
-            if (selectedSeats.length === 0) return alert("Оберіть місця!");
-            if (!phone) return alert("Введіть телефон!");
+            if (!selectedSeats.length) return alert("Спочатку оберіть місця на схемі!");
+            if (!phone) return alert("Введіть номер телефону або 'Каса'!");
 
-            const currentSession = document.getElementById('sessionSelect').value;
-            const total = calculateTotal();
+            const seatList = selectedSeats.map(i => i.id).join(', ');
+            const total = selectedSeats.reduce((a, b) => a + b.price, 0);
+            const session = document.getElementById('sessionSelect').value;
 
-            const order = {
+            // --- ПЕРЕВІРКА ПІДТВЕРДЖЕННЯ ---
+            const confirmMsg = `ПІДТВЕРДЖЕННЯ:\n\nТип: ${type}\nСеанс: ${session}\nМісця: ${seatList}\nСума: ${total} грн\nТелефон: ${phone}\n\nВсе вірно?`;
+            if (!confirm(confirmMsg)) return;
+
+            const body = {
                 action: "saveOrder",
-                id: "ADM-" + Date.now().toString().slice(-5),
-                sessionKey: currentSession,
+                id: "ADM-" + Date.now().toString().slice(-6),
+                sessionKey: session,
                 phone: phone,
                 seatKeys: selectedSeats.map(s => s.id),
                 totalPrice: total,
                 status: status
             };
 
+            // Візуальний індикатор завантаження
+            const btn = event.currentTarget;
+            const originalText = btn.innerText;
+            btn.innerText = "Зберігання...";
+            btn.disabled = true;
+
             try {
-                // Зберігаємо замовлення
-                await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(order) });
-
-                // Блокуємо місця
-                if (!hallSessions[currentSession]) hallSessions[currentSession] = [];
-                hallSessions[currentSession].push(...order.seatKeys);
-
-                // Зберігаємо зайняті місця
-                await fetch(SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "saveHall", hallSessions: hallSessions })
-                });
-
-                alert("Операція успішна!");
+                await sendPost(body);
+                hallSessions[session] = [...(hallSessions[session] || []), ...body.seatKeys];
+                await sendPost({ action: "saveHall", hallSessions: hallSessions });
+                
+                alert("✅ Успішно збережено!");
+                selectedSeats = [];
+                document.getElementById('quickPhone').value = "";
+                document.getElementById('manualPhone').value = "";
+                document.getElementById('quickSeatsDisplay').innerText = "Місця не обрано";
+                document.getElementById('manualSeatsDisplay').innerText = "Оберіть місця на схемі";
                 loadData();
             } catch (e) {
-                console.error(e);
-                alert("Помилка підключення до бази. Перевірте інтернет.");
+                alert("Помилка зв'язку з базою.");
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
             }
+        }
+
+        async function sendPost(data) {
+            return fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors", 
+                body: JSON.stringify(data)
+            });
         }
 
         function renderOrdersAndStats() {
-            const currentSession = document.getElementById('sessionSelect').value;
-            const sessionOrders = allOrders.filter(o => o.sessionKey === currentSession).reverse();
-
-            let html = '';
-            let totalCash = 0, totalTickets = 0;
-
-            sessionOrders.forEach(o => {
-                const isPaid = o.status === 'Оплачено';
-                if (isPaid) {
-                    totalCash += Number(o.totalPrice || 0);
-                    totalTickets += (o.seatKeys || []).length;
-                }
-
+            const cur = document.getElementById('sessionSelect').value;
+            const filtered = allOrders.filter(o => String(o.sessionKey).includes(cur));
+            let html = '', cash = 0, tix = 0;
+            
+            filtered.reverse().forEach(o => {
+                const paid = o.status === 'Оплачено';
+                if (paid) { cash += Number(o.totalPrice); tix += (o.seatKeys ? o.seatKeys.length : 0); }
                 html += `
                     <div class="order">
-                        <div style="display:flex; justify-content:space-between; font-size:13px;">
+                        <div style="display:flex; justify-content:space-between;">
                             <b>${o.phone}</b>
-                            <span style="color:${isPaid ? '#4caf50' : '#ff9800'}">${o.status}</span>
+                            <span style="color:${paid ? '#4caf50' : '#ff9800'}">${o.status}</span>
                         </div>
-                        <div style="color:var(--text-soft); font-size:12px; margin-top:5px;">
-                            ${o.seatKeys ? o.seatKeys.join(', ') : ''} | Сума: ${o.totalPrice} грн
-                        </div>
+                        <small style="color:#a8a095">${(o.seatKeys || []).join(', ')} — ${o.totalPrice} грн</small>
                     </div>`;
             });
-
-            document.getElementById('ordersList').innerHTML = html || "Немає замовлень";
-            document.getElementById('statsBox').innerText = `${totalCash} грн`;
-            document.getElementById('ticketCount').innerText = `${totalTickets} квитків продано`;
+            
+            document.getElementById('ordersList').innerHTML = html || "<p style='text-align:center; opacity:0.5;'>Замовлень немає</p>";
+            document.getElementById('statsBox').innerText = cash + " грн";
+            document.getElementById('ticketCount').innerText = tix + " квитків продано";
         }
 
+        async function resetSystem() {
+            if (!confirm("⚠️ УВАГА! Ви видалите ВСІ дані про продажі та вільні місця. Ви впевнені?")) return;
+            await sendPost({ action: "resetAll" });
+            alert("Базу очищено.");
+            location.reload();
+        }
+
+        window.refreshDataFromBase = loadData;
         window.logout = () => { localStorage.removeItem('adminLoggedIn'); location.href = "login.html"; };
-
-        window.resetSystem = async () => {
-            if (!confirm("⚠️ Це повністю очистить базу даних (замовлення та місця). Продовжити?")) return;
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "resetAll" })
-                });
-                alert("База даних очищена!");
-                location.reload();
-            } catch (e) {
-                alert("Помилка очищення.");
-            }
-        };
-
-        // Запуск при відкритті сторінки
-        loadData();
+        window.onload = loadData;
     </script>
 </body>
 </html>
