@@ -1,0 +1,103 @@
+/* Універсальні мобільні стилі для RESONANCE */
+
+@media screen and (max-width: 768px) {
+    /* 1. Загальні налаштування контейнера */
+    body {
+        padding: 10px !important;
+    }
+
+    .container {
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+
+    /* 2. Адаптація заголовка */
+    .header {
+        margin-bottom: 15px !important;
+    }
+    
+    .header h2 {
+        font-size: 18px !important;
+        letter-spacing: 1px !important;
+    }
+
+    /* 3. Схема залу (найважливіше) */
+    .hall-wrap, .hall-wrapper {
+        width: 100%;
+        overflow-x: auto !important; /* Дозволяє скролити зал вбік */
+        padding: 10px 0;
+        -webkit-overflow-scrolling: touch;
+        background: rgba(255,255,255,0.02);
+        border-radius: 10px;
+    }
+
+    #seatsGrid, #hallGrid {
+        min-width: 650px !important; /* Фіксуємо ширину сітки, щоб вона не стискалася */
+        padding: 10px;
+    }
+
+    .row {
+        gap: 4px !important;
+        margin-bottom: 6px !important;
+        justify-content: flex-start !important;
+    }
+
+    .row span, .row-info {
+        width: 45px !important;
+        font-size: 10px !important;
+        margin-right: 5px !important;
+    }
+
+    .seat {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 9px !important;
+        border-radius: 4px !important;
+    }
+
+    /* Проходи між секторами на мобілці трохи вужчі */
+    .row div[style*="width: 30px"], 
+    .row div[style*="width: 25px"] {
+        width: 15px !important;
+    }
+
+    /* 4. Бічна панель та картки */
+    .sidebar, .main, .card {
+        width: 100% !important;
+        min-width: unset !important;
+        padding: 15px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 5. Кнопки та інпути */
+    input, select, button {
+        font-size: 14px !important;
+        padding: 12px !important;
+    }
+
+    #statsBox {
+        font-size: 22px !important;
+    }
+
+    /* 6. Список замовлень (адмінка) */
+    .order {
+        padding: 10px !important;
+    }
+
+    .order-actions {
+        flex-wrap: wrap;
+    }
+
+    .btn-mini {
+        flex: 1;
+        text-align: center;
+        justify-content: center;
+    }
+
+    /* 7. Візуальна сцена */
+    .stage {
+        font-size: 12px !important;
+        letter-spacing: 5px !important;
+        margin: 15px 0 !important;
+    }
+}
