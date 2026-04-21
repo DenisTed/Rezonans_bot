@@ -1,12 +1,16 @@
-/* РЕМОНТ МОБІЛЬНОЇ ВЕРСІЇ */
+/* RESONANCE — ФІНАЛЬНИЙ МОБІЛЬНИЙ СТИЛЬ */
 @media screen and (max-width: 768px) {
     
-    /* 1. Забираємо фіксовану висоту та даємо блокам стояти один під одним */
+    /* 1. Загальна адаптація сторінки */
+    body { 
+        padding: 10px !important; 
+    }
+
     .container {
         display: flex !important;
-        flex-direction: column !important;
-        padding: 10px !important;
-        gap: 20px !important;
+        flex-direction: column !important; /* Все в один стовпчик */
+        gap: 15px !important;
+        max-width: 100vw !important;
     }
 
     .hall, .sidebar {
@@ -15,48 +19,60 @@
         flex: none !important;
     }
 
-    /* 2. Виправляємо заголовок (щоб текст не злипався) */
+    /* 2. Заголовок і шрифти */
     .header {
-        padding: 10px 0 !important;
-        font-size: 14px !important;
+        font-size: 12px !important;
+        margin-bottom: 20px !important;
+        padding: 5px 0 !important;
     }
 
-    /* 3. ГОЛОВНЕ: Схема залу */
-    /* Дозволяємо контейнеру залу мати внутрішній горизонтальний скрол */
+    h2 { 
+        font-size: 20px !important; 
+        text-align: center;
+    }
+
+    /* 3. Схема залу (найголовніше) */
+    /* Робимо так, щоб зал не стискався, а скролився */
     #seatsGrid {
         display: block !important;
         overflow-x: auto !important; 
-        -webkit-overflow-scrolling: touch;
+        -webkit-overflow-scrolling: touch; /* Плавний скрол на iPhone */
         padding: 15px 5px !important;
-        background: #111; /* Трохи виділяємо зону залу */
+        background: #111; 
         border-radius: 10px;
+        border: 1px solid #333;
     }
 
-    /* Фіксуємо мінімальну ширину рядів, щоб вони не стискалися в кашу */
+    /* Фіксована ширина ряду, щоб крісла не "злиплися" */
     .row {
-        width: 700px !important; /* Ширина, при якій всі 17 крісел стоять рівно */
+        display: flex !important;
+        width: 750px !important; 
         margin-bottom: 10px !important;
         justify-content: flex-start !important;
+        align-items: center !important;
     }
 
     .seat {
-        width: 30px !important;
-        height: 30px !important;
+        width: 32px !important;
+        height: 32px !important;
         font-size: 11px !important;
-        flex-shrink: 0 !important;
+        flex-shrink: 0 !important; /* Забороняємо стискатися */
     }
 
     .row span {
         width: 60px !important;
         font-size: 12px !important;
+        text-align: right !important;
+        margin-right: 10px !important;
         flex-shrink: 0 !important;
     }
 
-    /* 4. Кошик (Sidebar) */
+    /* 4. Кошик / Сайдбар (переносимо в самий низ) */
     .sidebar {
-        position: static !important; /* Щоб не перекривав зал */
-        margin-top: 20px;
-        order: 2; /* Кошик буде ПІСЛЯ залу */
+        order: 2 !important; /* Магічна властивість flex, кидає в кінець */
+        position: static !important; 
+        margin-top: 15px !important;
+        box-sizing: border-box !important;
     }
 
     /* 5. Сцена */
@@ -65,16 +81,30 @@
         letter-spacing: 5px !important;
         font-size: 14px !important;
         margin: 15px 0 !important;
+        padding-bottom: 5px !important;
     }
 
-    /* Додаємо підказку для користувача */
+    /* 6. Підказка для користувача */
     #seatsGrid::before {
         content: "↔ Гортайте зал вбік";
         display: block;
         text-align: center;
         color: #d89a4a;
-        font-size: 12px;
+        font-size: 11px;
         margin-bottom: 10px;
-        opacity: 0.7;
+        text-transform: uppercase;
+        opacity: 0.8;
+    }
+
+    /* Для адмінки: кнопки дій */
+    .order-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .btn-mini {
+        width: 100% !important;
+        padding: 12px !important;
     }
 }

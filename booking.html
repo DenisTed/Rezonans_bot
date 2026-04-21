@@ -4,30 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Бронювання квитків — RESONANCE</title>
+    
     <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="mobile-style.css">
 
-<link rel="stylesheet" href="mobile-style.css">
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #070707; color: #fff; margin: 0; padding: 20px; }
         .header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 1px solid #d89a4a; padding-bottom: 10px; }
         .header a { color: #d89a4a; text-decoration: none; font-weight: bold; text-transform: uppercase; }
-        .container { display: flex; gap: 30px; max-width: 1200px; margin: auto; flex-wrap: wrap; }
-        .hall { flex: 2; min-width: 750px; }
+        
+        .container { display: flex; gap: 30px; max-width: 1200px; margin: auto; }
+        .hall { flex: 2; min-width: 0; } /* min-width: 0 важливий для скролу */
         .sidebar { flex: 1; min-width: 300px; background: #1a1a1a; padding: 25px; border-radius: 15px; border: 1px solid rgba(216, 154, 74, 0.3); height: fit-content; }
-        select, button { width: 100%; padding: 15px; border-radius: 8px; font-size: 16px; margin-top: 10px; }
-        select { background: #222; color: #fff; border: 1px solid #d89a4a; }
-        button { background: #d89a4a; color: #000; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        button:disabled { background: #555; cursor: not-allowed; opacity: 0.5; }
-        button:hover:not(:disabled) { background: #f4b76e; }
+        
+        /* Обгортка для скролу залу */
+        .hall-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 20px; }
+        
         .stage { text-align: center; color: #d89a4a; letter-spacing: 10px; padding-bottom: 10px; border-bottom: 2px solid #d89a4a; margin: 30px 0; font-size: 18px; width: 100%; }
-        .row { display: flex; gap: 8px; justify-content: center; margin-bottom: 8px; align-items: center; }
-        .row span { width: 70px; color: #d89a4a; font-size: 13px; text-align: right; margin-right: 10px; }
-        .seat { width: 32px; height: 32px; background: #333; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; border: 1px solid #555; transition: 0.2s; }
-        .seat:hover:not(.occupied) { background: #d89a4a; color: #000; border-color: #fff; }
+        .row { display: flex; gap: 8px; justify-content: center; margin-bottom: 8px; align-items: center; min-width: 700px; }
+        
+        .seat { width: 32px; height: 32px; background: #333; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; border: 1px solid #555; transition: 0.2s; flex-shrink: 0; }
         .seat.selected { background: #d89a4a; color: #000; border-color: #fff; }
         .seat.occupied { background: #111; color: #444; border-color: #222; cursor: not-allowed; }
-        .columns-header { display: flex; justify-content: center; margin-bottom: 15px; font-size: 14px; color: #d89a4a; font-weight: bold; }
-        .col-label { text-align: center; }
+        
+        button { background: #d89a4a; color: #000; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; padding: 15px; border-radius: 8px; width: 100%; }
+        button:disabled { background: #555; cursor: not-allowed; opacity: 0.5; }
+        select { width: 100%; padding: 15px; border-radius: 8px; background: #222; color: #fff; border: 1px solid #d89a4a; }
     </style>
 </head>
 <body>
@@ -38,14 +40,17 @@
 
     <div class="container">
         <div class="hall">
-            <h2>Оберіть виставу:</h2>
-            <select id="sessionSelect" onchange="loadSession()">
-                <option value="">— Оберіть виставу та дату —</option>
-            </select>
+    <h2>Оберіть виставу:</h2>
+    <select id="sessionSelect" onchange="loadSession()">
+        <option value="">— Оберіть виставу та дату —</option>
+    </select>
 
-            <div class="stage">СЦЕНА</div>
-            <div id="seatsGrid"></div>
-        </div>
+    <div class="stage">СЦЕНА</div>
+    
+    <div style="width: 100%; overflow-x: auto;">
+        <div id="seatsGrid"></div>
+    </div>
+</div>
 
         <div class="sidebar">
             <h3>Ваше замовлення</h3>
