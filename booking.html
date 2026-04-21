@@ -167,7 +167,7 @@
                 selectedSeats = selectedSeats.filter(s => s.key !== key);
             } else {
                 element.classList.add('selected');
-                const price = row <= 3 ? 250 : 200;
+                const price = row <= 2 ? 250 : 200;
                 selectedSeats.push({ key, row, seatNum, price });
             }
             updateCart();
