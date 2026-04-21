@@ -69,7 +69,6 @@
             selectEl.innerHTML += `<option value="${perf.key}">${perf.title} — ${perf.dateStr}</option>`;
         });
 
-        // Допоміжна функція для відправки POST запитів
         async function sendPost(data) {
             const params = new URLSearchParams();
             for (let key in data) {
@@ -77,61 +76,55 @@
             }
             return fetch(SCRIPT_URL, {
                 method: "POST",
-                mode: "no-cors", // Використовуємо no-cors для Google Scripts
+                mode: "no-cors",
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: params
             });
         }
 
         async function loadOccupied() {
-    try {
-        // Одночасно завантажуємо і стан залу, і список замовлень для повної синхронізації
-        const [hallRes, ordersRes] = await Promise.all([
-            fetch(`${SCRIPT_URL}?action=getHall`),
-            fetch(`${SCRIPT_URL}?action=getOrders`)
-        ]);
+            try {
+                const [hallRes, ordersRes] = await Promise.all([
+                    fetch(`${SCRIPT_URL}?action=getHall`),
+                    fetch(`${SCRIPT_URL}?action=getOrders`)
+                ]);
 
-        const allSessions = await hallRes.json();
-        const allOrders = await ordersRes.json();
+                const allSessions = await hallRes.json();
+                const allOrders = await ordersRes.json();
 
-        // 1. Беремо місця з основної бази залу
-        let occupied = allSessions[currentSessionKey] || [];
+                let occupied = allSessions[currentSessionKey] || [];
 
-        // 2. Додаємо місця з усіх замовлень для цієї сесії
-        allOrders.forEach(order => {
-            if (String(order.sessionKey) === currentSessionKey) {
-                // Розбиваємо рядок ключів "1-1,1-2" у масив, якщо це рядок
-                const keys = Array.isArray(order.seatKeys) 
-                    ? order.seatKeys 
-                    : (order.seatKeys ? String(order.seatKeys).split(',') : []);
-                
-                keys.forEach(k => {
-                    if (!occupied.includes(k)) occupied.push(k);
+                allOrders.forEach(order => {
+                    if (String(order.sessionKey) === currentSessionKey) {
+                        const keys = Array.isArray(order.seatKeys) 
+                            ? order.seatKeys 
+                            : (order.seatKeys ? String(order.seatKeys).split(',') : []);
+                        
+                        keys.forEach(k => {
+                            if (!occupied.includes(k)) occupied.push(k);
+                        });
+                    }
                 });
+                occupiedSeats = occupied;
+            } catch(e) {
+                console.error("Помилка синхронізації:", e);
+                occupiedSeats = [];
             }
-        });
+        }
 
-        occupiedSeats = occupied;
-    } catch(e) {
-        console.error("Помилка синхронізації:", e);
-        occupiedSeats = [];
-    }
-}
-
-// Оновлена функція loadSession для виклику loadOccupied
-async function loadSession() {
-    currentSessionKey = selectEl.value;
-    if (!currentSessionKey) {
-        document.getElementById('seatsGrid').innerHTML = '';
-        return;
-    }
-    selectedSeats = [];
-    document.getElementById('seatsGrid').innerHTML = '<p style="text-align:center">Оновлення схеми залу...</p>';
-    
-    await loadOccupied(); // Тепер вона збирає дані з двох джерел
-    renderHall();
-    updateCart();
-}
+        async function loadSession() {
+            currentSessionKey = selectEl.value;
+            if (!currentSessionKey) {
+                document.getElementById('seatsGrid').innerHTML = '';
+                return;
+            }
+            selectedSeats = [];
+            document.getElementById('seatsGrid').innerHTML = '<p style="text-align:center">Оновлення схеми залу...</p>';
+            
+            await loadOccupied();
+            renderHall();
+            updateCart();
+        }
 
         function renderHall() {
             const grid = document.getElementById('seatsGrid');
@@ -174,7 +167,7 @@ async function loadSession() {
                 selectedSeats = selectedSeats.filter(s => s.key !== key);
             } else {
                 element.classList.add('selected');
-                const price = row <= 2 ? 250 : 200;
+                const price = row <= 3 ? 250 : 200;
                 selectedSeats.push({ key, row, seatNum, price });
             }
             updateCart();
@@ -196,7 +189,7 @@ async function loadSession() {
         }
 
         document.getElementById('payBtn').onclick = async () => {
-            const phone = prompt("Введіть ваш номер телефону підтвердження броннєвання з вами зв'яжеться Адміністратор:");
+            const phone = prompt("Введіть ваш номер телефону. Адміністратор зв'яжеться з вами для підтвердження:");
             if (!phone) return;
 
             const btn = document.getElementById('payBtn');
@@ -207,7 +200,6 @@ async function loadSession() {
             const seatKeys = selectedSeats.map(s => s.key);
 
             try {
-                // 1. Зберігаємо замовлення в таблицю
                 await sendPost({
                     action: "saveOrder",
                     id: Date.now(),
@@ -218,22 +210,20 @@ async function loadSession() {
                     status: 'waiting_payment'
                 });
 
-                // 2. Оновлюємо стан залу (займаємо місця)
-                const newOccupied = [...occupiedSeats, ...seatKeys];
+                // Локально оновлюємо для миттєвого відображення
+                occupiedSeats = [...occupiedSeats, ...seatKeys];
                 
-                // Отримуємо останній стан всіх сесій перед збереженням
                 const res = await fetch(`${SCRIPT_URL}?action=getHall`);
                 const allSessions = await res.json();
-                allSessions[currentSessionKey] = newOccupied;
+                allSessions[currentSessionKey] = occupiedSeats;
 
                 await sendPost({
                     action: "saveHall",
                     hallSessions: allSessions
                 });
 
-                alert(`✅ Замовлення прийнято!\nСума: ${totalSum} грн.\nРеквізити картки: 4874 1000 2745 5610.\nПісля оплати адміністратор передзвоне і підвердить замовлення!`);
+                alert(`✅ Замовлення прийнято!\nСума: ${totalSum} грн.\nРеквізити картки: 4874 1000 2745 5610.\nПісля оплати адміністратор підтвердить замовлення.`);
                 
-                // Перезавантаження сесії
                 await loadSession();
 
             } catch (e) {
