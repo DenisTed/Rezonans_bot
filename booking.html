@@ -23,8 +23,6 @@
         .seat:hover:not(.occupied) { background: #d89a4a; color: #000; border-color: #fff; }
         .seat.selected { background: #d89a4a; color: #000; border-color: #fff; }
         .seat.occupied { background: #111; color: #444; border-color: #222; cursor: not-allowed; }
-        
-        /* Стилі для заголовків колонок */
         .columns-header { display: flex; justify-content: center; margin-bottom: 15px; font-size: 14px; color: #d89a4a; font-weight: bold; }
         .col-label { text-align: center; }
     </style>
@@ -66,107 +64,117 @@
         let occupiedSeats = [];
         let selectedSeats = [];
 
-        // Ініціалізація списку вистав
         const selectEl = document.getElementById('sessionSelect');
         performances.forEach(perf => {
             selectEl.innerHTML += `<option value="${perf.key}">${perf.title} — ${perf.dateStr}</option>`;
         });
 
+        // Допоміжна функція для відправки POST запитів
+        async function sendPost(data) {
+            const params = new URLSearchParams();
+            for (let key in data) {
+                params.append(key, typeof data[key] === 'object' ? JSON.stringify(data[key]) : data[key]);
+            }
+            return fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors", // Використовуємо no-cors для Google Scripts
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params
+            });
+        }
+
         async function loadOccupied() {
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=getHall`);
-                const text = await res.text();
-                const allSessions = JSON.parse(text || '{}');
-                occupiedSeats = allSessions[currentSessionKey] || [];
-            } catch(e) {
-                console.error("Помилка завантаження:", e);
-                occupiedSeats = [];
-            }
-        }
+    try {
+        // Одночасно завантажуємо і стан залу, і список замовлень для повної синхронізації
+        const [hallRes, ordersRes] = await Promise.all([
+            fetch(`${SCRIPT_URL}?action=getHall`),
+            fetch(`${SCRIPT_URL}?action=getOrders`)
+        ]);
 
-        async function saveOccupied() {
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=getHall`);
-                const text = await res.text();
-                let allSessions = JSON.parse(text || '{}');
-                allSessions[currentSessionKey] = occupiedSeats;
-                await fetch(SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "saveHall", hallSessions: allSessions })
+        const allSessions = await hallRes.json();
+        const allOrders = await ordersRes.json();
+
+        // 1. Беремо місця з основної бази залу
+        let occupied = allSessions[currentSessionKey] || [];
+
+        // 2. Додаємо місця з усіх замовлень для цієї сесії
+        allOrders.forEach(order => {
+            if (String(order.sessionKey) === currentSessionKey) {
+                // Розбиваємо рядок ключів "1-1,1-2" у масив, якщо це рядок
+                const keys = Array.isArray(order.seatKeys) 
+                    ? order.seatKeys 
+                    : (order.seatKeys ? String(order.seatKeys).split(',') : []);
+                
+                keys.forEach(k => {
+                    if (!occupied.includes(k)) occupied.push(k);
                 });
-            } catch(e) { console.error("Помилка збереження:", e); }
-        }
-
-        async function loadSession() {
-            currentSessionKey = selectEl.value;
-            if (!currentSessionKey) {
-                document.getElementById('seatsGrid').innerHTML = '';
-                return;
             }
-            selectedSeats = [];
-            await loadOccupied();
-            renderHall();
-            updateCart();
-        }
+        });
 
-        function renderHall() {
-    const grid = document.getElementById('seatsGrid');
-    
-    // Заголовки залишаються без змін
-    grid.innerHTML = `
-        <div class="columns-header">
-            <div style="width: 80px;"></div> 
-            <div style="width: 155px;" class="col-label">4 місця</div>
-            <div style="width: 30px;"></div>
-            <div style="width: 395px;" class="col-label">10 центр</div>
-            <div style="width: 30px;"></div>
-            <div style="width: 115px;" class="col-label">3 край</div>
-        </div>
-    `;
-
-    for (let r = 1; r <= 12; r++) {
-        if (r === 5) continue; 
-
-        // Визначаємо ліміт реальних стільців
-        let numSeats = (r === 6 || r === 11 || r === 12) ? 14 : 17;
-
-        let rowHTML = `<div class="row"><span>Ряд ${r}</span>`;
-
-        // Цикл ЗАВЖДИ до 17, щоб сітка була рівною
-        for (let s = 1; s <= 17; s++) {
-            
-            if (s <= numSeats) {
-                // Малюємо звичайне крісло
-                const key = `${r}-${s}`;
-                const isOccupied = occupiedSeats.includes(key);
-                const className = isOccupied ? 'seat occupied' : 'seat';
-                rowHTML += `<div class="${className}" onclick="toggleSeat(this, '${key}', ${r}, ${s})">${s}</div>`;
-            } else {
-                // Малюємо "прозоре" крісло (placeholder)
-                // visibility: hidden зберігає ширину блоку, але ховає його
-                rowHTML += `<div class="seat" style="visibility: hidden;"></div>`;
-            }
-
-            // Проходи після 4-го та 14-го місця
-            // Вони з'являться навіть якщо стільці прозорі
-            if (s === 4 || s === 14) {
-                rowHTML += `<div style="width: 30px;"></div>`;
-            }
-        }
-        
-        rowHTML += `</div>`;
-        grid.innerHTML += rowHTML;
+        occupiedSeats = occupied;
+    } catch(e) {
+        console.error("Помилка синхронізації:", e);
+        occupiedSeats = [];
     }
 }
+
+// Оновлена функція loadSession для виклику loadOccupied
+async function loadSession() {
+    currentSessionKey = selectEl.value;
+    if (!currentSessionKey) {
+        document.getElementById('seatsGrid').innerHTML = '';
+        return;
+    }
+    selectedSeats = [];
+    document.getElementById('seatsGrid').innerHTML = '<p style="text-align:center">Оновлення схеми залу...</p>';
+    
+    await loadOccupied(); // Тепер вона збирає дані з двох джерел
+    renderHall();
+    updateCart();
+}
+
+        function renderHall() {
+            const grid = document.getElementById('seatsGrid');
+            grid.innerHTML = `
+                <div class="columns-header">
+                    <div style="width: 80px;"></div> 
+                    <div style="width: 155px;" class="col-label">4 місця</div>
+                    <div style="width: 30px;"></div>
+                    <div style="width: 395px;" class="col-label">10 центр</div>
+                    <div style="width: 30px;"></div>
+                    <div style="width: 115px;" class="col-label">3 край</div>
+                </div>
+            `;
+
+            for (let r = 1; r <= 12; r++) {
+                if (r === 5) continue; 
+                let numSeats = (r === 6 || r === 11 || r === 12) ? 14 : 17;
+                let rowHTML = `<div class="row"><span>Ряд ${r}</span>`;
+
+                for (let s = 1; s <= 17; s++) {
+                    if (s <= numSeats) {
+                        const key = `${r}-${s}`;
+                        const isOccupied = occupiedSeats.includes(key);
+                        const className = isOccupied ? 'seat occupied' : 'seat';
+                        rowHTML += `<div class="${className}" onclick="toggleSeat(this, '${key}', ${r}, ${s})">${s}</div>`;
+                    } else {
+                        rowHTML += `<div class="seat" style="visibility: hidden;"></div>`;
+                    }
+                    if (s === 4 || s === 14) rowHTML += `<div style="width: 30px;"></div>`;
+                }
+                rowHTML += `</div>`;
+                grid.innerHTML += rowHTML;
+            }
+        }
+
         function toggleSeat(element, key, row, seatNum) {
             if (element.classList.contains('occupied')) return;
-
             if (element.classList.contains('selected')) {
                 element.classList.remove('selected');
                 selectedSeats = selectedSeats.filter(s => s.key !== key);
             } else {
                 element.classList.add('selected');
-                const price = row <= 3 ? 250 : 200;
+                const price = row <= 2 ? 250 : 200;
                 selectedSeats.push({ key, row, seatNum, price });
             }
             updateCart();
@@ -182,42 +190,59 @@
                 totalEl.innerText = "0";
             } else {
                 tags.innerText = selectedSeats.map(s => `Р${s.row}М${s.seatNum}`).join(', ');
-                const sum = selectedSeats.reduce((acc, s) => acc + s.price, 0);
-                totalEl.innerText = sum;
+                totalEl.innerText = selectedSeats.reduce((acc, s) => acc + s.price, 0);
             }
             btn.disabled = selectedSeats.length === 0;
         }
 
         document.getElementById('payBtn').onclick = async () => {
-            const phone = prompt("Введіть ваш номер телефону для зв'язку:");
+            const phone = prompt("Введіть ваш номер телефону підтвердження броннєвання з вами зв'яжеться Адміністратор:");
             if (!phone) return;
 
+            const btn = document.getElementById('payBtn');
+            btn.disabled = true;
+            btn.innerText = "ОБРОБКА...";
+
             const totalSum = selectedSeats.reduce((sum, s) => sum + s.price, 0);
-            const perfName = selectEl.options[selectEl.selectedIndex].text;
+            const seatKeys = selectedSeats.map(s => s.key);
 
-            alert(`✅ Замовлення прийнято!\nСума: ${totalSum} грн.\nРеквізити картки: 4874 1000 2745 5610.\nПісля оплати адміністратор надішле квитки.`);
+            try {
+                // 1. Зберігаємо замовлення в таблицю
+                await sendPost({
+                    action: "saveOrder",
+                    id: Date.now(),
+                    sessionKey: currentSessionKey,
+                    phone: phone,
+                    seatKeys: seatKeys,
+                    totalPrice: totalSum,
+                    status: 'waiting_payment'
+                });
 
-            const order = {
-                action: "saveOrder",
-                id: Date.now(),
-                sessionKey: currentSessionKey,
-                performance: perfName,
-                seats: selectedSeats.map(s => `Р${s.row} М${s.seatNum}`),
-                seatKeys: selectedSeats.map(s => s.key),
-                totalPrice: totalSum,
-                phone: phone,
-                status: 'waiting_payment',
-                date: new Date().toLocaleString('uk-UA')
-            };
+                // 2. Оновлюємо стан залу (займаємо місця)
+                const newOccupied = [...occupiedSeats, ...seatKeys];
+                
+                // Отримуємо останній стан всіх сесій перед збереженням
+                const res = await fetch(`${SCRIPT_URL}?action=getHall`);
+                const allSessions = await res.json();
+                allSessions[currentSessionKey] = newOccupied;
 
-            await fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify(order)
-            });
+                await sendPost({
+                    action: "saveHall",
+                    hallSessions: allSessions
+                });
 
-            occupiedSeats.push(...selectedSeats.map(s => s.key));
-            await saveOccupied();
-            loadSession();
+                alert(`✅ Замовлення прийнято!\nСума: ${totalSum} грн.\nРеквізити картки: 4874 1000 2745 5610.\nПісля оплати адміністратор передзвоне і підвердить замовлення!`);
+                
+                // Перезавантаження сесії
+                await loadSession();
+
+            } catch (e) {
+                console.error(e);
+                alert("Сталася помилка. Спробуйте ще раз або зверніться до підтримки.");
+            } finally {
+                btn.innerText = "Оплатити на картку";
+                btn.disabled = selectedSeats.length === 0;
+            }
         };
     </script>
 </body>

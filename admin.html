@@ -97,171 +97,230 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFZ31_cCd2E9KrP0oeKjtlbgkqb01TswBwa66Wl12R6ikdgGcPpYPQ489GYtd_5nZd/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFZ31_cCd2E9KrP0oeKjtlbgkqb01TswBwa66Wl12R6ikdgGcPpYPQ489GYtd_5nZd/exec"; 
 
-        let selectedSeats = [];
-        let allOrders = [];
-        let hallSessions = {};
+    let selectedSeats = [];
+    let allOrders = [];
+    let hallSessions = {};
 
-        async function loadData() {
-            try {
-                const ordersRes = await fetch(`${SCRIPT_URL}?action=getOrders`);
-                allOrders = await ordersRes.json();
-                const hallRes = await fetch(`${SCRIPT_URL}?action=getHall`);
-                hallSessions = await hallRes.json();
-                renderHall();
-                renderOrdersAndStats();
-            } catch (e) { console.error("Помилка:", e); }
-        }
-
-        function renderHall() {
-            const currentSession = document.getElementById('sessionSelect').value;
-            const occupied = hallSessions[currentSession] || [];
-            let html = '';
-
-            for (let r = 1; r <= 12; r++) {
-                if (r === 5) continue;
-                html += `<div class="row"><div class="row-info">Ряд ${r}</div>`;
-                const numSeats = (r === 6 || r === 11 || r === 12) ? 14 : 17;
-
-                for (let s = 1; s <= 17; s++) {
-                    if (s <= numSeats) {
-                        const key = `${r}-${s}`;
-                        let status = occupied.includes(key) ? 'occupied' : '';
-                        if (selectedSeats.some(i => i.id === key)) status = 'selected';
-                        html += `<div class="seat ${status}" onclick="clickSeat('${r}','${s}')">${s}</div>`;
-                    } else {
-                        html += `<div class="seat" style="visibility: hidden;"></div>`;
-                    }
-                    if (s === 5 || s === 14) html += `<div style="width: 25px;"></div>`;
-                }
-                html += `</div>`;
-            }
-            document.getElementById('hallGrid').innerHTML = html;
-        }
-
-        window.clickSeat = function(r, s) {
-            const key = `${r}-${s}`;
-            const currentSession = document.getElementById('sessionSelect').value;
-            if ((hallSessions[currentSession] || []).includes(key)) return;
-
-            const idx = selectedSeats.findIndex(i => i.id === key);
-            if (idx > -1) selectedSeats.splice(idx, 1);
-            else selectedSeats.push({ id: key, price: (r <= 3 ? 250 : 200) });
-
-            const seatList = selectedSeats.map(i => i.id).join(', ');
-            const total = selectedSeats.reduce((a, b) => a + b.price, 0);
-            const infoText = selectedSeats.length ? `Обрано: ${seatList} (${total} грн)` : "Оберіть місця на схемі";
+    // Завантаження даних
+    async function loadData() {
+        try {
+            const ordersRes = await fetch(`${SCRIPT_URL}?action=getOrders`);
+            allOrders = await ordersRes.json();
+            const hallRes = await fetch(`${SCRIPT_URL}?action=getHall`);
+            hallSessions = await hallRes.json();
             
-            document.getElementById('quickSeatsDisplay').innerText = infoText;
-            document.getElementById('manualSeatsDisplay').innerText = infoText;
             renderHall();
-        };
-
-        async function processOrder(type, phone, status) {
-            if (!selectedSeats.length) return alert("Спочатку оберіть місця на схемі!");
-            const session = document.getElementById('sessionSelect').value;
-            const seatKeys = selectedSeats.map(s => s.id);
-            const total = selectedSeats.reduce((a, b) => a + b.price, 0);
-
-            if (!confirm(`Підтвердити замовлення на ${total} грн?`)) return;
-
-            const body = { action: "saveOrder", id: "ADM-" + Date.now().toString().slice(-6), sessionKey: session, phone, seatKeys, totalPrice: total, status };
-
-            try {
-                await sendPost(body);
-                hallSessions[session] = [...(hallSessions[session] || []), ...seatKeys];
-                await sendPost({ action: "saveHall", hallSessions });
-                alert("✅ Збережено!");
-                selectedSeats = [];
-                loadData();
-            } catch (e) { alert("Помилка."); }
-        }
-
-        function renderOrdersAndStats() {
-            const cur = document.getElementById('sessionSelect').value;
-            const filtered = allOrders.filter(o => String(o.sessionKey).includes(cur));
-            let totalCash = 0, totalTix = 0;
-
-            allOrders.forEach(o => {
-                if (String(o.status).trim().toLowerCase() === 'оплачено') {
-                    totalCash += Number(o.totalPrice) || 0;
-                    const keys = Array.isArray(o.seatKeys) ? o.seatKeys : (o.seatKeys ? String(o.seatKeys).split(',') : []);
-                    totalTix += keys.length;
-                }
-            });
-
-            let html = '';
-            [...filtered].reverse().forEach(o => {
-                const status = String(o.status || "").trim();
-                const isPaid = status.toLowerCase() === 'оплачено';
-                const keys = Array.isArray(o.seatKeys) ? o.seatKeys : (o.seatKeys ? String(o.seatKeys).split(',') : []);
-
-                html += `
-                    <div class="order" style="border-left-color: ${isPaid ? '#4caf50' : '#d89a4a'}">
-                        <div style="display:flex; justify-content:space-between;">
-                            <b>${o.phone}</b>
-                            <span class="status-badge ${isPaid ? 'status-paid' : 'status-pending'}">${status}</span>
-                        </div>
-                        <small style="color:var(--text-soft)">${keys.join(', ')} — ${o.totalPrice} грн</small>
-                        <div class="order-actions">
-                            ${!isPaid ? `<button class="btn-green btn-mini" onclick="confirmOrder('${o.id}')">✅ Підтвердити</button>` : ''}
-                            <button class="btn-red btn-mini" style="opacity:0.6" onclick="deleteOrder('${o.id}', '${o.sessionKey}', '${keys.join(',')}')">🗑️ Видалити</button>
-                        </div>
-                    </div>`;
-            });
-
-            document.getElementById('ordersList').innerHTML = html || "<p>Замовлень немає</p>";
-            document.getElementById('statsBox').innerText = totalCash + " грн";
-            document.getElementById('ticketCount').innerText = totalTix + " квитків";
-        }
-
-        async function confirmOrder(orderId) {
-            if (!confirm("Підтвердити оплату?")) return;
-            try {
-                await sendPost({ action: "updateOrderStatus", id: orderId, status: "Оплачено" });
-                loadData();
-            } catch (e) { alert("Помилка."); }
-        }
-
-        async function deleteOrder(orderId, sessionKey, seatKeysStr) {
-            if (!confirm("Видалити замовлення? Місця звільняться.")) return;
-            try {
-                const keys = seatKeysStr.split(',');
-                hallSessions[sessionKey] = (hallSessions[sessionKey] || []).filter(k => !keys.includes(k));
-                await sendPost({ action: "deleteOrder", id: orderId, sessionKey, updatedHall: hallSessions[sessionKey] });
-                loadData();
-            } catch (e) { alert("Помилка."); }
-        }
-
-        async function sendPost(data) {
-    // Використовуємо звичайний fetch без no-cors. 
-    // Щоб уникнути помилок CORS, Google Script має отримувати дані як текст або параметри
-    const formData = new URLSearchParams();
-    for (const key in data) {
-        if (typeof data[key] === 'object') {
-            formData.append(key, JSON.stringify(data[key]));
-        } else {
-            formData.append(key, data[key]);
+            renderOrdersAndStats();
+        } catch (e) { 
+            console.error("Помилка завантаження:", e); 
         }
     }
 
-    return fetch(SCRIPT_URL, {
-        method: "POST",
-        body: formData // Відправляємо як форму, це надійніше для Google Scripts
+    // Відмальовка залу
+    function renderHall() {
+    const currentSession = document.getElementById('sessionSelect').value;
+    
+    // 1. Отримуємо місця з hallSessions (ручні та прямі броні)
+    let occupied = [...(hallSessions[currentSession] || [])];
+
+    // 2. ДОДАТКОВО: Проходимо по всіх замовленнях і додаємо місця звідти
+    // Це гарантує, що якщо замовлення є в списку, воно буде в залі
+    allOrders.forEach(order => {
+        if (String(order.sessionKey) === currentSession) {
+            const keys = Array.isArray(order.seatKeys) 
+                ? order.seatKeys 
+                : (order.seatKeys ? String(order.seatKeys).split(',') : []);
+            
+            keys.forEach(k => {
+                if (!occupied.includes(k)) occupied.push(k);
+            });
+        }
     });
+
+    let html = '';
+    for (let r = 1; r <= 12; r++) {
+        if (r === 5) continue;
+        html += `<div class="row"><div class="row-info">Ряд ${r}</div>`;
+        const numSeats = (r === 6 || r === 11 || r === 12) ? 14 : 17;
+
+        for (let s = 1; s <= 17; s++) {
+            if (s <= numSeats) {
+                const key = `${r}-${s}`;
+                let status = occupied.includes(key) ? 'occupied' : '';
+                if (selectedSeats.some(i => i.id === key)) status = 'selected';
+                html += `<div class="seat ${status}" onclick="clickSeat('${r}','${s}')">${s}</div>`;
+            } else {
+                html += `<div class="seat" style="visibility: hidden;"></div>`;
+            }
+            // Повертаємо про проходи (використовуйте 4 або 5 залежно від вашої верстки)
+            if (s === 4 || s === 14) html += `<div style="width: 25px;"></div>`;
+        }
+        html += `</div>`;
+    }
+    document.getElementById('hallGrid').innerHTML = html;
 }
 
-        async function resetSystem() {
-            if (confirm("⚠️ ОЧИСТИТИ ВСЕ?")) {
-                await sendPost({ action: "resetAll" });
-                location.reload();
+    // Клік по місцю
+    window.clickSeat = function(r, s) {
+        const key = `${r}-${s}`;
+        const currentSession = document.getElementById('sessionSelect').value;
+        if ((hallSessions[currentSession] || []).includes(key)) return;
+
+        const idx = selectedSeats.findIndex(i => i.id === key);
+        if (idx > -1) selectedSeats.splice(idx, 1);
+        else selectedSeats.push({ id: key, price: (parseInt(r) <= 2 ? 250 : 200) });
+
+        const seatList = selectedSeats.map(i => i.id).join(', ');
+        const total = selectedSeats.reduce((a, b) => a + b.price, 0);
+        const infoText = selectedSeats.length ? `Обрано: ${seatList} (${total} грн)` : "Оберіть місця на схемі";
+        
+        document.getElementById('quickSeatsDisplay').innerText = infoText;
+        document.getElementById('manualSeatsDisplay').innerText = infoText;
+        renderHall();
+    };
+
+    // --- ПЕРЕВІРКА ТА ВИПРАВЛЕННЯ РУЧНОГО БРОНЮВАННЯ ---
+    async function processOrder(type, phone, status) {
+        if (!selectedSeats.length) return alert("Спочатку оберіть місця на схемі!");
+        if (!phone) return alert("Введіть номер телефону або назву!");
+
+        const session = document.getElementById('sessionSelect').value;
+        const seatKeys = selectedSeats.map(s => s.id);
+        const total = selectedSeats.reduce((a, b) => a + b.price, 0);
+
+        if (!confirm(`Підтвердити ${type} на ${total} грн?`)) return;
+
+        // Блокуємо кнопки
+        const btns = document.querySelectorAll('button');
+        btns.forEach(b => b.disabled = true);
+
+        try {
+            // 1. Зберігаємо замовлення
+            const orderData = { 
+                action: "saveOrder", 
+                id: "ADM-" + Date.now().toString().slice(-6), 
+                sessionKey: session, 
+                phone: phone, 
+                seatKeys: seatKeys, 
+                totalPrice: total, 
+                status: status 
+            };
+            await sendPost(orderData);
+
+            // 2. Оновлюємо стан залу
+            hallSessions[session] = [...(hallSessions[session] || []), ...seatKeys];
+            await sendPost({ action: "saveHall", hallSessions: hallSessions });
+
+            alert("✅ Успішно збережено!");
+            
+            // Очищення полів
+            selectedSeats = [];
+            document.getElementById('quickPhone').value = '';
+            document.getElementById('manualPhone').value = '';
+            document.getElementById('quickSeatsDisplay').innerText = "Місця не обрано";
+            document.getElementById('manualSeatsDisplay').innerText = "Оберіть місця на схемі";
+            
+            await loadData();
+        } catch (e) { 
+            alert("Помилка при збереженні."); 
+            console.error(e);
+        } finally {
+            btns.forEach(b => b.disabled = false);
+        }
+    }
+
+    // Підрахунок статистики та відмальовка списку
+    function renderOrdersAndStats() {
+        const cur = document.getElementById('sessionSelect').value;
+        const filtered = allOrders.filter(o => String(o.sessionKey) === cur);
+        let totalCash = 0, totalTix = 0;
+
+        // Рахуємо всю касу по всіх сеансах (якщо статус "Оплачено")
+        allOrders.forEach(o => {
+            if (String(o.status).trim().toLowerCase() === 'оплачено') {
+                totalCash += Number(o.totalPrice) || 0;
+                const keys = Array.isArray(o.seatKeys) ? o.seatKeys : (o.seatKeys ? String(o.seatKeys).split(',') : []);
+                totalTix += keys.length;
+            }
+        });
+
+        let html = '';
+        [...filtered].reverse().forEach(o => {
+            const status = String(o.status || "").trim();
+            const isPaid = status.toLowerCase() === 'оплачено';
+            const keys = Array.isArray(o.seatKeys) ? o.seatKeys : (o.seatKeys ? String(o.seatKeys).split(',') : []);
+
+            html += `
+                <div class="order" style="border-left-color: ${isPaid ? '#4caf50' : '#d89a4a'}">
+                    <div style="display:flex; justify-content:space-between;">
+                        <b>${o.phone}</b>
+                        <span class="status-badge ${isPaid ? 'status-paid' : 'status-pending'}">${status}</span>
+                    </div>
+                    <small style="color:var(--text-soft)">${keys.join(', ')} — ${o.totalPrice} грн</small>
+                    <div class="order-actions">
+                        ${!isPaid ? `<button class="btn-green btn-mini" onclick="confirmOrder('${o.id}')">✅ Підтвердити</button>` : ''}
+                        <button class="btn-red btn-mini" style="opacity:0.6" onclick="deleteOrder('${o.id}', '${o.sessionKey}', '${keys.join(',')}')">🗑️ Видалити</button>
+                    </div>
+                </div>`;
+        });
+
+        document.getElementById('ordersList').innerHTML = html || "<p>Замовлень немає</p>";
+        document.getElementById('statsBox').innerText = totalCash + " грн";
+        document.getElementById('ticketCount').innerText = totalTix + " квитків";
+    }
+
+    async function confirmOrder(orderId) {
+        if (!confirm("Підтвердити оплату?")) return;
+        try {
+            await sendPost({ action: "updateOrderStatus", id: orderId, status: "Оплачено" });
+            await loadData();
+        } catch (e) { alert("Помилка."); }
+    }
+
+    async function deleteOrder(orderId, sessionKey, seatKeysStr) {
+        if (!confirm("Видалити замовлення? Місця звільняться.")) return;
+        try {
+            const keysToRemove = seatKeysStr.split(',');
+            // Видаляємо місця з локального об'єкта
+            hallSessions[sessionKey] = (hallSessions[sessionKey] || []).filter(k => !keysToRemove.includes(k));
+            
+            await sendPost({ 
+                action: "deleteOrder", 
+                id: orderId, 
+                sessionKey: sessionKey, 
+                updatedHall: hallSessions[sessionKey] // Передаємо масив для поточної сесії
+            });
+            await loadData();
+        } catch (e) { alert("Помилка."); }
+    }
+
+    // Універсальна функція відправки
+    async function sendPost(data) {
+        const formData = new URLSearchParams();
+        for (const key in data) {
+            if (typeof data[key] === 'object') {
+                formData.append(key, JSON.stringify(data[key]));
+            } else {
+                formData.append(key, data[key]);
             }
         }
+        return fetch(SCRIPT_URL, {
+            method: "POST",
+            body: formData
+        });
+    }
 
-        window.refreshDataFromBase = loadData;
-        window.logout = () => { localStorage.removeItem('adminLoggedIn'); location.href = "login.html"; };
-        window.onload = loadData;
-    </script>
+    async function resetSystem() {
+        if (!confirm("⚠️ УВАГА! Це видалить ВСІ замовлення та очистить зал. Продовжити?")) return;
+        await sendPost({ action: "resetAll" });
+        location.reload();
+    }
+
+    window.refreshDataFromBase = loadData;
+    window.logout = () => { localStorage.removeItem('adminLoggedIn'); location.href = "login.html"; };
+    window.onload = loadData;
+</script>
 </body>
 </html>
