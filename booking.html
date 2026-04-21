@@ -3,32 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Бронювання квитків</title>
+    <title>Бронювання квитків — RESONANCE</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #070707; color: #fff; margin: 0; padding: 20px; }
         .header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 1px solid #d89a4a; padding-bottom: 10px; }
         .header a { color: #d89a4a; text-decoration: none; font-weight: bold; text-transform: uppercase; }
-        .container { display: flex; gap: 30px; max-width: 1100px; margin: auto; flex-wrap: wrap; }
-        .hall { flex: 2; min-width: 600px; }
-        .sidebar { flex: 1; background: #1a1a1a; padding: 25px; border-radius: 15px; border: 1px solid rgba(216, 154, 74, 0.3); height: fit-content; }
+        .container { display: flex; gap: 30px; max-width: 1200px; margin: auto; flex-wrap: wrap; }
+        .hall { flex: 2; min-width: 750px; }
+        .sidebar { flex: 1; min-width: 300px; background: #1a1a1a; padding: 25px; border-radius: 15px; border: 1px solid rgba(216, 154, 74, 0.3); height: fit-content; }
         select, button { width: 100%; padding: 15px; border-radius: 8px; font-size: 16px; margin-top: 10px; }
         select { background: #222; color: #fff; border: 1px solid #d89a4a; }
         button { background: #d89a4a; color: #000; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
         button:disabled { background: #555; cursor: not-allowed; opacity: 0.5; }
         button:hover:not(:disabled) { background: #f4b76e; }
-        .stage { text-align: center; color: #d89a4a; letter-spacing: 10px; padding-bottom: 10px; border-bottom: 2px solid #d89a4a; margin: 30px 0; font-size: 18px; }
+        .stage { text-align: center; color: #d89a4a; letter-spacing: 10px; padding-bottom: 10px; border-bottom: 2px solid #d89a4a; margin: 30px 0; font-size: 18px; width: 100%; }
         .row { display: flex; gap: 8px; justify-content: center; margin-bottom: 8px; align-items: center; }
-        .row span { width: 60px; color: #d89a4a; font-size: 13px; text-align: right; }
-        .seat { width: 32px; height: 32px; background: #333; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; border: 1px solid #555; }
-        .seat:hover:not(.occupied) { background: #d89a4a; color: #000; }
+        .row span { width: 70px; color: #d89a4a; font-size: 13px; text-align: right; margin-right: 10px; }
+        .seat { width: 32px; height: 32px; background: #333; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; border: 1px solid #555; transition: 0.2s; }
+        .seat:hover:not(.occupied) { background: #d89a4a; color: #000; border-color: #fff; }
         .seat.selected { background: #d89a4a; color: #000; border-color: #fff; }
         .seat.occupied { background: #111; color: #444; border-color: #222; cursor: not-allowed; }
+        
+        /* Стилі для заголовків колонок */
+        .columns-header { display: flex; justify-content: center; margin-bottom: 15px; font-size: 14px; color: #d89a4a; font-weight: bold; }
+        .col-label { text-align: center; }
     </style>
 </head>
 <body>
     <div class="header">
         <a href="#">RESONANCE</a>
-        <a href="index.html">Наголовну</a>
+        <a href="index.html">На головну</a>
     </div>
 
     <div class="container">
@@ -51,7 +55,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-pcdZVST0BnD5EgSeEQ48gy-CuG__aWDIt2cHfBmbko4VmgxEEsWUBnSQEVPpmIUK/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFZ31_cCd2E9KrP0oeKjtlbgkqb01TswBwa66Wl12R6ikdgGcPpYPQ489GYtd_5nZd/exec";
 
         const performances = [
             { key: "27.04", title: "Цікавий випадок", dateStr: "27 квітня, 19:00" },
@@ -62,7 +66,12 @@
         let occupiedSeats = [];
         let selectedSeats = [];
 
-        // Завантаження зайнятих місць з Google Таблиці
+        // Ініціалізація списку вистав
+        const selectEl = document.getElementById('sessionSelect');
+        performances.forEach(perf => {
+            selectEl.innerHTML += `<option value="${perf.key}">${perf.title} — ${perf.dateStr}</option>`;
+        });
+
         async function loadOccupied() {
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getHall`);
@@ -70,12 +79,11 @@
                 const allSessions = JSON.parse(text || '{}');
                 occupiedSeats = allSessions[currentSessionKey] || [];
             } catch(e) {
-                console.error("Не вдалося завантажити місця", e);
+                console.error("Помилка завантаження:", e);
                 occupiedSeats = [];
             }
         }
 
-        // Збереження зайнятих місць
         async function saveOccupied() {
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getHall`);
@@ -86,16 +94,9 @@
                     method: "POST",
                     body: JSON.stringify({ action: "saveHall", hallSessions: allSessions })
                 });
-            } catch(e) { console.error("Не вдалося зберегти місця", e); }
+            } catch(e) { console.error("Помилка збереження:", e); }
         }
 
-        // Заповнення списку вистав
-        const selectEl = document.getElementById('sessionSelect');
-        performances.forEach(perf => {
-            selectEl.innerHTML += `<option value="${perf.key}">${perf.title} — ${perf.dateStr}</option>`;
-        });
-
-        // Завантаження сеансу
         async function loadSession() {
             currentSessionKey = selectEl.value;
             if (!currentSessionKey) {
@@ -108,41 +109,55 @@
             updateCart();
         }
 
-        // Рендер залу (точно як на твоєму скріншоті)
         function renderHall() {
-            const grid = document.getElementById('seatsGrid');
-            grid.innerHTML = `
-                <div style="display: flex; justify-content: center; margin-bottom: 20px; font-size: 15px; color: #d89a4a; font-weight: bold; letter-spacing: 1px;">
-                    <span style="width: 60px;"></span>
-                    <div style="min-width: 200px; text-align: center;">4 місць</div>
-                    <div style="width: 30px;"></div>
-                    <div style="min-width: 200px; text-align: center;">10 центр</div>
-                    <div style="width: 30px;"></div>
-                    <div style="min-width: 280px; text-align: center;">3 крайній ряд</div>
-                </div>
-            `;
+    const grid = document.getElementById('seatsGrid');
+    
+    // Заголовки залишаються без змін
+    grid.innerHTML = `
+        <div class="columns-header">
+            <div style="width: 80px;"></div> 
+            <div style="width: 155px;" class="col-label">4 місця</div>
+            <div style="width: 30px;"></div>
+            <div style="width: 395px;" class="col-label">10 центр</div>
+            <div style="width: 30px;"></div>
+            <div style="width: 115px;" class="col-label">3 край</div>
+        </div>
+    `;
 
-            for (let r = 1; r <= 11; r++) {
-                if (r === 5) continue;
+    for (let r = 1; r <= 12; r++) {
+        if (r === 5) continue; 
 
-                const numSeats = (r === 4 || r === 6) ? 14 : 17;
-                let rowHTML = `<div class="row"><span>Ряд ${r}</span>`;
+        // Визначаємо ліміт реальних стільців
+        let numSeats = (r === 6 || r === 11 || r === 12) ? 14 : 17;
 
-                for (let s = 1; s <= numSeats; s++) {
-                    const key = `${r}-${s}`;
-                    const isOccupied = occupiedSeats.includes(key);
-                    const className = isOccupied ? 'seat occupied' : 'seat';
+        let rowHTML = `<div class="row"><span>Ряд ${r}</span>`;
 
-                    rowHTML += `<div class="${className}" onclick="toggleSeat(this, '${key}', ${r}, ${s})">${s}</div>`;
+        // Цикл ЗАВЖДИ до 17, щоб сітка була рівною
+        for (let s = 1; s <= 17; s++) {
+            
+            if (s <= numSeats) {
+                // Малюємо звичайне крісло
+                const key = `${r}-${s}`;
+                const isOccupied = occupiedSeats.includes(key);
+                const className = isOccupied ? 'seat occupied' : 'seat';
+                rowHTML += `<div class="${className}" onclick="toggleSeat(this, '${key}', ${r}, ${s})">${s}</div>`;
+            } else {
+                // Малюємо "прозоре" крісло (placeholder)
+                // visibility: hidden зберігає ширину блоку, але ховає його
+                rowHTML += `<div class="seat" style="visibility: hidden;"></div>`;
+            }
 
-                    if (s === 5 || s === 10) rowHTML += `<div style="width: 30px;"></div>`;
-                }
-                rowHTML += `</div>`;
-                grid.innerHTML += rowHTML;
+            // Проходи після 4-го та 14-го місця
+            // Вони з'являться навіть якщо стільці прозорі
+            if (s === 4 || s === 14) {
+                rowHTML += `<div style="width: 30px;"></div>`;
             }
         }
-
-        // Вибір місця
+        
+        rowHTML += `</div>`;
+        grid.innerHTML += rowHTML;
+    }
+}
         function toggleSeat(element, key, row, seatNum) {
             if (element.classList.contains('occupied')) return;
 
@@ -157,7 +172,6 @@
             updateCart();
         }
 
-        // Оновлення кошика
         function updateCart() {
             const tags = document.getElementById('selectedTags');
             const totalEl = document.getElementById('totalAmount');
@@ -174,15 +188,14 @@
             btn.disabled = selectedSeats.length === 0;
         }
 
-        // Оплата
         document.getElementById('payBtn').onclick = async () => {
-            const phone = prompt("Введіть ваш номер телефону (наприклад: 0501234567):");
+            const phone = prompt("Введіть ваш номер телефону для зв'язку:");
             if (!phone) return;
 
             const totalSum = selectedSeats.reduce((sum, s) => sum + s.price, 0);
             const perfName = selectEl.options[selectEl.selectedIndex].text;
 
-            alert(`✅ Замовлення створено!\nПереведіть ${totalSum} грн на картку 4874 1000 2745 5610.\nПісля оплати адміністратор підтвердить квитки.`);
+            alert(`✅ Замовлення прийнято!\nСума: ${totalSum} грн.\nРеквізити картки: 4874 1000 2745 5610.\nПісля оплати адміністратор надішле квитки.`);
 
             const order = {
                 action: "saveOrder",
@@ -197,16 +210,13 @@
                 date: new Date().toLocaleString('uk-UA')
             };
 
-            // Зберігаємо замовлення
             await fetch(SCRIPT_URL, {
                 method: "POST",
                 body: JSON.stringify(order)
             });
 
-            // Блокуємо місця
             occupiedSeats.push(...selectedSeats.map(s => s.key));
             await saveOccupied();
-
             loadSession();
         };
     </script>
