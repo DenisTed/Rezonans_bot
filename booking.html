@@ -5,31 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Бронювання квитків</title>
     <style>
-        /* Базові налаштування і темна тема */
         body { font-family: 'Segoe UI', sans-serif; background: #070707; color: #fff; margin: 0; padding: 20px; }
         .header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 1px solid #d89a4a; padding-bottom: 10px; }
         .header a { color: #d89a4a; text-decoration: none; font-weight: bold; text-transform: uppercase; }
-        
-        /* Сітка сторінки (зал ліворуч, панель оплати праворуч) */
         .container { display: flex; gap: 30px; max-width: 1100px; margin: auto; flex-wrap: wrap; }
         .hall { flex: 2; min-width: 600px; }
         .sidebar { flex: 1; background: #1a1a1a; padding: 25px; border-radius: 15px; border: 1px solid rgba(216, 154, 74, 0.3); height: fit-content; }
-        
-        /* Елементи керування */
         select, button { width: 100%; padding: 15px; border-radius: 8px; font-size: 16px; margin-top: 10px; }
         select { background: #222; color: #fff; border: 1px solid #d89a4a; }
         button { background: #d89a4a; color: #000; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
         button:disabled { background: #555; cursor: not-allowed; opacity: 0.5; }
         button:hover:not(:disabled) { background: #f4b76e; }
-
-        /* Сцена та місця */
-        .stage { text-align: center; color: #d89a4a; letter-spacing: 10px; padding-bottom: 10px; border-bottom: 2px solid #d89a4a; margin: 30px 0; }
+        .stage { text-align: center; color: #d89a4a; letter-spacing: 10px; padding-bottom: 10px; border-bottom: 2px solid #d89a4a; margin: 30px 0; font-size: 18px; }
         .row { display: flex; gap: 8px; justify-content: center; margin-bottom: 8px; align-items: center; }
-        .row span { width: 50px; color: #d89a4a; font-size: 12px; }
-        .seat { width: 30px; height: 30px; background: #333; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 1px solid #555; }
-        
-        /* Стани місць */
-        .seat:hover:not(.occupied) { background: #d89a4a; }
+        .row span { width: 60px; color: #d89a4a; font-size: 13px; text-align: right; }
+        .seat { width: 32px; height: 32px; background: #333; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; border: 1px solid #555; }
+        .seat:hover:not(.occupied) { background: #d89a4a; color: #000; }
         .seat.selected { background: #d89a4a; color: #000; border-color: #fff; }
         .seat.occupied { background: #111; color: #444; border-color: #222; cursor: not-allowed; }
     </style>
@@ -39,8 +30,6 @@
         <a href="#">RESONANCE</a>
         <a href="index.html">Наголовну</a>
     </div>
-    
-    
 
     <div class="container">
         <div class="hall">
@@ -62,108 +51,141 @@
     </div>
 
     <script>
-        // 1. Наші дані
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-pcdZVST0BnD5EgSeEQ48gy-CuG__aWDIt2cHfBmbko4VmgxEEsWUBnSQEVPpmIUK/exec";
+
         const performances = [
-            { id: "1", title: "Цікавий випадок", date: "2026-04-25" }
-            
+            { key: "27.04", title: "Цікавий випадок", dateStr: "27 квітня, 19:00" },
+            { key: "29.04", title: "Цікавий випадок", dateStr: "29 квітня, 19:00" }
         ];
-        const TICKET_PRICE = 250;
-        
+
         let currentSessionKey = null;
         let occupiedSeats = [];
         let selectedSeats = [];
 
-        // 2. Завантажуємо список вистав у Select
+        // Завантаження зайнятих місць з Google Таблиці
+        async function loadOccupied() {
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=getHall`);
+                const text = await res.text();
+                const allSessions = JSON.parse(text || '{}');
+                occupiedSeats = allSessions[currentSessionKey] || [];
+            } catch(e) {
+                console.error("Не вдалося завантажити місця", e);
+                occupiedSeats = [];
+            }
+        }
+
+        // Збереження зайнятих місць
+        async function saveOccupied() {
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=getHall`);
+                const text = await res.text();
+                let allSessions = JSON.parse(text || '{}');
+                allSessions[currentSessionKey] = occupiedSeats;
+                await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "saveHall", hallSessions: allSessions })
+                });
+            } catch(e) { console.error("Не вдалося зберегти місця", e); }
+        }
+
+        // Заповнення списку вистав
         const selectEl = document.getElementById('sessionSelect');
         performances.forEach(perf => {
-            selectEl.innerHTML += `<option value="${perf.id}|${perf.date}">${perf.title} — ${perf.date}</option>`;
+            selectEl.innerHTML += `<option value="${perf.key}">${perf.title} — ${perf.dateStr}</option>`;
         });
 
-        // 3. Функція завантаження сеансу (спрацьовує при виборі вистави)
-        function loadSession() {
+        // Завантаження сеансу
+        async function loadSession() {
             currentSessionKey = selectEl.value;
             if (!currentSessionKey) {
                 document.getElementById('seatsGrid').innerHTML = '';
                 return;
             }
-
-            // Дістаємо зайняті місця з пам'яті браузера (для адмінки)
-            const allSessions = JSON.parse(localStorage.getItem('hallSessions')) || {};
-            occupiedSeats = allSessions[currentSessionKey] || [];
-            selectedSeats = []; 
-            
+            selectedSeats = [];
+            await loadOccupied();
             renderHall();
             updateCart();
         }
 
-        // 4. Малюємо зал простіше
+        // Рендер залу (точно як на твоєму скріншоті)
         function renderHall() {
             const grid = document.getElementById('seatsGrid');
-            grid.innerHTML = ''; // Очищаємо
+            grid.innerHTML = `
+                <div style="display: flex; justify-content: center; margin-bottom: 20px; font-size: 15px; color: #d89a4a; font-weight: bold; letter-spacing: 1px;">
+                    <span style="width: 60px;"></span>
+                    <div style="min-width: 200px; text-align: center;">4 місць</div>
+                    <div style="width: 30px;"></div>
+                    <div style="min-width: 200px; text-align: center;">10 центр</div>
+                    <div style="width: 30px;"></div>
+                    <div style="min-width: 280px; text-align: center;">3 крайній ряд</div>
+                </div>
+            `;
 
-            for (let r = 1; r <= 10; r++) { // 10 рядів
+            for (let r = 1; r <= 11; r++) {
+                if (r === 5) continue;
+
+                const numSeats = (r === 4 || r === 6) ? 14 : 17;
                 let rowHTML = `<div class="row"><span>Ряд ${r}</span>`;
-                
-                for (let s = 1; s <= 15; s++) { // 15 місць у ряду
+
+                for (let s = 1; s <= numSeats; s++) {
                     const key = `${r}-${s}`;
                     const isOccupied = occupiedSeats.includes(key);
                     const className = isOccupied ? 'seat occupied' : 'seat';
-                    
-                    // Додаємо місце в рядок HTML
+
                     rowHTML += `<div class="${className}" onclick="toggleSeat(this, '${key}', ${r}, ${s})">${s}</div>`;
-                    
-                    // Робимо прохід (aisle) після 5 та 10 місця
-                    if (s === 5 || s === 10) rowHTML += `<div style="width: 20px;"></div>`; 
+
+                    if (s === 5 || s === 10) rowHTML += `<div style="width: 30px;"></div>`;
                 }
-                
                 rowHTML += `</div>`;
                 grid.innerHTML += rowHTML;
             }
         }
 
-        // 5. Вибір місця
+        // Вибір місця
         function toggleSeat(element, key, row, seatNum) {
-            if (element.classList.contains('occupied')) return; // Якщо зайнято — нічого не робимо
+            if (element.classList.contains('occupied')) return;
 
             if (element.classList.contains('selected')) {
                 element.classList.remove('selected');
-                selectedSeats = selectedSeats.filter(s => s.key !== key); // Видаляємо з масиву
+                selectedSeats = selectedSeats.filter(s => s.key !== key);
             } else {
                 element.classList.add('selected');
-                selectedSeats.push({ key, row, seatNum }); // Додаємо в масив
+                const price = row <= 3 ? 250 : 200;
+                selectedSeats.push({ key, row, seatNum, price });
             }
             updateCart();
         }
 
-        // 6. Оновлення кошика
+        // Оновлення кошика
         function updateCart() {
             const tags = document.getElementById('selectedTags');
-            const total = document.getElementById('totalAmount');
+            const totalEl = document.getElementById('totalAmount');
             const btn = document.getElementById('payBtn');
 
             if (selectedSeats.length === 0) {
                 tags.innerText = "Не обрано";
+                totalEl.innerText = "0";
             } else {
                 tags.innerText = selectedSeats.map(s => `Р${s.row}М${s.seatNum}`).join(', ');
+                const sum = selectedSeats.reduce((acc, s) => acc + s.price, 0);
+                totalEl.innerText = sum;
             }
-
-            total.innerText = selectedSeats.length * TICKET_PRICE;
-            btn.disabled = selectedSeats.length === 0; // Вмикаємо кнопку, якщо є місця
+            btn.disabled = selectedSeats.length === 0;
         }
 
-        // 7. Оплата і збереження (Міст до Адмін-панелі)
-        document.getElementById('payBtn').onclick = () => {
+        // Оплата
+        document.getElementById('payBtn').onclick = async () => {
             const phone = prompt("Введіть ваш номер телефону (наприклад: 0501234567):");
             if (!phone) return;
 
-            const totalSum = selectedSeats.length * TICKET_PRICE;
+            const totalSum = selectedSeats.reduce((sum, s) => sum + s.price, 0);
             const perfName = selectEl.options[selectEl.selectedIndex].text;
 
             alert(`✅ Замовлення створено!\nПереведіть ${totalSum} грн на картку 4441 1111 2222 3333.\nПісля оплати адміністратор підтвердить квитки.`);
 
-            // ЗБЕРЕЖЕННЯ ДЛЯ АДМІНКИ (Замовлення)
-            const orders = JSON.parse(localStorage.getItem('theatreOrders')) || [];
-            orders.push({
+            const order = {
+                action: "saveOrder",
                 id: Date.now(),
                 sessionKey: currentSessionKey,
                 performance: perfName,
@@ -171,18 +193,21 @@
                 seatKeys: selectedSeats.map(s => s.key),
                 totalPrice: totalSum,
                 phone: phone,
-                status: 'waiting_payment', // Статус для адмінки
+                status: 'waiting_payment',
                 date: new Date().toLocaleString('uk-UA')
+            };
+
+            // Зберігаємо замовлення
+            await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify(order)
             });
-            localStorage.setItem('theatreOrders', JSON.stringify(orders));
 
-            // ЗБЕРЕЖЕННЯ ДЛЯ АДМІНКИ (Зайняті місця)
+            // Блокуємо місця
             occupiedSeats.push(...selectedSeats.map(s => s.key));
-            const allSessions = JSON.parse(localStorage.getItem('hallSessions')) || {};
-            allSessions[currentSessionKey] = occupiedSeats;
-            localStorage.setItem('hallSessions', JSON.stringify(allSessions));
+            await saveOccupied();
 
-            loadSession(); // Оновлюємо зал (місця стануть зайнятими)
+            loadSession();
         };
     </script>
 </body>
