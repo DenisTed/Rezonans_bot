@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Хроніки залаштунків — Історія №1</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Стилі для сторінки лонгріду */
+        .story-page-body {
+            background: #0f0a07; /* Темний театральний фон */
+            color: #f6e6cf;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        /* Обкладинка статті */
+        .story-hero {
+            position: relative;
+            height: 70vh;
+            background: linear-gradient(rgba(0,0,0,0.2), #0f0a07), 
+                        url('') center/cover no-repeat;
+            display: flex;
+            align-items: flex-end;
+            padding: 50px 20px;
+        }
+
+        .story-header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .story-tag {
+            background: #d89a4a;
+            color: #1a0f08;
+            padding: 5px 15px;
+            text-transform: uppercase;
+            font-weight: 800;
+            font-size: 12px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .story-header-content h1 {
+            font-size: clamp(30px, 6vw, 52px);
+            line-height: 1.1;
+            margin: 0;
+            color: #fff;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        /* Основний текст */
+        .story-main-content {
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .story-intro {
+            font-size: 20px;
+            color: #d89a4a;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        /* Та сама цитата з нюансом, яку ми виправляли */
+        .story-quote {
+            border-left: 3px solid #d89a4a;
+            padding-left: 25px;
+            margin: 40px 0;
+            font-size: 24px;
+            line-height: 1.5;
+            color: #fff;
+            font-style: italic;
+        }
+
+        /* Галерея всередині тексту */
+        .story-inner-gallery {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .story-inner-gallery img {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid rgba(216, 154, 74, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .story-inner-gallery img:hover {
+            transform: scale(1.02);
+        }
+
+        /* Кнопка повернення */
+        .nav-footer {
+            border-top: 1px solid rgba(216, 154, 74, 0.1);
+            margin-top: 60px;
+            padding-top: 40px;
+            text-align: center;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            color: #d89a4a;
+            border: 1px solid #d89a4a;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background: #d89a4a;
+            color: #1a0f08;
+        }
+
+        @media (max-width: 600px) {
+            .story-inner-gallery { grid-template-columns: 1fr; }
+            .story-hero { height: 50vh; }
+        }
+    </style>
+</head>
+<body class="story-page-body">
+
+    <header class="story-hero">
+        <div class="story-header-content">
+            <span class="story-tag">Репетиція</span>
+            <h1>«Цікавий випадок...» або як ми шукали підсвідомість</h1>
+        </div>
+    </header>
+
+    <main class="story-main-content">
+        <p class="story-intro">
+            8 травня, 2026. За лаштунками театру «Резонанс» завжди відбувається щось магічне, але сьогоднішній випадок здивував навіть досвідчених акторів.
+        </p>
+
+        <p>
+            Під час підготовки до вистави «Цікавий випадок у психологічній практиці», ми зіткнулися з неочікуваною перешкодою. Сцена в кабінеті ніяк не піддавалася: світло було занадто різким, а актори відчували напругу, яка не відповідала сценарію.
+        </p>
+
+        <div class="story-quote">
+            «Ми шукали підсвідомість персонажа, а знайшли дитячу травму електричної розетки.»
+        </div>
+
+        <p>
+            Виявилося, що один із софітів періодично миготів через технічну несправність. Наш головний герой, настільки увійшовши в роль психолога, замість того щоб кликати техніка, почав «вести діалог» із розеткою, намагаючись зрозуміти її «біль». 
+        </p>
+
+        <div class="story-inner-gallery">
+            <img src="css/img1.jpg" alt="Процес репетиції">
+            <img src="css/img2.jpg" alt="Обговорення сцени">
+        </div>
+
+        <p>
+            Цей курйозний момент миттєво зняв напругу в колективі. Всі розсміялися, технік швидко все полагодив, а актори знайшли саме ту легку, іронічну інтонацію, якої нам бракувало для прем'єри. 
+        </p>
+
+        <p>
+            Театр — це не лише текст, це жива енергія людей, які створюють диво тут і зараз. Чекаємо на вас у залі!
+        </p>
+
+        <footer class="nav-footer">
+            <a href="index.html" class="btn-back">← До всіх хронік</a>
+        </footer>
+    </main>
+
+</body>
+</html>

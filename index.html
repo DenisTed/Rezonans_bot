@@ -8,10 +8,9 @@
   <link rel="stylesheet" href="css/styles.css" />
   
   <style>
-    /* Тільки те, що дійсно потрібно саме для головної (дуже мало) */
     .hero {
       background: linear-gradient(rgba(0,0,0,0.65), rgba(15,10,7,0.92)),
-                  url("theatre-bg.png") center/cover no-repeat;
+                  url("css/theatre-bg.webp") center/cover no-repeat;
     }
 
     .user-account-btn {
@@ -20,101 +19,133 @@
       font-weight: 700;
       border-color: #f1c27d;
     }
+
     .theatre-backstage {
-  max-width: 500px; /* Обмежуємо ширину, щоб не «пливло» на десктопі */
-  margin: 0 auto;
-}
+      max-width: 500px;
+      margin: 0 auto;
+    }
 
-/* Контейнер зі скролом */
-.news-feed-scroll {
-  max-height: 80vh; /* Висота стрічки */
-  overflow-y: auto;
-  padding-right: 10px;
-  scrollbar-width: thin;
-  scrollbar-color: #d89a4a transparent;
-}
+    .news-feed-scroll {
+      max-height: 80vh;
+      overflow-y: auto;
+      padding-right: 10px;
+      scrollbar-width: thin;
+      scrollbar-color: #d89a4a transparent;
+    }
 
-.news-card {
-  background: rgba(26, 15, 8, 0.6);
-  border: 1px solid rgba(216, 154, 74, 0.2);
-  border-radius: 15px;
-  margin-bottom: 30px;
-  overflow: hidden;
-  backdrop-filter: blur(10px);
-}
+    .news-card {
+      background: rgba(26, 15, 8, 0.6);
+      border: 1px solid rgba(216, 154, 74, 0.2);
+      border-radius: 15px;
+      margin-bottom: 30px;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
 
-.card-image {
-  height: 180px;
-  background-size: cover;
-  background-position: center;
-  position: relative;
-}
+    /* МАСШТАБУВАННЯ ГОЛОВНОГО ФОТО */
+    .card-image {
+      height: 200px;
+      background-size: cover; /* Зображення повністю заповнює блок */
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
+    }
 
-.badge {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  background: #d89a4a;
-  color: #000;
-  padding: 4px 12px;
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  border-radius: 4px;
-}
+    .badge {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: #d89a4a;
+      color: #000;
+      padding: 4px 12px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      border-radius: 4px;
+    }
 
-.card-body {
-  padding: 20px;
-}
+    .card-body {
+      padding: 20px;
+    }
 
-.date {
-  font-size: 11px;
-  color: rgba(216, 154, 74, 0.7);
-  display: block;
-  margin-bottom: 8px;
-}
+    .date {
+      font-size: 11px;
+      color: rgba(216, 154, 74, 0.7);
+      display: block;
+      margin-bottom: 8px;
+    }
 
-.card-body h3 {
-  font-size: 18px;
-  line-height: 1.3;
-  margin: 0 0 15px 0;
-  color: #fff;
-}
+    .card-body h3 {
+      font-size: 18px;
+      line-height: 1.3;
+      margin: 0 0 15px 0;
+      color: #fff;
+    }
 
-/* Виправлення нюансу з цитатою (як на вашому фото) */
-.quote-text {
-  border-left: 2px solid #d89a4a;
-  padding-left: 15px;
-  margin-bottom: 20px;
-}
+    .quote-text {
+      border-left: 2px solid #d89a4a;
+      padding-left: 15px;
+      margin-bottom: 20px;
+    }
 
-.quote-text p {
-  font-style: italic;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #d9c3a3;
-  margin: 0;
-}
+    .quote-text p {
+      font-style: italic;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #d9c3a3;
+      margin: 0;
+    }
 
-.read-full {
-  display: inline-block;
-  color: #d89a4a;
-  text-decoration: none;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  margin-top: 10px;
-}
+    /* МАСШТАБУВАННЯ МІНІ-ГАЛЕРЕЇ */
+    .post-mini-gallery {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 15px 0;
+    }
 
-.read-full:hover {
-  letter-spacing: 1px;
-}
+    .mini-img {
+      aspect-ratio: 1 / 1; /* Робить картинки квадратними */
+      background-size: cover; /* Масштабує контент всередині */
+      background-position: center;
+      border-radius: 6px;
+      border: 1px solid rgba(216, 154, 74, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .mini-img:hover {
+      transform: scale(1.05);
+      border-color: #d89a4a;
+    }
+
+    .mini-img.more {
+      background: rgba(216, 154, 74, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #d89a4a;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .read-full {
+      display: inline-block;
+      color: #d89a4a;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-top: 10px;
+    }
+
+    .read-full:hover {
+      letter-spacing: 1px;
+    }
   </style>
 </head>
 
 <body class="page-home">
 
-  <!-- Анімація переходу -->
   <div class="page-transition is-entering" id="pageTransition">
     <div class="page-transition__curtain page-transition__curtain--left"></div>
     <div class="page-transition__curtain page-transition__curtain--right"></div>
@@ -125,86 +156,59 @@
     <section class="hero">
       <div class="hero-content">
 
-        <!-- Ліва частина — текст і меню -->
         <div class="hero-info-group">
           <div class="hero-text-top">
             <h1>Театр «Резонанс»</h1>
             <p>Афіші, прем’єри та живі хроніки підготовки вистав у самому серці театрального затишку.</p>
-            <p>Вітаємо тепер можливе замовлення через сайт нашого театру! </p>
+            <p>Вітаємо! Тепер можливе замовлення через сайт нашого театру! </p>
           </div>
           <div>
             <h2>
               Отримати квиток за внесок
               <p>можна або за телефоном +38 (099) 743 66 32 та в дірект Інстаграму</p>
-
             </h2>
           </div>
 
           <div class="menu-container">
             <div class="nav-main-links">
-              <a href="https://www.instagram.com/rezonans_theatre/" class="hero-btn js-page-link">Направлення в Інстраграм</a>
+              <a href="https://www.instagram.com/rezonans_theatre/" class="hero-btn js-page-link">Направлення в Інстаграм</a>
               <a href="repertoire.html" class="hero-btn js-page-link">Репертуар</a>
-              
               <a href="contacts.html" class="dropdown-item js-page-link">Контакти</a>
-                  
             </div>
-
-            
           </div>
         </div>
 
-
-
         <section class="theatre-backstage">
-  <h2 class="feed-title">ХРОНІКИ ЗАЛАШТУНКІВ</h2>
-  
-  <div class="news-feed-scroll">
-    <article class="news-card">
-      <div class="card-image" style="background-image: url('img/backstage1.jpg');">
-        <span class="badge">Репетиція</span>
-      </div>
-      <div class="card-body">
-        <header>
-          <span class="date">15 травня, 2026 • 2 хв читання</span>
-          <h3>«Цікавий випадок...» або як ми шукали підсвідомість</h3>
-        </header>
-        <div class="quote-text">
-          <p>Сьогодні на репетиції актор, що грає психолога, настільки увійшов у роль, що почав консультувати освітлювача. Знайшли причину, чому софіт не вмикався — дитяча травма розетки.</p>
-        </div>
-        <div class="post-mini-gallery">
-          <div class="mini-img" style="background-image: url('img/b1.jpg');"></div>
-          <div class="mini-img" style="background-image: url('img/b2.jpg');"></div>
-          <div class="mini-img more">+3</div>
-        </div>
-        <a href="backstage-story-1.html" class="read-full">Читати повну історію →</a>
-      </div>
-    </article>
-
-    
-  </div>
-</section>
+          <h2 class="feed-title">ХРОНІКИ ЗАЛАШТУНКІВ</h2>
+          
+          <div class="news-feed-scroll">
+            <article class="news-card">
+              <div class="card-image" style="background-image: url('');">
+                <span class="badge">Репетиція</span>
+              </div>
+              <div class="card-body">
+                <header>
+                  <span class="date">15 травня, 2026 • 2 хв читання</span>
+                  <h3>«Цікавий випадок...» або як ми шукали підсвідомість</h3>
+                </header>
+                <div class="quote-text">
+                  <p>Сьогодні на репетиції актор, що грає психолога, настільки увійшов у роль, що почав консультувати освітлювача. Знайшли причину, чому софіт не вмикався — дитяча травма розетки.</p>
+                </div>
+                <div class="post-mini-gallery">
+                  <div class="mini-img" style="background-image: url('css/img1.webp');"></div>
+                  <div class="mini-img" style="background-image: url('css/img2.webp');"></div>
+                  
+                </div>
+                <a href="backstage-story-1.html" class="read-full">Читати повну історію →</a>
+              </div>
+            </article>
+          </div>
+        </section>
 
       </div>
     </section>
   </main>
 
   <script src="js/main.js"></script>
-  <script>
-    // Авторизація кнопки (оновлений варіант)
-    document.addEventListener('DOMContentLoaded', () => {
-      const authBtn = document.getElementById('authButton');
-      const isLoggedIn = localStorage.getItem('isLoggedIn');
-      const userName = localStorage.getItem('userName');
-
-      if (isLoggedIn === 'true' && userName && authBtn) {
-        authBtn.href = 'profile.html';
-        authBtn.classList.add('user-account-btn');
-        authBtn.innerHTML = `
-          <span style="margin-right: 8px;">👤</span>
-          <span>${userName.toUpperCase()}</span>
-        `;
-      }
-    });
-  </script>
 </body>
 </html>

@@ -3,96 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Історія залаштунків — Театр «Резонанс»</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>Хроніки — «Цікавий випадок» | Резонанс</title>
     <style>
-        /* Специфічні стилі для лонгріду */
-        .story-page {
-            background: #0a0805;
-            color: #f6e6cf;
-            line-height: 1.8;
+        :root {
+            --accent: #d89a4a; /* Золотий акцент */
+            --bg-dark: #0a0805;
+            --text-main: #d9c3a3; /* Світло-бежевий для мета-даних */
+            --text-white: #ffffff; /* Чистий білий для основного тексту */
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body.story-page {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Ефект появи контенту */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .story-hero {
-            height: 60vh;
-            background: linear-gradient(to bottom, transparent, #0a0805), 
-                        url('img/backstage-main.jpg') center/cover;
+            position: relative;
+            height: 80vh;
+            min-height: 500px;
+            /* ПОКРАЩЕНО: Збільшено щільність нижнього градієнта для підкладки під текст */
+            background: linear-gradient(to bottom, rgba(10,8,5,0.1) 0%, rgba(10,8,5,0.7) 40%, rgba(10,8,5,1) 90%), 
+                        url('css/img1.webp') center/cover no-repeat; 
             display: flex;
             align-items: flex-end;
-            padding: 40px;
+            padding-bottom: 60px;
         }
 
         .story-container {
-            max-width: 800px;
+            max-width: 850px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 0 25px;
+            animation: fadeInUp 0.8s ease-out;
         }
 
         .story-header h1 {
-            font-size: clamp(32px, 5vw, 48px);
-            color: #d89a4a;
-            margin-bottom: 10px;
-            line-height: 1.2;
+            font-size: clamp(32px, 8vw, 64px);
+            /* ПОКРАЩЕНО: Змінено на чистий білий для максимального контрасту */
+            background: linear-gradient(135deg, #fff 0%, #fff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 15px 0;
+            line-height: 1.1;
+            font-weight: 700;
+            /* ДОДАНО: Легка тінь для читабельності на світлих частинах масок */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .story-meta {
-            color: rgba(216, 154, 74, 0.6);
+            color: var(--accent);
             text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 12px;
-            margin-bottom: 30px;
+            letter-spacing: 3px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: block; /* Важливо для коректних margin */
         }
 
+        .story-content {
+            font-size: 19px;
+            line-height: 1.8;
+            margin-top: -30px; 
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ПОКРАЩЕНО: Основний текст тепер чисто білий */
         .story-content p {
-            font-size: 18px;
-            margin-bottom: 25px;
-            color: #d9c3a3;
+            color: var(--text-white);
+            margin-bottom: 30px;
+            /* ДОДАНО: М'яка тінь, щоб текст не губився серед іскор */
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
         }
 
-        .story-content h2 {
-            color: #d89a4a;
-            margin-top: 50px;
-            font-weight: 400;
-        }
-
-        /* Велика цитата */
+        /* Покращена цитата */
         .story-blockquote {
-            font-size: 24px;
+            font-size: clamp(20px, 4vw, 26px);
             font-style: italic;
-            border-left: 3px solid #d89a4a;
-            padding-left: 30px;
-            margin: 50px 0;
-            color: #fff;
+            border-left: 4px solid var(--accent);
+            padding: 20px 0 20px 30px;
+            margin: 60px 0;
+            /* ПОКРАЩЕНО: Яскравіший білий і тінь */
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+            background: linear-gradient(90deg, rgba(216,154,74,0.1) 0%, transparent 100%);
         }
 
-        /* Галерея всередині статті */
+        /* Адаптивна галерея */
         .article-gallery {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin: 40px 0;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 50px 0;
         }
 
         .article-gallery img {
             width: 100%;
-            border-radius: 10px;
-            border: 1px solid rgba(216, 154, 74, 0.2);
+            height: 400px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(216, 154, 74, 0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .article-gallery img:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .story-content h2 {
+            /* ПОКРАЩЕНО: Яскравіший білий */
+            color: #ffffff;
+            font-size: 32px;
+            margin-top: 60px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(216, 154, 74, 0.2);
+            display: inline-block;
+            padding-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .footer-nav {
+            text-align: center;
+            padding: 80px 0 100px;
         }
 
         .back-to-home {
-            display: inline-block;
-            margin-top: 50px;
-            color: #d89a4a;
+            display: inline-flex;
+            align-items: center;
+            color: var(--accent);
             text-decoration: none;
-            border: 1px solid #d89a4a;
-            padding: 10px 25px;
-            border-radius: 50px;
-            transition: 0.3s;
+            border: 2px solid var(--accent); /* Зроблено трохи товстішим */
+            padding: 16px 40px;
+            border-radius: 100px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+            transition: 0.3s all ease;
+            letter-spacing: 1px;
+            /* ДОДАНО: Щоб кнопка була чіткою */
+            background-color: rgba(10,8,5,0.5);
         }
 
         .back-to-home:hover {
-            background: #d89a4a;
+            background: var(--accent);
             color: #000;
+            box-shadow: 0 0 25px rgba(216, 154, 74, 0.6);
+        }
+
+        /* Мобільні виправлення */
+        @media (max-width: 600px) {
+            .story-hero { height: 65vh; min-height: 400px; }
+            .story-content { font-size: 17px; margin-top: 0; }
+            .article-gallery img { height: 280px; }
+            .story-blockquote { margin: 40px 0; padding-left: 20px; }
         }
     </style>
 </head>
@@ -100,8 +179,10 @@
 
     <header class="story-hero">
         <div class="story-container">
-            <div class="story-meta">15 Травня, 2026 • Репортаж</div>
-            <h1>«Цікавий випадок...» або як ми шукали підсвідомість</h1>
+            <span class="story-meta">15 Травня, 2026 • Репортаж №1</span>
+            <div class="story-header">
+                <h1>«Цікавий випадок...» або як ми шукали підсвідомість</h1>
+            </div>
         </div>
     </header>
 
@@ -109,23 +190,27 @@
         <article class="story-content">
             <p>Процес створення вистави — це завжди балансування на межі реальності та вимислу. Сьогоднішня репетиція стала тому найкращим підтвердженням.</p>
             
-            <div class="story-blockquote">
+            <blockquote class="story-blockquote">
                 «Театр починається не з вішалки, а з того моменту, коли актор забуває, де закінчується він і починається його персонаж».
-            </div>
+            </blockquote>
 
             <p>Під час розбору сцени в кабінеті психолога, наш головний герой настільки захопився аналізом ситуації, що мимохідь почав "діагностувати" колег по сцені. Курйоз у тому, що його висновки виявилися напрочуд влучними!</p>
 
-            <div class="article-gallery">
-                <img src="img/b1.jpg" alt="Момент репетиції 1">
-                <img src="img/b2.jpg" alt="Момент репетиції 2">
-            </div>
+            <section class="article-gallery">
+                <img src="css/img1.webp" loading="lazy" alt="Актори під час репетиції: глибока робота над роллю">
+                <img src="css/img2.webp" loading="lazy" alt="Залаштунки театру: емоційне обговорення сценарію">
+            </section>
 
             <h2>Чому це важливо?</h2>
             <p>Такі моменти щирості дозволяють знайти ті самі "живі" інтонації, які глядач потім відчує в залі. Ми не просто вчимо текст — ми проживаємо кожен випадок, як свій власний.</p>
             
-            <p>Чекаємо на вас на прем'єрі, щоб ви самі могли побачити результат цих пошуків.</p>
+            <p>Чекаємо на вас на прем'єрі, щоб ви самі могли побачити результат цих пошуків. Кожен квиток — це ваш внесок у розвиток незалежного театру.</p>
 
-            <a href="index.html" class="back-to-home">← Повернутися до хронік</a>
+            <nav class="footer-nav">
+                <a href="index.html" class="back-to-home" aria-label="Повернутися на головну сторінку хронік">
+                    <span>← Повернутися до хронік</span>
+                </a>
+            </nav>
         </article>
     </main>
 
