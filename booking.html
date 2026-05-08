@@ -9,28 +9,96 @@
     <link rel="stylesheet" href="mobile-style.css">
 
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #070707; color: #fff; margin: 0; padding: 20px; }
-        .header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 1px solid #d89a4a; padding-bottom: 10px; }
-        .header a { color: #d89a4a; text-decoration: none; font-weight: bold; text-transform: uppercase; }
-        
-        .container { display: flex; gap: 30px; max-width: 1200px; margin: auto; }
-        .hall { flex: 2; min-width: 0; } /* min-width: 0 важливий для скролу */
-        .sidebar { flex: 1; min-width: 300px; background: #1a1a1a; padding: 25px; border-radius: 15px; border: 1px solid rgba(216, 154, 74, 0.3); height: fit-content; }
-        
-        /* Обгортка для скролу залу */
-        .hall-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 20px; }
-        
-        .stage { text-align: center; color: #d89a4a; letter-spacing: 10px; padding-bottom: 10px; border-bottom: 2px solid #d89a4a; margin: 30px 0; font-size: 18px; width: 100%; }
-        .row { display: flex; gap: 8px; justify-content: center; margin-bottom: 8px; align-items: center; min-width: 700px; }
-        
-        .seat { width: 32px; height: 32px; background: #333; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; border: 1px solid #555; transition: 0.2s; flex-shrink: 0; }
-        .seat.selected { background: #d89a4a; color: #000; border-color: #fff; }
-        .seat.occupied { background: #111; color: #444; border-color: #222; cursor: not-allowed; }
-        
-        button { background: #d89a4a; color: #000; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; padding: 15px; border-radius: 8px; width: 100%; }
-        button:disabled { background: #555; cursor: not-allowed; opacity: 0.5; }
-        select { width: 100%; padding: 15px; border-radius: 8px; background: #222; color: #fff; border: 1px solid #d89a4a; }
-    </style>
+    /* Загальні налаштування */
+    body { font-family: 'Segoe UI', sans-serif; background: #070707; color: #fff; margin: 0; padding: 20px; }
+    
+    .header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 1px solid #d89a4a; padding-bottom: 10px; }
+    .header a { color: #d89a4a; text-decoration: none; font-weight: bold; text-transform: uppercase; }
+    
+    .container { display: flex; gap: 30px; max-width: 1200px; margin: auto; }
+    .hall { flex: 2; min-width: 0; } 
+    
+    .sidebar { 
+        flex: 1; 
+        min-width: 300px; 
+        background: #1a1a1a; 
+        padding: 25px; 
+        border-radius: 15px; 
+        border: 1px solid rgba(216, 154, 74, 0.3); 
+        height: fit-content; 
+    }
+
+    .stage { 
+        text-align: center; 
+        color: #d89a4a; 
+        letter-spacing: 10px; 
+        padding-bottom: 10px; 
+        border-bottom: 2px solid #d89a4a; 
+        margin: 30px 0; 
+        font-size: 18px; 
+        width: 100%; 
+    }
+
+    /* Стилі сітки залу */
+    #seatsGrid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 20px;
+    }
+
+    .row { 
+        display: flex; 
+        gap: 6px; 
+        margin-bottom: 8px; 
+        align-items: center; 
+    }
+
+    .row-label { 
+        width: 60px; 
+        font-size: 13px; 
+        color: #888; 
+        flex-shrink: 0; 
+    }
+
+    .seat { 
+        width: 30px; 
+        height: 30px; 
+        background: #333; 
+        border-radius: 6px; 
+        cursor: pointer; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 11px; 
+        border: 1px solid #555; 
+        transition: 0.2s; 
+        flex-shrink: 0; 
+    }
+
+    .seat.selected { background: #d89a4a; color: #000; border-color: #fff; }
+    .seat.occupied { background: #111; color: #444; border-color: #222; cursor: not-allowed; }
+    
+    /* Проходи та порожнечі */
+    .aisle { width: 25px; flex-shrink: 0; }
+    .empty-space { visibility: hidden; width: 30px; flex-shrink: 0; }
+
+    /* Елементи керування */
+    button { background: #d89a4a; color: #000; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; padding: 15px; border-radius: 8px; width: 100%; }
+    button:disabled { background: #555; cursor: not-allowed; opacity: 0.5; }
+    select { width: 100%; padding: 15px; border-radius: 8px; background: #222; color: #fff; border: 1px solid #d89a4a; margin-bottom: 10px; }
+
+    /* АДАПТАЦІЯ ДЛЯ ТЕЛЕФОНІВ */
+    @media screen and (max-width: 768px) {
+        .container { flex-direction: column; }
+        .row-label { width: 45px; font-size: 11px; }
+        .seat { width: 24px; height: 24px; font-size: 9px; border-radius: 4px; }
+        .empty-space { width: 24px; }
+        .aisle { width: 10px; }
+        .row { gap: 3px; }
+        .sidebar { min-width: unset; }
+    }
+</style>
 </head>
 <body>
     <div class="header">
@@ -65,7 +133,7 @@
 
         const performances = [
             
-            { key: "29.04", title: "Цікавий випадок", dateStr: "29 квітня, 18:00" }
+            { key: "20.05", title: "Цікавий випадок", dateStr: "20 травня, 18:00" }
         ];
 
         let currentSessionKey = null;
@@ -136,39 +204,44 @@
             updateCart();
         }
 
-        function renderHall() {
-            const grid = document.getElementById('seatsGrid');
-            grid.innerHTML = `
-                <div class="columns-header">
-                    <div style="width: 80px;"></div> 
-                    <div style="width: 155px;" class="col-label">4 місця</div>
-                    <div style="width: 30px;"></div>
-                    <div style="width: 395px;" class="col-label">10 центр</div>
-                    <div style="width: 30px;"></div>
-                    <div style="width: 115px;" class="col-label">3 край</div>
-                </div>
-            `;
+    function renderHall() {
+    const grid = document.getElementById('seatsGrid');
+   
 
-            for (let r = 1; r <= 12; r++) {
-                if (r === 5) continue; 
-                let numSeats = (r === 6 || r === 11 || r === 12) ? 14 : 17;
-                let rowHTML = `<div class="row"><span>Ряд ${r}</span>`;
+    for (let r = 1; r <= 12; r++) {
+        if (r === 5) continue; 
+        
+        let numSeats = (r === 6 || r === 11 || r === 12) ? 14 : 17;
+        let rowHTML = `<div class="row"><span>Ряд ${r}</span>`;
+        
+        // Додаємо лічильник для відображення цифри на стільці
+        let displaySeatNum = 1;
 
-                for (let s = 1; s <= 17; s++) {
-                    if (s <= numSeats) {
-                        const key = `${r}-${s}`;
-                        const isOccupied = occupiedSeats.includes(key);
-                        const className = isOccupied ? 'seat occupied' : 'seat';
-                        rowHTML += `<div class="${className}" onclick="toggleSeat(this, '${key}', ${r}, ${s})">${s}</div>`;
-                    } else {
-                        rowHTML += `<div class="seat" style="visibility: hidden;"></div>`;
-                    }
-                    if (s === 4 || s === 14) rowHTML += `<div style="width: 30px;"></div>`;
-                }
-                rowHTML += `</div>`;
-                grid.innerHTML += rowHTML;
+        for (let s = 1; s <= 17; s++) {
+            const isHiddenArea = (r <= 2 && s <= 4);
+
+            if (s <= numSeats && !isHiddenArea) {
+                const key = `${r}-${s}`; // ID в базі залишається унікальним за позицією
+                const isOccupied = occupiedSeats.includes(key);
+                const className = isOccupied ? 'seat occupied' : 'seat';
+                
+                // Використовуємо displaySeatNum для тексту всередині квадратика
+                rowHTML += `<div class="${className}" onclick="toggleSeat(this, '${key}', ${r}, ${displaySeatNum})">${displaySeatNum}</div>`;
+                displaySeatNum++; 
+            } else {
+                rowHTML += `<div class="seat" style="visibility: hidden;"></div>`;
+                // Якщо стілець прихований, ми НЕ збільшуємо displaySeatNum для рядів 1-2
+            }
+
+            if (s === 4 || s === 14) {
+                rowHTML += `<div style="width: 30px;"></div>`;
             }
         }
+        rowHTML += `</div>`;
+        grid.innerHTML += rowHTML;
+    }
+}
+
 
         function toggleSeat(element, key, row, seatNum) {
             if (element.classList.contains('occupied')) return;
