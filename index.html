@@ -20,6 +20,95 @@
       font-weight: 700;
       border-color: #f1c27d;
     }
+    .theatre-backstage {
+  max-width: 500px; /* Обмежуємо ширину, щоб не «пливло» на десктопі */
+  margin: 0 auto;
+}
+
+/* Контейнер зі скролом */
+.news-feed-scroll {
+  max-height: 80vh; /* Висота стрічки */
+  overflow-y: auto;
+  padding-right: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #d89a4a transparent;
+}
+
+.news-card {
+  background: rgba(26, 15, 8, 0.6);
+  border: 1px solid rgba(216, 154, 74, 0.2);
+  border-radius: 15px;
+  margin-bottom: 30px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.card-image {
+  height: 180px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: #d89a4a;
+  color: #000;
+  padding: 4px 12px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  border-radius: 4px;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.date {
+  font-size: 11px;
+  color: rgba(216, 154, 74, 0.7);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.card-body h3 {
+  font-size: 18px;
+  line-height: 1.3;
+  margin: 0 0 15px 0;
+  color: #fff;
+}
+
+/* Виправлення нюансу з цитатою (як на вашому фото) */
+.quote-text {
+  border-left: 2px solid #d89a4a;
+  padding-left: 15px;
+  margin-bottom: 20px;
+}
+
+.quote-text p {
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #d9c3a3;
+  margin: 0;
+}
+
+.read-full {
+  display: inline-block;
+  color: #d89a4a;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 10px;
+}
+
+.read-full:hover {
+  letter-spacing: 1px;
+}
   </style>
 </head>
 
@@ -46,7 +135,8 @@
           <div>
             <h2>
               Отримати квиток за внесок
-              <p>можна або за телефоном та в дірект Інстаграму</p>
+              <p>можна або за телефоном +38 (099) 743 66 32 та в дірект Інстаграму</p>
+
             </h2>
           </div>
 
@@ -63,20 +153,36 @@
           </div>
         </div>
 
-        <!-- Права частина — Хроніки залаштунків -->
-        <div class="theatre-news-feed">
-          <h2 class="feed-title">ХРОНІКИ ЗАЛАШТУНКІВ</h2>
-          <div class="news-scroll-container">
-            <article class="news-post">
-              <div class="news-post-image"></div>
-              <div class="news-post-content">
-                <span class="status-tag">Репетиція</span>
-                <h3>«Цікавий випадок у психологічній практиці»</h3>
-                <p>Вже йдемо на фінальні прогони. Ведуться інтенсивні репетиції.</p>
-              </div>
-            </article>
-          </div>
+
+
+        <section class="theatre-backstage">
+  <h2 class="feed-title">ХРОНІКИ ЗАЛАШТУНКІВ</h2>
+  
+  <div class="news-feed-scroll">
+    <article class="news-card">
+      <div class="card-image" style="background-image: url('img/backstage1.jpg');">
+        <span class="badge">Репетиція</span>
+      </div>
+      <div class="card-body">
+        <header>
+          <span class="date">15 травня, 2026 • 2 хв читання</span>
+          <h3>«Цікавий випадок...» або як ми шукали підсвідомість</h3>
+        </header>
+        <div class="quote-text">
+          <p>Сьогодні на репетиції актор, що грає психолога, настільки увійшов у роль, що почав консультувати освітлювача. Знайшли причину, чому софіт не вмикався — дитяча травма розетки.</p>
         </div>
+        <div class="post-mini-gallery">
+          <div class="mini-img" style="background-image: url('img/b1.jpg');"></div>
+          <div class="mini-img" style="background-image: url('img/b2.jpg');"></div>
+          <div class="mini-img more">+3</div>
+        </div>
+        <a href="backstage-story-1.html" class="read-full">Читати повну історію →</a>
+      </div>
+    </article>
+
+    
+  </div>
+</section>
 
       </div>
     </section>
