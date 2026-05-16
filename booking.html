@@ -124,7 +124,7 @@
             <h3>Ваше замовлення</h3>
             <p style="color: #aaa;">Місця: <span id="selectedTags" style="color: #fff;">Не обрано</span></p>
             <h2 style="color: #d89a4a;">Разом: <span id="totalAmount">0</span> грн</h2>
-            <button id="payBtn" disabled>Оплатити на картку</button>
+            <button id="payBtn" disabled>Внести благодійний внесок</button>
         </div>
     </div>
 
@@ -317,7 +317,7 @@ document.getElementById('payBtn').onclick = async () => {
         console.error(e);
         alert("Помилка зв'язку з сервером. Але замовлення могло бути надіслане. Перезавантажте сторінку.");
     } finally {
-        btn.innerText = "Оплатити на картку";
+        btn.innerText = "Оплата за бронювання місця в залі";
         btn.disabled = selectedSeats.length === 0;
     }
 };
