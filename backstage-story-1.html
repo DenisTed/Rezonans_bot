@@ -1,218 +1,109 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Хроніки — «Цікавий випадок» | Резонанс</title>
-    <style>
-        :root {
-            --accent: #d89a4a; /* Золотий акцент */
-            --bg-dark: #0a0805;
-            --text-main: #d9c3a3; /* Світло-бежевий для мета-даних */
-            --text-white: #ffffff; /* Чистий білий для основного тексту */
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body.story-page {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Ефект появи контенту */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .story-hero {
-            position: relative;
-            height: 80vh;
-            min-height: 500px;
-            /* ПОКРАЩЕНО: Збільшено щільність нижнього градієнта для підкладки під текст */
-            background: linear-gradient(to bottom, rgba(10,8,5,0.1) 0%, rgba(10,8,5,0.7) 40%, rgba(10,8,5,1) 90%), 
-                        url('css/img1.webp') center/cover no-repeat; 
-            display: flex;
-            align-items: flex-end;
-            padding-bottom: 60px;
-        }
-
-        .story-container {
-            max-width: 850px;
-            margin: 0 auto;
-            padding: 0 25px;
-            animation: fadeInUp 0.8s ease-out;
-        }
-
-        .story-header h1 {
-            font-size: clamp(32px, 8vw, 64px);
-            /* ПОКРАЩЕНО: Змінено на чистий білий для максимального контрасту */
-            background: linear-gradient(135deg, #fff 0%, #fff 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 0 0 15px 0;
-            line-height: 1.1;
-            font-weight: 700;
-            /* ДОДАНО: Легка тінь для читабельності на світлих частинах масок */
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .story-meta {
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: block; /* Важливо для коректних margin */
-        }
-
-        .story-content {
-            font-size: 19px;
-            line-height: 1.8;
-            margin-top: -30px; 
-            position: relative;
-            z-index: 2;
-        }
-
-        /* ПОКРАЩЕНО: Основний текст тепер чисто білий */
-        .story-content p {
-            color: var(--text-white);
-            margin-bottom: 30px;
-            /* ДОДАНО: М'яка тінь, щоб текст не губився серед іскор */
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-        }
-
-        /* Покращена цитата */
-        .story-blockquote {
-            font-size: clamp(20px, 4vw, 26px);
-            font-style: italic;
-            border-left: 4px solid var(--accent);
-            padding: 20px 0 20px 30px;
-            margin: 60px 0;
-            /* ПОКРАЩЕНО: Яскравіший білий і тінь */
-            color: #ffffff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
-            background: linear-gradient(90deg, rgba(216,154,74,0.1) 0%, transparent 100%);
-        }
-
-        /* Адаптивна галерея */
-        .article-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin: 50px 0;
-        }
-
-        .article-gallery img {
-            width: 100%;
-            height: 400px;
-            object-fit: cover;
-            border-radius: 12px;
-            border: 1px solid rgba(216, 154, 74, 0.1);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        }
-
-        .article-gallery img:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-        }
-
-        .story-content h2 {
-            /* ПОКРАЩЕНО: Яскравіший білий */
-            color: #ffffff;
-            font-size: 32px;
-            margin-top: 60px;
-            margin-bottom: 25px;
-            border-bottom: 1px solid rgba(216, 154, 74, 0.2);
-            display: inline-block;
-            padding-bottom: 5px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .footer-nav {
-            text-align: center;
-            padding: 80px 0 100px;
-        }
-
-        .back-to-home {
-            display: inline-flex;
-            align-items: center;
-            color: var(--accent);
-            text-decoration: none;
-            border: 2px solid var(--accent); /* Зроблено трохи товстішим */
-            padding: 16px 40px;
-            border-radius: 100px;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 14px;
-            transition: 0.3s all ease;
-            letter-spacing: 1px;
-            /* ДОДАНО: Щоб кнопка була чіткою */
-            background-color: rgba(10,8,5,0.5);
-        }
-
-        .back-to-home:hover {
-            background: var(--accent);
-            color: #000;
-            box-shadow: 0 0 25px rgba(216, 154, 74, 0.6);
-        }
-
-        /* Мобільні виправлення */
-        @media (max-width: 600px) {
-            .story-hero { height: 65vh; min-height: 400px; }
-            .story-content { font-size: 17px; margin-top: 0; }
-            .article-gallery img { height: 280px; }
-            .story-blockquote { margin: 40px 0; padding-left: 20px; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Хроніки — «Цікавий випадок» | Резонанс</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .story-hero {
+      position: relative; min-height: 460px; height: 70vh;
+      display: flex; align-items: flex-end; padding-bottom: 46px;
+      background: linear-gradient(to bottom, rgba(10,8,5,.15) 0%, rgba(10,8,5,.75) 45%, var(--ink) 92%),
+                  url('img/img1.webp') center/cover no-repeat;
+    }
+    .story-hero h1 {
+      font-size: clamp(30px, 7vw, 58px); color: #fff; font-weight: 700;
+      line-height: 1.1; margin: 12px 0 0; text-shadow: 0 2px 12px rgba(0,0,0,.6);
+    }
+    .story-content { font-size: 18px; line-height: 1.85; margin-top: 30px; }
+    .story-content p { color: var(--cream); margin-bottom: 26px; }
+    .story-content h2 {
+      color: #fff; font-size: 28px; margin: 50px 0 20px; font-weight: 500;
+      border-bottom: 1px solid var(--line); display: inline-block; padding-bottom: 6px;
+    }
+    .story-quote {
+      font-size: clamp(20px, 3.5vw, 26px); font-style: italic; color: #fff;
+      border-left: 4px solid var(--gold); padding: 16px 0 16px 28px; margin: 50px 0;
+      background: linear-gradient(90deg, rgba(216,154,74,.08) 0%, transparent 100%);
+    }
+    .story-gallery {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px; margin: 44px 0;
+    }
+    .story-gallery img {
+      width: 100%; height: 380px; object-fit: cover; border-radius: var(--r-md);
+      border: 1px solid var(--line); box-shadow: var(--shadow-soft); transition: transform .4s, border-color .3s;
+    }
+    .story-gallery img:hover { transform: translateY(-5px); border-color: var(--gold); }
+    .story-footer { text-align: center; padding: 60px 0 20px; }
+    @media (max-width: 600px) { .story-gallery img { height: 260px; } }
+  </style>
 </head>
-<body class="story-page">
+<body class="page-story">
 
-    <header class="story-hero">
-        <div class="story-container">
-            <span class="story-meta">15 Травня, 2026 • Репортаж №1</span>
-            <div class="story-header">
-                <h1>«Цікавий випадок...» або як ми шукали підсвідомість</h1>
-            </div>
-        </div>
-    </header>
+  <header class="story-hero">
+    <div class="wrap wrap--narrow">
+      <span class="eyebrow">15 травня 2026 · Репортаж №1</span>
+      <h1>«Цікавий випадок...» або як ми шукали підсвідомість</h1>
+    </div>
+  </header>
 
-    <main class="story-container">
-        <article class="story-content">
-            <p>Процес створення вистави — це завжди балансування на межі реальності та вимислу. Сьогоднішня репетиція стала тому найкращим підтвердженням.</p>
-            
-            <blockquote class="story-blockquote">
-                «Театр починається не з вішалки, а з того моменту, коли актор забуває, де закінчується він і починається його персонаж».
-            </blockquote>
+  <main class="wrap wrap--narrow">
+    <article class="story-content">
+      <p>Процес створення вистави — це завжди балансування на межі реальності та вимислу. Сьогоднішня репетиція стала тому найкращим підтвердженням.</p>
 
-            <p>Під час розбору сцени в кабінеті психолога, наш головний герой настільки захопився аналізом ситуації, що мимохідь почав "діагностувати" колег по сцені. Курйоз у тому, що його висновки виявилися напрочуд влучними!</p>
+      <blockquote class="story-quote">
+        «Театр починається не з вішалки, а з того моменту, коли актор забуває, де закінчується він і починається його персонаж».
+      </blockquote>
 
-            <section class="article-gallery">
-                <img src="css/img1.webp" loading="lazy" alt="Актори під час репетиції: глибока робота над роллю">
-                <img src="css/img2.webp" loading="lazy" alt="Залаштунки театру: емоційне обговорення сценарію">
-            </section>
+      <p>Під час розбору сцени в кабінеті психолога наш головний герой настільки захопився аналізом ситуації, що мимохідь почав «діагностувати» колег по сцені. Курйоз у тому, що його висновки виявилися напрочуд влучними!</p>
 
-            <h2>Чому це важливо?</h2>
-            <p>Такі моменти щирості дозволяють знайти ті самі "живі" інтонації, які глядач потім відчує в залі. Ми не просто вчимо текст — ми проживаємо кожен випадок, як свій власний.</p>
-            
-            <p>Чекаємо на вас на прем'єрі, щоб ви самі могли побачити результат цих пошуків. Кожен квиток — це ваш внесок у розвиток незалежного театру.</p>
+      <section class="story-gallery">
+        <img src="img/img1.webp" loading="lazy" alt="Актори під час репетиції">
+        <img src="img/img2.webp" loading="lazy" alt="Обговорення сценарію за лаштунками">
+      </section>
 
-            <nav class="footer-nav">
-                <a href="index.html" class="back-to-home" aria-label="Повернутися на головну сторінку хронік">
-                    <span>← Повернутися до хронік</span>
-                </a>
-            </nav>
-        </article>
-    </main>
+      <h2>Чому це важливо?</h2>
+      <p>Такі моменти щирості дозволяють знайти ті самі «живі» інтонації, які глядач потім відчує в залі. Ми не просто вчимо текст — ми проживаємо кожен випадок, як свій власний.</p>
+      <p>Чекаємо на вас на прем'єрі, щоб ви самі могли побачити результат цих пошуків. Кожен квиток — це ваш внесок у розвиток незалежного театру.</p>
 
+      <div class="story-footer">
+        <a href="index.html#casting" class="btn btn--primary">Записатися на кастинг</a>
+        <a href="index.html" class="btn btn--ghost">← До хронік</a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <div class="site-footer__brand">
+        <a class="brand" href="index.html">Резо<span>нанс</span></a>
+        <p>Незалежний театр у Кропивницькому. Живі вистави, театральна студія та відкритий набір нових студійців.</p>
+      </div>
+      <div class="site-footer__col">
+        <h4>Навігація</h4>
+        <a href="index.html">Головна</a>
+        <a href="studio.html">Студія</a>
+        <a href="troupe.html">Трупа</a>
+        <a href="repertoire.html">Репертуар</a>
+        <a href="contacts.html">Контакти</a>
+      </div>
+      <div class="site-footer__col">
+        <h4>Контакти</h4>
+        <a href="tel:+380997436632">+38 (099) 743 66 32</a>
+        <span>вул. Шевченка, 1</span>
+        <span>Актова зала ЦДУ ім. В. Винниченка</span>
+        <a href="https://www.instagram.com/rezonans_theatre/" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <div class="wrap site-footer__bottom">
+      <small>© 2026 Театр «Резонанс» · Кропивницький</small>
+      <small>Вхід після третього дзвоника та зйомка під час вистави заборонені</small>
+    </div>
+  </footer>
+
+  <script src="JS/main.js"></script>
+  <script src="JS/site.js"></script>
 </body>
 </html>

@@ -1,241 +1,119 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Репертуар — Театр «Резонанс»</title>
-    <style>
-        :root {
-            --accent: #d89a4a;
-            --bg-dark: #0a0805;
-            --text-main: #d9c3a3;
-            --text-white: #ffffff;
-        }
-
-        /* Глобальні налаштування */
-        body, html {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-dark);
-        }
-
-        .page-repertoire {
-            background: linear-gradient(rgba(10, 8, 5, 0.85), rgba(10, 8, 5, 0.95)), 
-                        url('css/221.png') center/cover no-repeat fixed;
-            min-height: 100dvh;
-            padding: 40px 20px;
-            color: var(--text-main);
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        /* Хедер сторінки */
-        .repertoire-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 60px;
-            animation: fadeInUp 0.8s ease-out;
-        }
-
-        .repertoire-header h2 {
-            font-size: clamp(28px, 5vw, 42px);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin: 0;
-            font-weight: 300;
-            color: var(--text-white);
-            text-shadow: 0 0 20px rgba(216, 154, 74, 0.4);
-        }
-
-        .back-link {
-            background: rgba(216, 154, 74, 0.1);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 12px 28px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .back-link:hover {
-            background: var(--accent);
-            color: #000;
-            box-shadow: 0 0 20px rgba(216, 154, 74, 0.4);
-        }
-
-        /* СІТКА */
-        .repertoire-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 40px;
-            justify-items: center;
-            animation: fadeInUp 1s ease-out;
-        }
-
-        /* Картка вистави */
-        .play-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(216, 154, 74, 0.15);
-            border-radius: 24px;
-            overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-            backdrop-filter: blur(12px);
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            max-width: 380px;
-        }
-
-        .play-card:hover {
-            transform: translateY(-10px);
-            border-color: rgba(216, 154, 74, 0.5);
-            background: rgba(255, 255, 255, 0.07);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-        }
-
-        .play-thumb {
-            height: 480px;
-            overflow: hidden;
-            position: relative;
-            background: #000; /* Фон для фото в режимі contain */
-        }
-
-        .play-thumb-img {
-            width: 100%;
-            height: 100%;
-            background-size: contain; 
-            background-position: center;
-            background-repeat: no-repeat;
-            transition: transform 0.8s ease;
-        }
-
-        .play-card:hover .play-thumb-img {
-            transform: scale(1.05);
-        }
-
-        .play-body {
-            padding: 35px 25px;
-            text-align: center;
-        }
-
-        .play-category {
-            color: var(--accent);
-            font-size: 13px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 18px;
-            font-weight: 700;
-        }
-
-        .play-title {
-            font-size: 26px;
-            margin: 0 0 15px 0;
-            font-weight: 400;
-            line-height: 1.3;
-            color: var(--text-white);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .play-meta {
-            color: var(--text-main);
-            font-size: 15px;
-            opacity: 0.8;
-        }
-
-        .coming-soon-text {
-            text-align: center;
-            margin-top: 100px;
-            color: var(--text-main);
-            opacity: 0.6;
-            font-size: 16px;
-            line-height: 1.6;
-            border-top: 1px solid rgba(216, 154, 74, 0.1);
-            padding-top: 40px;
-            margin-bottom: 60px;
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* АДАПТИВНІСТЬ */
-        @media (max-width: 768px) {
-            .repertoire-grid {
-                grid-template-columns: 1fr;
-                gap: 30px;
-            }
-            .play-card {
-                max-width: 450px;
-            }
-            .repertoire-header {
-                margin-bottom: 40px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .repertoire-header {
-                flex-direction: column;
-                gap: 25px;
-                text-align: center;
-            }
-            .repertoire-header h2 {
-                font-size: 30px;
-            }
-            .play-thumb {
-                height: 400px;
-            }
-            .play-title {
-                font-size: 22px;
-            }
-            .back-link {
-                width: 100%;
-                box-sizing: border-box;
-                text-align: center;
-            }
-            .page-repertoire {
-                padding: 30px 15px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Репертуар — Театр «Резонанс»</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .rep-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 34px;
+      margin-top: 10px;
+    }
+    a.play-card { text-decoration: none; color: inherit; display: flex; flex-direction: column; }
+    .play-thumb { height: 440px; background: #000; overflow: hidden; }
+    .play-thumb-img {
+      width: 100%; height: 100%;
+      background-size: contain; background-position: center; background-repeat: no-repeat;
+      transition: transform .8s ease;
+    }
+    .play-card:hover .play-thumb-img { transform: scale(1.05); }
+    .play-body { padding: 26px 22px; text-align: center; }
+    .play-cat { color: var(--gold); font-size: 12px; letter-spacing: 3px; text-transform: uppercase; font-weight: 700; margin-bottom: 12px; }
+    .play-name { font-size: 22px; color: #fff; margin: 0 0 12px; font-weight: 400; line-height: 1.3; }
+    .play-meta { color: var(--cream-dim); font-size: 14px; }
+    .rep-note {
+      text-align: center; color: var(--cream-dim); opacity: .65; font-size: 15px;
+      border-top: 1px solid var(--line-soft); padding-top: 34px; margin-top: 50px; line-height: 1.6;
+    }
+    @media (max-width: 520px) { .play-thumb { height: 380px; } }
+  </style>
 </head>
 <body class="page-repertoire">
 
-    <main class="container">
-        <header class="repertoire-header">
-            <h2>Репертуар</h2>
-            <a href="index.html" class="back-link">← На Головну</a>
-        </header>
+  <div class="page-transition is-entering" id="pageTransition">
+    <div class="page-transition__curtain page-transition__curtain--left"></div>
+    <div class="page-transition__curtain page-transition__curtain--right"></div>
+  </div>
 
-        <div class="repertoire-grid">
-            
-            <article class="play-card">
-                <div class="play-thumb">
-                    <div class="play-thumb-img" style="background-image: url('css/a_pcix.jpg');"></div>
-                </div>
-                <div class="play-body">
-                    <div class="play-category">Психологічна комедія</div>
-                    <h3 class="play-title">Цікавий випадок у психологічній практиці</h3>
-                    <div class="play-meta">ЦДУ ім. В. Винниченка • 2026</div>
-                </div>
-            </article>
+  <header class="wrap topbar">
+    <a class="brand" href="index.html">Резо<span>нанс</span></a>
+    <nav class="nav">
+      <a href="index.html">Головна</a>
+      <a href="studio.html">Студія</a>
+      <a href="troupe.html">Трупа</a>
+      <a href="repertoire.html" aria-current="page">Репертуар</a>
+      <a href="contacts.html">Контакти</a>
+      <a class="nav-cta" href="auth.html" id="accountBtn">Кабінет</a>
+    </nav>
+  </header>
+  <div class="wrap"><div class="topbar-divider"></div></div>
 
-            </div>
+  <main class="wrap section">
+    <span class="eyebrow">Сцена «Резонанс»</span>
+    <h1 class="page-title" style="margin-bottom: 40px;">Репертуар</h1>
 
-        <footer class="coming-soon-text">
-            Кожна вистава театру «Резонанс» — це окремий світ.<br>
-            Стежте за оновленнями репертуару в наших соцмережах.
-        </footer>
-    </main>
+    <div class="rep-grid">
+      <a href="afisha.html" class="card play-card">
+        <div class="play-thumb">
+          <div class="play-thumb-img" style="background-image: url('img/a_pcix.jpg');"></div>
+        </div>
+        <div class="play-body">
+          <div class="play-cat">Психологічна комедія</div>
+          <h3 class="play-name">Цікавий випадок у психологічній практиці</h3>
+          <div class="play-meta">20 травня 2026, 18:00 · ЦДУ ім. В. Винниченка</div>
+        </div>
+      </a>
+    </div>
 
+    <p class="rep-note">
+      Кожна вистава театру «Резонанс» — це окремий світ.<br>
+      Стежте за оновленнями репертуару в наших соцмережах.
+    </p>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <div class="site-footer__brand">
+        <a class="brand" href="index.html">Резо<span>нанс</span></a>
+        <p>Незалежний театр у Кропивницькому. Живі вистави, театральна студія та відкритий набір нових студійців.</p>
+      </div>
+      <div class="site-footer__col">
+        <h4>Навігація</h4>
+        <a href="index.html">Головна</a>
+        <a href="studio.html">Студія</a>
+        <a href="troupe.html">Трупа</a>
+        <a href="repertoire.html">Репертуар</a>
+        <a href="contacts.html">Контакти</a>
+      </div>
+      <div class="site-footer__col">
+        <h4>Контакти</h4>
+        <a href="tel:+380997436632">+38 (099) 743 66 32</a>
+        <span>вул. Шевченка, 1</span>
+        <span>Актова зала ЦДУ ім. В. Винниченка</span>
+        <a href="https://www.instagram.com/rezonans_theatre/" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <div class="wrap site-footer__bottom">
+      <small>© 2026 Театр «Резонанс» · Кропивницький</small>
+      <small>Вхід після третього дзвоника та зйомка під час вистави заборонені</small>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var btn = document.getElementById('accountBtn');
+      if (btn && localStorage.getItem('isLoggedIn') === 'true') {
+        var name = localStorage.getItem('userName');
+        btn.textContent = name ? ('Кабінет · ' + name) : 'Кабінет';
+        btn.setAttribute('href', 'profile.html');
+      }
+    })();
+  </script>
+  <script src="JS/main.js"></script>
+  <script src="JS/site.js"></script>
 </body>
 </html>

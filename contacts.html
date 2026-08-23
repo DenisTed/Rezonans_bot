@@ -6,81 +6,145 @@
   <title>Контакти — Театр «Резонанс»</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .contacts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 22px;
+      margin: 10px 0 40px;
+    }
+    .contact-card { padding: 26px; display: flex; gap: 16px; align-items: flex-start; }
+    .card-icon {
+      width: 46px; height: 46px; flex-shrink: 0;
+      border-radius: 12px; display: grid; place-items: center;
+      background: rgba(216,154,74,.1); color: var(--gold); border: 1px solid var(--line);
+    }
+    .contact-card .label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); }
+    .contact-card .value { margin: 6px 0 2px; color: #fff; font-size: 16px; }
+    .contact-card .sub-value { margin: 0; color: var(--cream-dim); font-size: 14px; }
+    .contact-link { color: var(--cream); text-decoration: none; }
+    .contact-link:hover { color: var(--gold); }
+    .social-links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+    .social-btn {
+      font-size: 13px; color: var(--gold); text-decoration: none;
+      border: 1px solid var(--line); padding: 7px 14px; border-radius: var(--r-pill); transition: .25s;
+    }
+    .social-btn:hover { background: var(--gold); color: #1a0f08; }
+
+    .map-frame { border-radius: var(--r-lg); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow-soft); }
+    .map-frame iframe { display: block; filter: grayscale(.2) contrast(1.05); }
+  </style>
 </head>
 <body class="page-contacts">
 
   <div class="page-transition is-entering" id="pageTransition">
     <div class="page-transition__curtain page-transition__curtain--left"></div>
     <div class="page-transition__curtain page-transition__curtain--right"></div>
-    <div class="page-transition__glow"></div>
   </div>
 
-  <main class="contacts-page">
-    <div class="contacts-container">
-      
-      <header class="contacts-header">
-        <a href="index.html" class="back-link">← На Головну</a>
-        <h1>Контакти</h1>
-      </header>
+  <header class="wrap topbar">
+    <a class="brand" href="index.html">Резо<span>нанс</span></a>
+    <nav class="nav">
+      <a href="index.html">Головна</a>
+      <a href="studio.html">Студія</a>
+      <a href="troupe.html">Трупа</a>
+      <a href="repertoire.html">Репертуар</a>
+      <a href="contacts.html" aria-current="page">Контакти</a>
+      <a class="nav-cta" href="auth.html" id="accountBtn">Кабінет</a>
+    </nav>
+  </header>
+  <div class="wrap"><div class="topbar-divider"></div></div>
 
-      <section class="contacts-grid">
-        
-        <div class="contact-card">
-          <div class="card-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-          </div>
-          <div class="card-info">
-            <span class="label">Локація</span>
-            <p class="value">вул. Шевченка, 1</p>
-            <p class="sub-value">Актова зала ЦДПУ ім. В. Винниченка</p>
+  <main class="wrap section">
+    <span class="eyebrow">Як нас знайти</span>
+    <h1 class="page-title" style="margin-bottom: 34px;">Контакти</h1>
+
+    <section class="contacts-grid">
+
+      <div class="card contact-card">
+        <div class="card-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        </div>
+        <div>
+          <span class="label">Локація</span>
+          <p class="value">вул. Шевченка, 1</p>
+          <p class="sub-value">Актова зала ЦДУ ім. В. Винниченка</p>
+        </div>
+      </div>
+
+      <div class="card contact-card">
+        <div class="card-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+        </div>
+        <div>
+          <span class="label">Зв'язок</span>
+          <p class="value"><a href="tel:+380997436632" class="contact-link">+38 (099) 743 66 32</a></p>
+          <p class="sub-value"><a href="mailto:resonance.theatre@gmail.com" class="contact-link">resonance.theatre@gmail.com</a></p>
+        </div>
+      </div>
+
+      <div class="card contact-card">
+        <div class="card-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+        </div>
+        <div>
+          <span class="label">Соцмережі</span>
+          <div class="social-links">
+            <a href="https://www.instagram.com/rezonans_theatre/" class="social-btn" target="_blank" rel="noopener">Instagram</a>
+            <a href="https://t.me/Rezonans_teatr_bot" class="social-btn" target="_blank" rel="noopener">Telegram-бот</a>
           </div>
         </div>
+      </div>
 
-        <div class="contact-card">
-          <div class="card-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-          </div>
-          <div class="card-info">
-            <span class="label">Зв'язок</span>
-            <p class="value"><a href="tel:+380000000000" class="contact-link">+38 (099) 743 66 32</a></p>
-            <p class="sub-value"><a href="mailto:resonance.theatre@gmail.com" class="contact-link">resonance@gmail.com</a></p>
-          </div>
-        </div>
+    </section>
 
-        <div class="contact-card">
-          <div class="card-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-          </div>
-          <div class="card-info">
-            <span class="label">Соцмережі</span>
-            <div class="social-links">
-              <a href="https://www.instagram.com/rezonans_theatre/" class="social-btn">Instagram</a>
-              
-              <a href="https://t.me/Rezonans_teatr_bot" class="social-btn">Запустити бота</a>
-              
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-      <section class="map-section">
-        <div class="map-frame">
-          <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2645.7481541311394!2d32.26256961125208!3d48.508375871158586!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40d043226cd66df1%3A0xc682f6e99bd29929!2z0LLRg9C70LjRhtGPINCo0LXQstGH0LXQvdC60LAsIDEsINCa0YDQvtC_0LjQstC90LjRhtGM0LrQuNC5LCDQmtGW0YDQvtCy0L7Qs9GA0LDQtNGB0YzQutCw!5e0!3m2!1suk!2sua!4v1700000000000!5m2!1suk!2sua" 
-            width="100%" 
-            height="450" 
-            style="border:0;" 
-            allowfullscreen="" 
-            loading="lazy" 
-            referrerpolicy="no-referrer-when-downgrade">
-          </iframe>
-        </div>
-      </section>
-
+    <div class="map-frame">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2645.7481541311394!2d32.26256961125208!3d48.508375871158586!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40d043226cd66df1%3A0xc682f6e99bd29929!2z0LLRg9C70LjRhtGPINCo0LXQstGH0LXQvdC60LAsIDEsINCa0YDQvtC_0LjQstC90LjRhtGM0LrQuNC5LCDQmtGW0YDQvtCy0L7Qs9GA0LDQtNGB0YzQutCw!5e0!3m2!1suk!2sua!4v1700000000000!5m2!1suk!2sua"
+        width="100%" height="420" style="border:0;" allowfullscreen="" loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"></iframe>
     </div>
   </main>
 
-  <script src="js/main.js"></script>
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <div class="site-footer__brand">
+        <a class="brand" href="index.html">Резо<span>нанс</span></a>
+        <p>Незалежний театр у Кропивницькому. Живі вистави, театральна студія та відкритий набір нових студійців.</p>
+      </div>
+      <div class="site-footer__col">
+        <h4>Навігація</h4>
+        <a href="index.html">Головна</a>
+        <a href="studio.html">Студія</a>
+        <a href="troupe.html">Трупа</a>
+        <a href="repertoire.html">Репертуар</a>
+        <a href="contacts.html">Контакти</a>
+      </div>
+      <div class="site-footer__col">
+        <h4>Контакти</h4>
+        <a href="tel:+380997436632">+38 (099) 743 66 32</a>
+        <span>вул. Шевченка, 1</span>
+        <span>Актова зала ЦДУ ім. В. Винниченка</span>
+        <a href="https://www.instagram.com/rezonans_theatre/" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <div class="wrap site-footer__bottom">
+      <small>© 2026 Театр «Резонанс» · Кропивницький</small>
+      <small>Вхід після третього дзвоника та зйомка під час вистави заборонені</small>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var btn = document.getElementById('accountBtn');
+      if (btn && localStorage.getItem('isLoggedIn') === 'true') {
+        var name = localStorage.getItem('userName');
+        btn.textContent = name ? ('Кабінет · ' + name) : 'Кабінет';
+        btn.setAttribute('href', 'profile.html');
+      }
+    })();
+  </script>
+  <script src="JS/main.js"></script>
+  <script src="JS/site.js"></script>
 </body>
 </html>

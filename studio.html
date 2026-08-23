@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Студія — Театр «Резонанс»</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .studio-lead { max-width: 68ch; }
+    .studio-lead p { color: var(--cream); font-size: 16px; line-height: 1.85; margin: 0 0 16px; }
+
+    /* Чого навчаємо — сітка предметів */
+    .subjects { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-top: 8px; }
+    .subject {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--r-md);
+      background: rgba(255,255,255,.02); color: var(--cream); font-size: 15px;
+    }
+    .subject .n { color: var(--gold); font-weight: 700; font-size: 13px; min-width: 22px; }
+
+    /* Як влаштовано — картки */
+    .how-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .how-card { padding: 26px; }
+    .how-card .ic { font-size: 24px; margin-bottom: 10px; }
+    .how-card h3 { color: #fff; font-size: 18px; font-weight: 500; margin: 0 0 10px; }
+    .how-card p { color: var(--cream-dim); font-size: 14px; line-height: 1.7; margin: 0; }
+
+    /* Шлях новачка — кроки */
+    .path { display: grid; gap: 14px; counter-reset: step; max-width: 760px; }
+    .path .step {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--r-md);
+      background: rgba(255,255,255,.02);
+    }
+    .path .step::before {
+      counter-increment: step; content: counter(step);
+      flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
+      display: grid; place-items: center;
+      background: var(--gold); color: #1a0f08; font-weight: 700; font-size: 15px;
+    }
+    .path .step h3 { color: #fff; font-size: 16px; font-weight: 500; margin: 4px 0 4px; }
+    .path .step p { color: var(--cream-dim); font-size: 14px; margin: 0; line-height: 1.6; }
+
+    /* Корисне для студійця */
+    .useful { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .useful .panel { padding: 26px; }
+    .useful h3 { color: var(--gold); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 14px; }
+    .useful ul { margin: 0; padding-left: 18px; color: var(--cream-dim); font-size: 15px; line-height: 1.9; }
+    .useful .fill { color: var(--gold-soft); }
+
+    .cta-band { text-align: center; padding: 52px 0; }
+    .cta-band h2 { border: none; margin-bottom: 10px; }
+    .cta-band p { color: var(--cream-dim); margin: 0 0 22px; }
+
+    @media (max-width: 640px) {
+      .useful { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="page-studio">
+
+  <div class="page-transition is-entering" id="pageTransition">
+    <div class="page-transition__curtain page-transition__curtain--left"></div>
+    <div class="page-transition__curtain page-transition__curtain--right"></div>
+  </div>
+
+  <header class="wrap topbar">
+    <a class="brand" href="index.html">Резо<span>нанс</span></a>
+    <nav class="nav">
+      <a href="index.html">Головна</a>
+      <a href="studio.html" aria-current="page">Студія</a>
+      <a href="troupe.html">Трупа</a>
+      <a href="repertoire.html">Репертуар</a>
+      <a href="contacts.html">Контакти</a>
+      <a class="nav-cta" href="auth.html" id="accountBtn">Кабінет</a>
+    </nav>
+  </header>
+  <div class="wrap"><div class="topbar-divider"></div></div>
+
+  <main class="wrap section">
+    <span class="eyebrow">Театральна студія · Для студійців</span>
+    <h1 class="page-title" style="margin-bottom: 18px;">Студія «Резонанс»</h1>
+    <div class="studio-lead">
+      <p>Студія — це навчально-творчий колектив, де учасники опановують театральне мистецтво і водночас створюють справжні постановки. Тут займаються і початківці без досвіду, і ті, хто вже пробував себе на сцені.</p>
+      <p>Головна ідея проста: ти навчаєшся — і одразу застосовуєш це у виставах. За один сезон новачок може вийти на сцену перед справжнім залом.</p>
+    </div>
+  </main>
+
+  <!-- ЧОГО НАВЧАЄМО -->
+  <section class="band">
+    <div class="wrap">
+      <span class="eyebrow">Програма</span>
+      <h2 style="font-size:clamp(22px,4vw,32px); font-weight:300; letter-spacing:2px; color:#fff; text-transform:uppercase; margin:6px 0 22px;">Чого навчаємо</h2>
+      <div class="subjects">
+        <div class="subject"><span class="n">01</span> Акторська майстерність</div>
+        <div class="subject"><span class="n">02</span> Сценічна мова</div>
+        <div class="subject"><span class="n">03</span> Пластика</div>
+        <div class="subject"><span class="n">04</span> Сценічний рух</div>
+        <div class="subject"><span class="n">05</span> Імпровізація</div>
+        <div class="subject"><span class="n">06</span> Робота з партнером</div>
+        <div class="subject"><span class="n">07</span> Робота з текстом</div>
+        <div class="subject"><span class="n">08</span> Основи режисури</div>
+        <div class="subject"><span class="n">09</span> Історія та культура театру</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ЯК УСЕ ВЛАШТОВАНО -->
+  <section class="band">
+    <div class="wrap">
+      <span class="eyebrow">Як усе влаштовано</span>
+      <h2 style="font-size:clamp(22px,4vw,32px); font-weight:300; letter-spacing:2px; color:#fff; text-transform:uppercase; margin:6px 0 22px;">Групи, педагоги, сцена</h2>
+      <div class="how-cards">
+        <div class="card how-card">
+          <div class="ic">👥</div>
+          <h3>Навчальні групи</h3>
+          <p>Заняття проходять у групах. Ти рухаєшся разом зі своїм потоком — від перших вправ до роботи над роллю.</p>
+        </div>
+        <div class="card how-card">
+          <div class="ic">🎓</div>
+          <h3>Педагоги</h3>
+          <p>Досвідчені наставники ведуть тебе через майстерність, мову й рух. У малому колективі один педагог часто поєднує кілька напрямів.</p>
+        </div>
+        <div class="card how-card">
+          <div class="ic">🎬</div>
+          <h3>Студійні постановки</h3>
+          <p>Студія ставить власні вистави. У постановці студієць стає повноцінним виконавцем і виходить на сцену перед глядачем.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ШЛЯХ НОВАЧКА -->
+  <section class="band">
+    <div class="wrap">
+      <span class="eyebrow">Крок за кроком</span>
+      <h2 style="font-size:clamp(22px,4vw,32px); font-weight:300; letter-spacing:2px; color:#fff; text-transform:uppercase; margin:6px 0 22px;">Шлях від новачка до сцени</h2>
+      <div class="path">
+        <div class="step">
+          <div>
+            <h3>Кастинг і знайомство</h3>
+            <p>Залишаєш заявку, приходиш на зустріч. Досвід не потрібен — головне бажання.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <h3>Навчання</h3>
+            <p>Опановуєш майстерність, сценічну мову, рух та імпровізацію у своїй групі.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <h3>Читка й репетиції</h3>
+            <p>Розбираєте п'єсу за ролями, працюєте над сценами й мізансценами разом із режисером.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <h3>Прогони й генеральна</h3>
+            <p>Вистава збирається повністю — зі світлом, звуком, костюмами й гримом.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <h3>Прем'єра</h3>
+            <p>Твій перший вихід на сцену перед справжнім залом. І — до репертуару театру.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- КОРИСНЕ ДЛЯ СТУДІЙЦІВ -->
+  <section class="band">
+    <div class="wrap">
+      <span class="eyebrow">Корисне</span>
+      <h2 style="font-size:clamp(22px,4vw,32px); font-weight:300; letter-spacing:2px; color:#fff; text-transform:uppercase; margin:6px 0 22px;">Для студійців</h2>
+
+      <!-- ЗАПОВНИ СВОЇМИ ДАНИМИ: розклад, куратор, оплата тощо -->
+      <div class="useful">
+        <div class="panel">
+          <h3>Практична інформація</h3>
+          <ul>
+            <li>Розклад занять: <span class="fill">впиши дні та час</span></li>
+            <li>Місце: актова зала ЦДУ ім. В. Винниченка, вул. Шевченка, 1</li>
+            <li>Куратор групи: <span class="fill">впиши ім'я та контакт</span></li>
+            <li>Оплата / умови: <span class="fill">впиши, якщо потрібно</span></li>
+            <li>Що взяти на заняття: <span class="fill">зручний одяг і взуття</span></li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Правила студії</h3>
+          <ul>
+            <li>Не запізнюйся на репетиції — вистава це командна робота.</li>
+            <li>Попереджай куратора, якщо не можеш прийти.</li>
+            <li>Вхід до зали після третього дзвоника заборонено.</li>
+            <li>Фото- та відеозйомка під час вистави заборонені.</li>
+            <li><span class="fill">Додай свої пункти за потреби.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="band cta-band">
+    <div class="wrap">
+      <h2 style="font-size:clamp(22px,4vw,32px); font-weight:300; letter-spacing:2px; color:#fff; text-transform:uppercase;">Хочеш до нас у студію?</h2>
+      <p>Запис триває постійно. Залиш заявку — і ми зателефонуємо.</p>
+      <a href="index.html#casting-form" class="btn btn--primary">Записатися на кастинг</a>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <div class="site-footer__brand">
+        <a class="brand" href="index.html">Резо<span>нанс</span></a>
+        <p>Незалежний театр у Кропивницькому. Живі вистави, театральна студія та відкритий набір нових студійців.</p>
+      </div>
+      <div class="site-footer__col">
+        <h4>Навігація</h4>
+        <a href="index.html">Головна</a>
+        <a href="studio.html">Студія</a>
+        <a href="troupe.html">Трупа</a>
+        <a href="repertoire.html">Репертуар</a>
+        <a href="contacts.html">Контакти</a>
+      </div>
+      <div class="site-footer__col">
+        <h4>Контакти</h4>
+        <a href="tel:+380997436632">+38 (099) 743 66 32</a>
+        <span>вул. Шевченка, 1</span>
+        <span>Актова зала ЦДУ ім. В. Винниченка</span>
+        <a href="https://www.instagram.com/rezonans_theatre/" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <div class="wrap site-footer__bottom">
+      <small>© 2026 Театр «Резонанс» · Кропивницький</small>
+      <small>Вхід після третього дзвоника та зйомка під час вистави заборонені</small>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var btn = document.getElementById('accountBtn');
+      if (btn && localStorage.getItem('isLoggedIn') === 'true') {
+        var name = localStorage.getItem('userName');
+        btn.textContent = name ? ('Кабінет · ' + name) : 'Кабінет';
+        btn.setAttribute('href', 'profile.html');
+      }
+    })();
+  </script>
+  <script src="JS/main.js"></script>
+  <script src="JS/site.js"></script>
+</body>
+</html>

@@ -1,132 +1,139 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Бронювання квитків — RESONANCE</title>
-    
-    <link rel="stylesheet" href="style.css"> 
-    <link rel="stylesheet" href="mobile-style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Бронювання квитків — Театр «Резонанс»</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="mobile-style.css" />
+  <style>
+    /* Сітка «зал + кошик» у стилі сайту.
+       Класи container/hall/sidebar/row/seat/stage/#seatsGrid НЕ перейменовувати —
+       від них залежать JS бронювання та mobile-style.css. */
+    .container { display: flex; gap: 30px; max-width: var(--maxw); margin: 0 auto; align-items: flex-start; }
+    .hall { flex: 2; min-width: 0; }
+    .hall h2 { font-size: 20px; color: #fff; font-weight: 500; margin: 0 0 14px; }
 
-    <style>
-    /* Загальні налаштування */
-    body { font-family: 'Segoe UI', sans-serif; background: #070707; color: #fff; margin: 0; padding: 20px; }
-    
-    .header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 1px solid #d89a4a; padding-bottom: 10px; }
-    .header a { color: #d89a4a; text-decoration: none; font-weight: bold; text-transform: uppercase; }
-    
-    .container { display: flex; gap: 30px; max-width: 1200px; margin: auto; }
-    .hall { flex: 2; min-width: 0; } 
-    
-    .sidebar { 
-        flex: 1; 
-        min-width: 300px; 
-        background: #1a1a1a; 
-        padding: 25px; 
-        border-radius: 15px; 
-        border: 1px solid rgba(216, 154, 74, 0.3); 
-        height: fit-content; 
+    .sidebar {
+      flex: 1; min-width: 300px; padding: 26px; height: fit-content;
+      position: sticky; top: 20px;
+      background: rgba(255,255,255,.03); border: 1px solid var(--line);
+      border-radius: var(--r-lg); backdrop-filter: blur(12px);
+    }
+    .sidebar h3 { margin: 0 0 14px; color: #fff; font-weight: 500; }
+    .sidebar h2 { color: var(--gold); font-size: 22px; margin: 4px 0 18px; }
+
+    .stage {
+      text-align: center; color: var(--gold); letter-spacing: 10px;
+      padding-bottom: 10px; border-bottom: 2px solid var(--gold);
+      margin: 26px 0; font-size: 16px; width: 100%; text-transform: uppercase;
     }
 
-    .stage { 
-        text-align: center; 
-        color: #d89a4a; 
-        letter-spacing: 10px; 
-        padding-bottom: 10px; 
-        border-bottom: 2px solid #d89a4a; 
-        margin: 30px 0; 
-        font-size: 18px; 
-        width: 100%; 
+    #seatsGrid { display: flex; flex-direction: column; align-items: center; padding-bottom: 20px; }
+    .row { display: flex; gap: 6px; margin-bottom: 8px; align-items: center; }
+    .row span { width: 60px; font-size: 13px; color: var(--cream-dim); flex-shrink: 0; }
+
+    .seat {
+      width: 30px; height: 30px; background: #2a241c; border-radius: 6px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 11px;
+      border: 1px solid #4a4033; color: var(--cream-dim); transition: .18s; flex-shrink: 0;
+    }
+    .seat:hover:not(.occupied) { border-color: var(--gold); color: #fff; }
+    .seat.selected { background: var(--gold); color: #1a0f08; border-color: var(--gold-soft); }
+    .seat.occupied { background: #100d09; color: #3a332a; border-color: #221d16; cursor: not-allowed; }
+
+    select {
+      width: 100%; padding: 14px; border-radius: var(--r-sm); background: var(--ink-3);
+      color: #fff; border: 1px solid var(--line); margin-bottom: 12px; font-size: 15px;
     }
 
-    /* Стилі сітки залу */
-    #seatsGrid {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-bottom: 20px;
-    }
-
-    .row { 
-        display: flex; 
-        gap: 6px; 
-        margin-bottom: 8px; 
-        align-items: center; 
-    }
-
-    .row-label { 
-        width: 60px; 
-        font-size: 13px; 
-        color: #888; 
-        flex-shrink: 0; 
-    }
-
-    .seat { 
-        width: 30px; 
-        height: 30px; 
-        background: #333; 
-        border-radius: 6px; 
-        cursor: pointer; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        font-size: 11px; 
-        border: 1px solid #555; 
-        transition: 0.2s; 
-        flex-shrink: 0; 
-    }
-
-    .seat.selected { background: #d89a4a; color: #000; border-color: #fff; }
-    .seat.occupied { background: #111; color: #444; border-color: #222; cursor: not-allowed; }
-    
-    /* Проходи та порожнечі */
-    .aisle { width: 25px; flex-shrink: 0; }
-    .empty-space { visibility: hidden; width: 30px; flex-shrink: 0; }
-
-    /* Елементи керування */
-    button { background: #d89a4a; color: #000; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; padding: 15px; border-radius: 8px; width: 100%; }
-    button:disabled { background: #555; cursor: not-allowed; opacity: 0.5; }
-    select { width: 100%; padding: 15px; border-radius: 8px; background: #222; color: #fff; border: 1px solid #d89a4a; margin-bottom: 10px; }
-
-    /* АДАПТАЦІЯ ДЛЯ ТЕЛЕФОНІВ */
-    @media screen and (max-width: 768px) {
-        .container { flex-direction: column; }
-        .row-label { width: 45px; font-size: 11px; }
-        .seat { width: 24px; height: 24px; font-size: 9px; border-radius: 4px; }
-        .empty-space { width: 24px; }
-        .aisle { width: 10px; }
-        .row { gap: 3px; }
-        .sidebar { min-width: unset; }
-    }
-</style>
+    .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0 20px; font-size: 12px; color: var(--cream-dim); }
+    .legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; margin-right: 6px; vertical-align: -2px; }
+    .legend .free { background: #2a241c; border: 1px solid #4a4033; }
+    .legend .sel { background: var(--gold); }
+    .legend .occ { background: #100d09; border: 1px solid #221d16; }
+  </style>
 </head>
-<body>
-    <div class="header">
-        <a href="#">RESONANCE</a>
-        <a href="index.html">На головну</a>
-    </div>
+<body class="page-booking">
+
+  <div class="page-transition is-entering" id="pageTransition">
+    <div class="page-transition__curtain page-transition__curtain--left"></div>
+    <div class="page-transition__curtain page-transition__curtain--right"></div>
+  </div>
+
+  <header class="wrap topbar">
+    <a class="brand" href="index.html">Резо<span>нанс</span></a>
+    <nav class="nav">
+      <a href="index.html">Головна</a>
+      <a href="studio.html">Студія</a>
+      <a href="troupe.html">Трупа</a>
+      <a href="repertoire.html">Репертуар</a>
+      <a href="contacts.html">Контакти</a>
+      <a class="nav-cta" href="auth.html" id="accountBtn">Кабінет</a>
+    </nav>
+  </header>
+  <div class="wrap"><div class="topbar-divider"></div></div>
+
+  <main class="wrap section">
+    <span class="eyebrow">Бронювання</span>
+    <h1 class="page-title" style="margin-bottom: 28px;">Оберіть місце в залі</h1>
 
     <div class="container">
-        <div class="hall">
-    <h2>Оберіть виставу:</h2>
-    <select id="sessionSelect" onchange="loadSession()">
-        <option value="">— Оберіть виставу та дату —</option>
-    </select>
+      <div class="hall">
+        <h2>Оберіть виставу:</h2>
+        <select id="sessionSelect" onchange="loadSession()">
+          <option value="">— Оберіть виставу та дату —</option>
+        </select>
 
-    <div class="stage">СЦЕНА</div>
-    
-    <div style="width: 100%; overflow-x: auto;">
-        <div id="seatsGrid"></div>
-    </div>
-</div>
-
-        <div class="sidebar">
-            <h3>Ваше замовлення</h3>
-            <p style="color: #aaa;">Місця: <span id="selectedTags" style="color: #fff;">Не обрано</span></p>
-            <h2 style="color: #d89a4a;">Разом: <span id="totalAmount">0</span> грн</h2>
-            <button id="payBtn" disabled>Внести благодійний внесок</button>
+        <div class="legend">
+          <span><i class="free"></i>Вільно</span>
+          <span><i class="sel"></i>Обрано</span>
+          <span><i class="occ"></i>Зайнято</span>
         </div>
+
+        <div class="stage">Сцена</div>
+
+        <div style="width: 100%; overflow-x: auto;">
+          <div id="seatsGrid"></div>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <h3>Ваше замовлення</h3>
+        <p style="color: var(--cream-dim);">Місця: <span id="selectedTags" style="color:#fff;">Не обрано</span></p>
+        <h2>Разом: <span id="totalAmount">0</span> грн</h2>
+        <button id="payBtn" class="btn btn--primary btn--block" disabled>Внести благодійний внесок</button>
+      </div>
     </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <div class="site-footer__brand">
+        <a class="brand" href="index.html">Резо<span>нанс</span></a>
+        <p>Незалежний театр у Кропивницькому. Живі вистави, театральна студія та відкритий набір нових студійців.</p>
+      </div>
+      <div class="site-footer__col">
+        <h4>Навігація</h4>
+        <a href="index.html">Головна</a>
+        <a href="studio.html">Студія</a>
+        <a href="troupe.html">Трупа</a>
+        <a href="repertoire.html">Репертуар</a>
+        <a href="contacts.html">Контакти</a>
+      </div>
+      <div class="site-footer__col">
+        <h4>Контакти</h4>
+        <a href="tel:+380997436632">+38 (099) 743 66 32</a>
+        <span>вул. Шевченка, 1</span>
+        <span>Актова зала ЦДУ ім. В. Винниченка</span>
+        <a href="https://www.instagram.com/rezonans_theatre/" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <div class="wrap site-footer__bottom">
+      <small>© 2026 Театр «Резонанс» · Кропивницький</small>
+      <small>Вхід після третього дзвоника та зйомка під час вистави заборонені</small>
+    </div>
+  </footer>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyEUuctwPk1oMzByss1Ex-wYJ_ym2PrKwob9fb3wEe7HYJXKKQfakliWawx2CHJHwRc/exec";
@@ -322,5 +329,17 @@ document.getElementById('payBtn').onclick = async () => {
     }
 };
     </script>
+  <script>
+    (function () {
+      var btn = document.getElementById('accountBtn');
+      if (btn && localStorage.getItem('isLoggedIn') === 'true') {
+        var name = localStorage.getItem('userName');
+        btn.textContent = name ? ('Кабінет · ' + name) : 'Кабінет';
+        btn.setAttribute('href', 'profile.html');
+      }
+    })();
+  </script>
+  <script src="JS/main.js"></script>
+  <script src="JS/site.js"></script>
 </body>
 </html>
