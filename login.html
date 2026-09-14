@@ -1,39 +1,45 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title>Вхід в систему</title>
-    <style>
-        body { background: #070707; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { background: #1a1a1a; padding: 40px; border-radius: 15px; border: 1px solid #d89a4a; text-align: center; width: 300px; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; background: #222; border: 1px solid #444; color: #fff; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #d89a4a; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Вхід для адміністратора — Резонанс</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .login-shell { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .login-card { width: 100%; max-width: 340px; padding: 40px; text-align: center; }
+    .login-card h2 { color: var(--gold); letter-spacing: 6px; margin: 0 0 6px; font-weight: 600; }
+    .login-card p.sub { color: var(--cream-dim); font-size: 14px; margin: 0 0 24px; }
+    .login-card .field { margin-bottom: 14px; text-align: left; }
+    #error { color: #e57373; font-size: 13px; display: none; margin-top: 14px; }
+  </style>
 </head>
-<body>
-    <div class="login-card">
-        <h2 style="color: #d89a4a;">RESONANCE</h2>
-        <p>Вхід для адміністратора</p>
-        <input type="text" id="username" placeholder="Логін">
-        <input type="password" id="password" placeholder="Пароль">
-        <button onclick="tryLogin()">Увійти</button>
-        <p id="error" style="color: red; font-size: 12px; display: none;">Невірний логін або пароль!</p>
+<body class="page-login">
+  <div class="login-shell">
+    <div class="panel login-card">
+      <h2>Резонанс</h2>
+      <p class="sub">Вхід для адміністратора</p>
+      <input type="text" id="username" class="field" placeholder="Логін">
+      <input type="password" id="password" class="field" placeholder="Пароль">
+      <button onclick="tryLogin()" class="btn btn--primary btn--block">Увійти</button>
+      <p id="error">Невірний логін або пароль!</p>
     </div>
+  </div>
 
-    <script>
-        function tryLogin() {
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
+  <script>
+    function tryLogin() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
 
-            // ТУТ ЗАДАЄШ СВІЙ ПАРОЛЬ
-            if (user === "admin" && pass === "hsJ@K+9hcJ!xSse]m0q2v,rWd7cP+:") {
-                // Зберігаємо "ключ" у пам'ять браузера на 1 годину
-                localStorage.setItem('adminLoggedIn', 'true');
-                window.location.href = "admin.html"; // Перенаправлення на адмінку
-            } else {
-                document.getElementById('error').style.display = 'block';
-            }
-        }
-    </script>
+      // ТУТ ЗАДАЄШ СВІЙ ПАРОЛЬ
+      if (user === "admin" && pass === "hsJ@K+9hcJ!xSse]m0q2v,rWd7cP+:") {
+        // Зберігаємо "ключ" у пам'ять браузера
+        localStorage.setItem('adminLoggedIn', 'true');
+        window.location.href = "admin.html"; // Перенаправлення на адмінку
+      } else {
+        document.getElementById('error').style.display = 'block';
+      }
+    }
+  </script>
 </body>
 </html>

@@ -6,224 +6,34 @@
   <title>Афіша — Театр «Резонанс»</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="css/styles.css" />
-  
   <style>
-    /* ОСНОВНИЙ ФОН ТА СКИДАННЯ */
-    * { box-sizing: border-box; }
-    
-    body, html {
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-    }
-
-    .afisha-page {
-      background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.95)), 
-                  url('img/theatre-bg.jpg') center/cover no-repeat fixed;
-      min-height: 100dvh;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      color: #f6e6cf;
-      font-family: 'Segoe UI', Roboto, sans-serif;
-    }
-
-    .afisha-container {
-      max-width: 700px; /* Оптимальна ширина для вертикальних постерів */
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    /* ХЕДЕР ТА НАВІГАЦІЯ */
-    .afisha-header {
-      display: flex;
+    .poster-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 40px;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 25px;
-      gap: 15px;
+      margin-top: 10px;
     }
-
-    .afisha-header h1 {
-      font-size: clamp(20px, 5vw, 26px);
-      margin: 0;
-      letter-spacing: 4px;
-      font-weight: 300;
-      text-transform: uppercase;
-    }
-
-    /* Оновлені стилі для кнопок навігації */
-.nav-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.nav-link {
-  background: rgb(216, 154, 74);
-  border: 1px solid rgb(216, 154, 74);
-  color: #000000 !important; /* Золотистий колір */
-  padding: 8px 16px;
-  border-radius: 50px;
-  font-size: 12px;
-  text-decoration: none;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: all 0.3s ease;
-}
-
-.nav-link:hover {
-  background: #d89a4a;
-  color: #000000 !important;
-  box-shadow: 0 0 15px rgba(216, 154, 74, 0.3);
-}
-
-/* Стиль для головної кнопки "Купити квиток" */
-.buy-ticket-btn {
-  background: #d89a4a;
-  color: #1a0f08 !important;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: bold;
-  text-decoration: none;
-  text-transform: uppercase;
-  font-size: 14px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  display: inline-block;
-}
-
-.buy-ticket-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(216, 154, 74, 0.4);
-}
-
-    .back-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(216, 154, 74, 0.4);
-      color: #d89a4a;
-      padding: 7px 14px;
-      border-radius: 50px;
-      font-size: 11px;
-      text-decoration: none;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      white-space: nowrap;
-    }
-
-    .back-btn:hover {
-      background: #d89a4a;
-      color: #1a0f08;
-    }
-
-    /* ПОСТЕР: ВИПРАВЛЕНО МАШТАБУВАННЯ */
-    .main-poster {
-      width: 100%;
-      max-height: 65vh; /* Постер займає не більше 65% висоти екрану */
-      border-radius: 15px;
+    .poster {
+      border-radius: var(--r-lg);
       overflow: hidden;
-      margin-bottom: 25px;
-      border: 1px solid rgba(216, 154, 74, 0.2);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      background: rgba(0,0,0,.4);
+      display: flex; justify-content: center; align-items: center;
     }
+    .poster img { width: 100%; height: auto; max-height: 72vh; object-fit: contain; }
 
-    .main-poster img {
-      width: auto;
-      height: auto;
-      max-width: 100%;
-      max-height: 65vh;
-      object-fit: contain; /* Картинка вписується в межі без обрізки */
-      display: block;
-    }
-
-    /* ІНФОРМАЦІЙНА ПАНЕЛЬ: ЧИТАБЕЛЬНІСТЬ */
-    .play-details {
-      background: rgba(20, 16, 12, 0.85); 
-      padding: 30px 20px;
-      border-radius: 20px;
-      border: 1px solid rgba(216, 154, 74, 0.15);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-
-    .badge-premium {
-      background: #d89a4a;
-      color: #1a0f08;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      padding: 5px 15px;
-      border-radius: 4px;
-      text-transform: uppercase;
-      display: inline-block;
-      margin-bottom: 15px;
-    }
-
-    .play-genre {
-      font-size: 14px;
-      color: #d89a4a;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-      opacity: 0.9;
-    }
-
-    .play-title {
-      font-size: clamp(22px, 6vw, 34px);
-      line-height: 1.2;
-      font-weight: 500;
-      margin: 0 0 20px 0;
-      color: #ffffff;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-    }
-
-    .play-meta-info {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      font-size: 15px;
-      color: #f6e6cf;
-      flex-wrap: wrap;
-    }
-
+    .play-details { padding: 8px 4px; }
+    .play-title { font-size: clamp(26px, 5vw, 40px); font-weight: 400; color: #fff; margin: 12px 0 22px; line-height: 1.2; }
+    .meta-list { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 28px; }
     .meta-item {
-      background: rgba(0, 0, 0, 0.4);
-      padding: 8px 14px;
-      border-radius: 10px;
-      border: 1px solid rgba(216, 154, 74, 0.1);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      background: rgba(0,0,0,.35); border: 1px solid var(--line);
+      padding: 10px 16px; border-radius: var(--r-md); font-size: 15px; color: var(--cream);
     }
-
-    .footer-note {
-      text-align: center;
-      margin-top: 30px;
-      font-size: 13px;
-      color: #d9c3a3;
-      opacity: 0.5;
-      line-height: 1.5;
-    }
-
-    /* АДАПТИВНІСТЬ ДЛЯ МОБІЛЬНИХ */
-    @media (max-width: 480px) {
-      .afisha-header {
-        flex-direction: column;
-        text-align: center;
-      }
-      .main-poster {
-        max-height: 50vh;
-      }
-      .main-poster img {
-        max-height: 50vh;
-      }
-      .play-details {
-        padding: 25px 15px;
-      }
+    @media (max-width: 820px) {
+      .poster-grid { grid-template-columns: 1fr; gap: 26px; }
+      .poster img { max-height: 60vh; }
     }
   </style>
 </head>
@@ -234,39 +44,86 @@
     <div class="page-transition__curtain page-transition__curtain--right"></div>
   </div>
 
-  <main class="afisha-container">
-    
-    <header class="afisha-header">
-      <h1>АФІША</h1>
-      <header class="afisha-header">
-  
-  
-    <a href="index.html" class="nav-link">← Головна</a>
-    <a href="repertoire.html" class="nav-link">Репертуар</a>
-  
-</header>
-    </header>
+  <header class="wrap topbar">
+    <a class="brand" href="index.html">Резо<span>нанс</span></a>
+    <nav class="nav">
+      <a href="index.html">Головна</a>
+      <a href="studio.html">Студія</a>
+      <a href="troupe.html">Трупа</a>
+      <a href="repertoire.html">Репертуар</a>
+      <a href="contacts.html">Контакти</a>
+      <a class="nav-cta" href="auth.html" id="accountBtn">Кабінет</a>
+    </nav>
+  </header>
+  <div class="wrap"><div class="topbar-divider"></div></div>
 
-    <div class="main-poster">
-      <img src="css/a_pcix.jpg" alt="Постер вистави">
+  <main class="wrap section">
+    <span class="eyebrow">Найближча прем'єра</span>
+
+    <div class="poster-grid">
+      <div class="poster">
+        <img src="img/a_pcix.jpg" alt="Постер вистави «Цікавий випадок у психологічній практиці»">
+      </div>
+
+      <div class="play-details">
+        <span class="eyebrow" style="color: var(--cream-dim);">Психологічна комедія</span>
+        <h1 class="play-title">Цікавий випадок у психологічній практиці</h1>
+
+        <div class="meta-list">
+          <span class="meta-item">📅 20 травня 2026</span>
+          <span class="meta-item">🕕 18:00</span>
+          <span class="meta-item">📍 ЦДУ ім. В. Винниченка</span>
+        </div>
+
+        <p class="lead">Легка іронічна історія про те, як в кабінеті психолога межа між лікарем і пацієнтом стирається — і кожен випадок стає трохи про кожного з нас.</p>
+
+        <div class="hero-actions" style="display:flex; gap:12px; flex-wrap:wrap; margin-top:26px;">
+          <a href="index.html#casting" class="btn btn--primary">Записатися на кастинг</a>
+          <a href="repertoire.html" class="btn btn--ghost">Весь репертуар</a>
+        </div>
+      </div>
     </div>
-
-    <section class="play-details">
-      <div class="badge-premium">Найближча прем'єра</div>
-      
-      <div class="play-genre">Психологічна комедія</div>
-      <h2 class="play-title">Цікавий випадок у психологічній практиці</h2>
-      
-      
-    </section>
-
-    <footer class="footer-note">
-      <br>
-      Слідкуйте за анонсами в наших соцмережах.
-    </footer>
-
   </main>
 
-  <script src="js/main.js"></script>
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <div class="site-footer__brand">
+        <a class="brand" href="index.html">Резо<span>нанс</span></a>
+        <p>Незалежний театр у Кропивницькому. Живі вистави, театральна студія та відкритий набір нових студійців.</p>
+      </div>
+      <div class="site-footer__col">
+        <h4>Навігація</h4>
+        <a href="index.html">Головна</a>
+        <a href="studio.html">Студія</a>
+        <a href="troupe.html">Трупа</a>
+        <a href="repertoire.html">Репертуар</a>
+        <a href="contacts.html">Контакти</a>
+      </div>
+      <div class="site-footer__col">
+        <h4>Контакти</h4>
+        <a href="tel:+380997436632">+38 (099) 743 66 32</a>
+        <span>вул. Шевченка, 1</span>
+        <span>Актова зала ЦДУ ім. В. Винниченка</span>
+        <a href="https://www.instagram.com/rezonans_theatre/" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <div class="wrap site-footer__bottom">
+      <small>© 2026 Театр «Резонанс» · Кропивницький</small>
+      <small>Вхід після третього дзвоника та зйомка під час вистави заборонені</small>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var btn = document.getElementById('accountBtn');
+      if (btn && localStorage.getItem('isLoggedIn') === 'true') {
+        var name = localStorage.getItem('userName');
+        btn.textContent = name ? ('Кабінет · ' + name) : 'Кабінет';
+        btn.setAttribute('href', 'profile.html');
+      }
+    })();
+  </script>
+  <script src="JS/main.js"></script>
+  <script src="JS/site.js"></script>
 </body>
 </html>

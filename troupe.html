@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Склад театру — Театр «Резонанс»</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Стилі трупи тримаємо тут, у самій сторінці, щоб рендерилось надійно */
+    .troupe-intro { margin-bottom: 34px; }
+
+    .group-title {
+      font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--gold); margin: 44px 0 20px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .troupe-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 24px;
+    }
+    .troupe-card { text-align: center; }
+    .troupe-photo {
+      aspect-ratio: 3 / 4;
+      border-radius: var(--r-md);
+      background: var(--ink-3) center/cover no-repeat;
+      border: 1px solid var(--line);
+      display: grid; place-items: center;
+      margin-bottom: 14px;
+      color: #5a5148; letter-spacing: 3px; font-size: 12px; text-transform: uppercase;
+      transition: border-color .3s, transform .3s;
+    }
+    .troupe-card:hover .troupe-photo { border-color: var(--gold); transform: translateY(-4px); }
+    .troupe-card h3 { color: #fff; font-size: 17px; font-weight: 500; margin: 0 0 4px; }
+    .troupe-card .role { color: var(--cream-dim); font-size: 13px; margin: 0; }
+
+    @media (max-width: 520px) {
+      .troupe-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; }
+    }
+  </style>
+</head>
+<body class="page-troupe">
+
+  <div class="page-transition is-entering" id="pageTransition">
+    <div class="page-transition__curtain page-transition__curtain--left"></div>
+    <div class="page-transition__curtain page-transition__curtain--right"></div>
+  </div>
+
+  <header class="wrap topbar">
+    <a class="brand" href="index.html">Резо<span>нанс</span></a>
+    <nav class="nav">
+      <a href="index.html">Головна</a>
+      <a href="studio.html">Студія</a>
+      <a href="troupe.html" aria-current="page">Трупа</a>
+      <a href="repertoire.html">Репертуар</a>
+      <a href="contacts.html">Контакти</a>
+      <a class="nav-cta" href="auth.html" id="accountBtn">Кабінет</a>
+    </nav>
+  </header>
+  <div class="wrap"><div class="topbar-divider"></div></div>
+
+  <main class="wrap section">
+    <span class="eyebrow">Наша команда</span>
+    <h1 class="page-title" style="margin-bottom: 18px;">Склад театру</h1>
+    <p class="lead troupe-intro">Актори та студійці, які зараз виходять на сцену «Резонансу».</p>
+
+    <!--
+      ЯК ЗАПОВНИТИ:
+      1) Заміни «Ім'я Прізвище» та роль на свої.
+      2) Для фото додай стиль до .troupe-photo та прибери слово «Фото», напр.:
+         <div class="troupe-photo" style="background-image:url('img/actor1.jpg')"></div>
+      3) Копіюй/видаляй блок <article class="troupe-card">…</article> скільки треба.
+      4) Групи (керівництво / актори / студійці) — за бажанням, просто зміни .group-title.
+    -->
+
+    <!-- ГРУПА 1 -->
+    <h2 class="group-title">Художнє керівництво</h2>
+    <div class="troupe-grid">
+      <article class="troupe-card">
+        <div class="troupe-photo">Фото</div>
+        <h3>Ім'я Прізвище</h3>
+        <p class="role">Художній керівник</p>
+      </article>
+      <article class="troupe-card">
+        <div class="troupe-photo">Фото</div>
+        <h3>Ім'я Прізвище</h3>
+        <p class="role">Режисер</p>
+      </article>
+    </div>
+
+    <!-- ГРУПА 2 -->
+    <h2 class="group-title">Актори та студійці</h2>
+    <div class="troupe-grid">
+      <article class="troupe-card">
+        <div class="troupe-photo">Фото</div>
+        <h3>Ім'я Прізвище</h3>
+        <p class="role">Актор</p>
+      </article>
+      <article class="troupe-card">
+        <div class="troupe-photo">Фото</div>
+        <h3>Ім'я Прізвище</h3>
+        <p class="role">Акторка</p>
+      </article>
+      <article class="troupe-card">
+        <div class="troupe-photo">Фото</div>
+        <h3>Ім'я Прізвище</h3>
+        <p class="role">Актор</p>
+      </article>
+      <article class="troupe-card">
+        <div class="troupe-photo">Фото</div>
+        <h3>Ім'я Прізвище</h3>
+        <p class="role">Акторка</p>
+      </article>
+      <article class="troupe-card">
+        <div class="troupe-photo">Фото</div>
+        <h3>Ім'я Прізвище</h3>
+        <p class="role">Студієць</p>
+      </article>
+      <article class="troupe-card">
+        <div class="troupe-photo">Фото</div>
+        <h3>Ім'я Прізвище</h3>
+        <p class="role">Студійка</p>
+      </article>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <div class="site-footer__brand">
+        <a class="brand" href="index.html">Резо<span>нанс</span></a>
+        <p>Незалежний театр у Кропивницькому. Живі вистави, театральна студія та відкритий набір нових студійців.</p>
+      </div>
+      <div class="site-footer__col">
+        <h4>Навігація</h4>
+        <a href="index.html">Головна</a>
+        <a href="studio.html">Студія</a>
+        <a href="troupe.html">Трупа</a>
+        <a href="repertoire.html">Репертуар</a>
+        <a href="contacts.html">Контакти</a>
+      </div>
+      <div class="site-footer__col">
+        <h4>Контакти</h4>
+        <a href="tel:+380997436632">+38 (099) 743 66 32</a>
+        <span>вул. Шевченка, 1</span>
+        <span>Актова зала ЦДУ ім. В. Винниченка</span>
+        <a href="https://www.instagram.com/rezonans_theatre/" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <div class="wrap site-footer__bottom">
+      <small>© 2026 Театр «Резонанс» · Кропивницький</small>
+      <small>Вхід після третього дзвоника та зйомка під час вистави заборонені</small>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var btn = document.getElementById('accountBtn');
+      if (btn && localStorage.getItem('isLoggedIn') === 'true') {
+        var name = localStorage.getItem('userName');
+        btn.textContent = name ? ('Кабінет · ' + name) : 'Кабінет';
+        btn.setAttribute('href', 'profile.html');
+      }
+    })();
+  </script>
+  <script src="JS/main.js"></script>
+  <script src="JS/site.js"></script>
+</body>
+</html>
